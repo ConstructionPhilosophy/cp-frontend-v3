@@ -1,17 +1,24 @@
 export interface User {
   id: string;
+  username: string;
   name: string;
-  email: string;
+  email?: string;
   avatar?: string;
   title?: string;
   company?: string;
+  bio?: string;
   description?: string;
-  points: number;
-  answersCount: number;
-  questionsCount: number;
+  points?: number;
+  answersCount?: number;
+  questionsCount?: number;
+  posts?: number;
+  views?: number;
+  thanks?: number;
+  insightful?: number;
   level?: string;
   badges?: string[];
   verified?: boolean;
+  createdAt?: Date;
 }
 
 export interface Question {
@@ -21,12 +28,13 @@ export interface Question {
   authorId: string;
   author: User;
   createdAt: Date;
-  updatedAt: Date;
-  tags: string[];
+  updatedAt?: Date;
+  tags?: string[];
+  category?: string;
   space?: string;
-  upvotes: number;
-  downvotes: number;
-  answersCount: number;
+  upvotes?: number;
+  downvotes?: number;
+  answersCount?: number;
   isHelpful?: boolean;
   priority?: 'low' | 'medium' | 'high';
 }
@@ -49,8 +57,9 @@ export interface Space {
   id: string;
   name: string;
   description?: string;
-  memberCount: number;
-  questionsCount: number;
+  memberCount?: number;
+  questionsCount?: number;
+  hashtag?: string;
   color?: string;
   icon?: string;
 }
@@ -62,5 +71,6 @@ export interface Vendor {
   logo?: string;
   website?: string;
   category: string;
+  location?: string;
   verified?: boolean;
 }
