@@ -10,12 +10,14 @@ import { ForgotPasswordPage } from "./pages/forgot-password";
 import { CheckEmailResetPage } from "./pages/check-email-reset";
 import { ResetPasswordPage } from "./pages/reset-password";
 import { PasswordResetSuccessPage } from "./pages/password-reset-success";
+import { SecurityDashboard } from "./pages/security-dashboard-simple";
 
 function App() {
   return (
     <Router>
       <Route path="/" component={HomePage} />
       <Route path="/profile" component={ProfilePage} />
+      <Route path="/security" component={() => <SecurityDashboard />} />
       <Route path="/login" component={() => <LoginPage />} />
       <Route path="/signup" component={() => <SignupPage />} />
       <Route path="/check-email" component={() => <CheckEmailPage />} />

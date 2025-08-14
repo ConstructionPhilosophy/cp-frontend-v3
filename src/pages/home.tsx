@@ -7,6 +7,8 @@ import AnswerCard from "../components/answer-card";
 import MobileNavigation from "../components/mobile-navigation";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { Link } from "wouter";
+import { Shield } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import { mockQuestions, mockUsers } from "../lib/mock-data";
 import { useIsMobile } from "../hooks/use-mobile";
@@ -30,6 +32,28 @@ export default function Home() {
 
           {/* Main Content Area */}
           <div className="lg:col-span-6">
+            {/* Security Dashboard Link */}
+            <div className="mb-6">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-blue-600 rounded-lg p-2">
+                      <Shield className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">AI Security Recommendations</h3>
+                      <p className="text-sm text-gray-600">Get personalized security insights for your company</p>
+                    </div>
+                  </div>
+                  <Link href="/security">
+                    <Button variant="outline" size="sm">
+                      View Dashboard
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
             {/* Mobile Category Filters */}
             {isMobile && (
               <div className="lg:hidden mb-6">
