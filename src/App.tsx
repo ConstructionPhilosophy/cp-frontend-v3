@@ -1,15 +1,14 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./pages/home";
-import NotFound from "./pages/not-found";
+import { Route, Router } from "wouter";
+import HomePage from "./pages/home";
+import ProfilePage from "./pages/profile";
+import NotFoundPage from "./pages/not-found";
 
 function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Route path="/" component={HomePage} />
+      <Route path="/profile" component={ProfilePage} />
+      <Route component={NotFoundPage} />
     </Router>
   );
 }
