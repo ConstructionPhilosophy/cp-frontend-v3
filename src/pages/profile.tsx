@@ -4,20 +4,36 @@ import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
 import { Separator } from '../components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Textarea } from '../components/ui/textarea';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../components/ui/dropdown-menu';
+import Header from '../components/layout/header';
 import { 
   MapPin, 
   Mail, 
   Phone, 
-  Calendar, 
+  Globe, 
+  Building, 
   Users, 
-  MessageCircle, 
-  FileText,
-  ExternalLink,
-  CheckCircle,
-  Building,
+  MessageSquare, 
+  ThumbsUp, 
+  Star, 
+  Plus, 
+  MoreHorizontal,
+  Filter,
+  ChevronDown,
+  Bookmark,
+  Share,
+  Edit,
+  Flag,
+  Send,
+  Calendar,
   GraduationCap,
-  Briefcase,
-  Globe
+  Briefcase
 } from 'lucide-react';
 
 // Mock data based on API structure
@@ -107,7 +123,7 @@ const mockActivities = [
     content: "We have a $2M ARR B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith... See more",
     timestamp: "Nov 19",
     category: "Questions & Answers",
-    engagement: { answers: 1, thanks: 5, insightful: 2 }
+    engagement: { comments: 1, thanks: 5, insightful: 2 }
   },
   {
     id: "2",
@@ -116,174 +132,169 @@ const mockActivities = [
     content: "We are looking for a landing page tool that they are missing a minimal with a custom solution that no... See more",
     timestamp: "Nov 12",
     category: "#Inbound #SaaS",
-    engagement: { answers: 1, thanks: 15, insightful: 6 }
-  },
-  {
-    id: "3",
-    type: "post",
-    title: "Why Your Company Needs a CRM to Grow Better?",
-    content: "CRMs are powerful tools that help you expedite business growth while eliminating friction, improving cross-team collaboration, managing your contact records, syncing... See more",
-    timestamp: "Nov 11",
-    category: "Questions & #CRM #Growth",
-    engagement: { answers: 1, thanks: 21, insightful: 12 }
+    engagement: { comments: 1, thanks: 15, insightful: 6 }
   }
 ];
 
-const activityFilters = ["All", "Questions & Answers", "Updates & Insights", "Articles & News"];
-
 export default function ProfilePage() {
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [showFullAbout, setShowFullAbout] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
+  const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+  const filters = ['All', 'News', 'Posts', 'Articles', 'Videos', 'Jobs'];
+
+  const toggleComments = (postId: string) => {
+    setExpandedComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
   };
 
-  const getInitials = (firstName: string, lastName: string) => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+  const handleCommentChange = (postId: string, text: string) => {
+    setCommentText(prev => ({
+      ...prev,
+      [postId]: text
+    }));
+  };
+
+  const handleSubmitComment = (postId: string) => {
+    console.log(`Comment for post ${postId}:`, commentText[postId]);
+    setCommentText(prev => ({
+      ...prev,
+      [postId]: ''
+    }));
   };
 
   return (
-    <div className="min-h-screen bg-cmo-bg-main">
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Profile Info */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Main Profile Card */}
-            <Card className="overflow-hidden">
-              {/* Banner */}
+    <div className="min-h-screen bg-cmo-bg">
+      <Header />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            {/* Banner and Profile Section */}
+            <Card className="mb-6 overflow-hidden">
               <div 
-                className="h-48 bg-cover bg-center relative"
-                style={{ 
+                className="h-48 bg-gradient-to-r from-blue-500 to-purple-600"
+                style={{
                   backgroundImage: `url(${mockProfileData.bannerUrl})`,
-                  backgroundSize: 'cover'
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
                 }}
-              >
-                <div className="absolute inset-0 bg-black bg-opacity-20" />
-              </div>
+              />
               
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row items-start gap-4 -mt-16 relative z-10">
-                  <Avatar className="w-32 h-32 border-4 border-white shadow-lg">
-                    <AvatarImage src={mockProfileData.photoUrl} alt={`${mockProfileData.firstName} ${mockProfileData.lastName}`} />
+              <CardContent className="relative p-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                  {/* Avatar */}
+                  <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
+                    <AvatarImage src={mockProfileData.photoUrl} />
                     <AvatarFallback className="text-2xl">
-                      {getInitials(mockProfileData.firstName, mockProfileData.lastName)}
+                      {mockProfileData.firstName.charAt(0)}{mockProfileData.lastName.charAt(0)}
                     </AvatarFallback>
                   </Avatar>
                   
-                  <div className="flex-1 mt-16 sm:mt-0">
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+                  {/* Profile Info - Better Aligned */}
+                  <div className="flex-1 sm:-mt-16">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <h1 className="text-2xl font-bold text-cmo-text-primary">
-                            {mockProfileData.firstName} {mockProfileData.lastName}
-                          </h1>
-                          {mockProfileData.emailVerified && (
-                            <CheckCircle className="w-5 h-5 text-blue-500" />
-                          )}
-                        </div>
-                        <p className="text-cmo-text-secondary font-medium mt-1">
+                        <h1 className="text-3xl font-bold text-cmo-text-primary">
+                          {mockProfileData.firstName} {mockProfileData.lastName}
+                        </h1>
+                        <p className="text-lg text-cmo-text-secondary mb-2">
                           {mockProfileData.title}
                         </p>
+                        <div className="flex items-center gap-4 text-sm text-cmo-text-secondary">
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-4 h-4" />
+                            {mockProfileData.city}, {mockProfileData.state}
+                          </span>
+                          {/* Followers/Following Count */}
+                          <span className="flex items-center gap-1">
+                            <Users className="w-4 h-4" />
+                            {mockProfileData.followersCount} followers
+                          </span>
+                          <span>
+                            {mockProfileData.followingCount} following
+                          </span>
+                        </div>
                       </div>
                       
-                      <div className="flex gap-2">
-                        <Button className="bg-cmo-primary hover:bg-blue-600 text-white">
+                      {/* Action Buttons */}
+                      <div className="flex items-center gap-3">
+                        <Button variant="outline" size="sm">
+                          <MessageSquare className="w-4 h-4 mr-2" />
                           Message
                         </Button>
-                        <Button variant="outline" className="border-cmo-primary text-cmo-primary hover:bg-blue-50">
-                          +Follow
+                        <Button className="bg-cmo-primary hover:bg-cmo-primary/90">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Follow
                         </Button>
-                        <Button variant="outline" size="icon">
-                          <span className="text-lg">⋯</span>
-                        </Button>
+                        
+                        {/* Three Dots Menu with Icons */}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon">
+                              <MoreHorizontal className="w-4 h-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Edit className="mr-2 h-4 w-4" />
+                              <span>Edit Profile</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Flag className="mr-2 h-4 w-4" />
+                              <span>Report</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Share className="mr-2 h-4 w-4" />
+                              <span>Share</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* About Section */}
-            <Card>
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-cmo-text-primary mb-4">About</h2>
-                <div className="space-y-4">
-                  <p className="text-cmo-text-secondary leading-relaxed">
-                    {showFullAbout ? mockProfileData.about : mockProfileData.about.substring(0, 200) + "..."}
-                    <button 
-                      onClick={() => setShowFullAbout(!showFullAbout)}
-                      className="text-cmo-primary ml-2 font-medium hover:underline"
-                    >
-                      {showFullAbout ? "See less" : "See more"}
-                    </button>
-                  </p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <div>
-                      <h3 className="font-semibold text-cmo-text-primary mb-2">Marketing expertise</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {mockProfileData.skills.map((skill, index) => (
-                          <Badge key={index} variant="secondary" className="text-cmo-primary bg-blue-50">
-                            #{skill}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="mt-3">
-                        <p className="text-sm text-cmo-text-secondary">Open to networking</p>
-                        <p className="text-sm font-medium text-cmo-text-primary">Yes</p>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h3 className="font-semibold text-cmo-text-primary mb-2">Marketing interests</h3>
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant="secondary" className="text-cmo-primary bg-blue-50">
-                          #event-marketing
-                        </Badge>
-                        <Badge variant="secondary" className="text-cmo-primary bg-blue-50">
-                          #performance-marketing
-                        </Badge>
-                        <Badge variant="secondary" className="text-cmo-primary bg-blue-50">
-                          #account-based-marketing
-                        </Badge>
-                      </div>
-                      <div className="mt-3">
-                        <p className="text-sm text-cmo-text-secondary">Open to advising</p>
-                        <p className="text-sm font-medium text-cmo-text-primary">Yes</p>
-                      </div>
-                    </div>
+                {/* About Section */}
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-3">About</h3>
+                  <p className="text-cmo-text-secondary leading-relaxed">{mockProfileData.about}</p>
+                </div>
+
+                {/* Contact Information */}
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-cmo-primary" />
+                    <span>{mockProfileData.email}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-cmo-primary" />
+                    <span>{mockProfileData.phoneNumber}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Education Section */}
-            <Card>
+            <Card className="mb-6">
               <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <GraduationCap className="w-5 h-5 text-cmo-text-secondary" />
-                  <h2 className="text-lg font-semibold text-cmo-text-primary">Education</h2>
-                </div>
+                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                  Education
+                </h3>
                 <div className="space-y-4">
                   {mockEducation.map((edu) => (
-                    <div key={edu.id} className="flex gap-4 p-4 border border-cmo-border rounded-lg">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <GraduationCap className="w-5 h-5 text-cmo-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-cmo-text-primary">
-                          {edu.degree} in {edu.fieldOfStudy}
-                        </h3>
-                        <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
-                        <p className="text-sm text-cmo-text-secondary">
-                          {formatDate(edu.startDate)} - {formatDate(edu.endDate)}
-                        </p>
-                        {edu.grade && (
-                          <p className="text-sm text-cmo-text-secondary">Grade: {edu.grade}</p>
-                        )}
-                      </div>
+                    <div key={edu.id} className="border-l-4 border-cmo-primary pl-4">
+                      <h4 className="font-semibold text-lg">{edu.degree}</h4>
+                      <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
+                      <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
+                      <p className="text-sm text-cmo-text-secondary mt-1">
+                        {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
+                        {edu.grade && ` • ${edu.grade}`}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -291,43 +302,47 @@ export default function ProfilePage() {
             </Card>
 
             {/* Experience Section */}
-            <Card>
+            <Card className="mb-6">
               <CardContent className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Briefcase className="w-5 h-5 text-cmo-text-secondary" />
-                  <h2 className="text-lg font-semibold text-cmo-text-primary">Experience</h2>
-                </div>
-                <div className="space-y-4">
+                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                  <Briefcase className="w-6 h-6 text-cmo-primary" />
+                  Experience
+                </h3>
+                <div className="space-y-6">
                   {mockExperience.map((exp) => (
-                    <div key={exp.id} className="flex gap-4 p-4 border border-cmo-border rounded-lg">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Building className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-cmo-text-primary">{exp.role}</h3>
-                        <p className="text-cmo-text-secondary">{exp.company}</p>
-                        <div className="flex items-center gap-2 text-sm text-cmo-text-secondary">
-                          <MapPin className="w-4 h-4" />
-                          <span>{exp.location}</span>
-                        </div>
-                        <p className="text-sm text-cmo-text-secondary">
-                          {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Present"}
-                        </p>
-                        {exp.description && (
-                          <p className="text-sm text-cmo-text-secondary mt-2">{exp.description}</p>
-                        )}
-                      </div>
+                    <div key={exp.id} className="border-l-4 border-cmo-primary pl-4">
+                      <h4 className="font-semibold text-lg">{exp.role}</h4>
+                      <p className="text-cmo-primary font-medium">{exp.company}</p>
+                      <p className="text-cmo-text-secondary flex items-center gap-1">
+                        <MapPin className="w-4 h-4" />
+                        {exp.location}
+                      </p>
+                      <p className="text-sm text-cmo-text-secondary mt-1">
+                        {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
+                      </p>
+                      <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
 
-            {/* Activity Tabs and Content */}
+            {/* User Activities */}
             <Card>
               <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold">Activities</h3>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm">
+                      <Filter className="w-4 h-4 mr-2" />
+                      Filter
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Activity Filters */}
                 <div className="flex flex-wrap gap-2 mb-6">
-                  {activityFilters.map((filter) => (
+                  {filters.map((filter) => (
                     <Button
                       key={filter}
                       variant={activeFilter === filter ? "default" : "outline"}
@@ -340,41 +355,121 @@ export default function ProfilePage() {
                   ))}
                 </div>
 
-                <div className="space-y-4">
+                {/* Activity Feed */}
+                <div className="space-y-6">
                   {mockActivities.map((activity) => (
-                    <div key={activity.id} className="border border-cmo-border rounded-lg p-4">
-                      <div className="flex items-start gap-3">
-                        <Avatar className="w-8 h-8">
+                    <div key={activity.id} className="border-b border-cmo-border pb-6 last:border-b-0">
+                      <div className="flex gap-3">
+                        <Avatar className="w-12 h-12">
                           <AvatarImage src={mockProfileData.photoUrl} />
-                          <AvatarFallback className="text-xs">
-                            {getInitials(mockProfileData.firstName, mockProfileData.lastName)}
+                          <AvatarFallback>
+                            {mockProfileData.firstName.charAt(0)}{mockProfileData.lastName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-cmo-text-primary text-sm">
-                              {mockProfileData.firstName} {mockProfileData.lastName}
-                            </span>
-                            <span className="text-cmo-text-secondary text-xs">• {activity.timestamp}</span>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="font-medium text-cmo-text-primary">{activity.title}</h4>
+                              <div className="flex items-center gap-2 text-sm text-cmo-text-secondary mt-1">
+                                <span>{mockProfileData.firstName} {mockProfileData.lastName}</span>
+                                <span>•</span>
+                                <span>{activity.timestamp}</span>
+                                <Badge variant="secondary" className="text-xs">
+                                  {activity.category}
+                                </Badge>
+                              </div>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Edit className="mr-2 h-4 w-4" />
+                                  <span>Edit</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Flag className="mr-2 h-4 w-4" />
+                                  <span>Report</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Share className="mr-2 h-4 w-4" />
+                                  <span>Share</span>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           </div>
-                          <p className="text-xs text-cmo-text-secondary mb-2">{activity.category}</p>
-                          <h3 className="font-semibold text-cmo-text-primary mb-2">{activity.title}</h3>
-                          <p className="text-cmo-text-secondary text-sm mb-3">{activity.content}</p>
+                          <p className="text-cmo-text-secondary mt-3">{activity.content}</p>
                           
-                          <div className="flex items-center gap-4 text-sm text-cmo-text-secondary">
-                            <button className="flex items-center gap-1 hover:text-cmo-primary">
-                              <MessageCircle className="w-4 h-4" />
-                              <span>Answer</span>
-                            </button>
-                            <span className="flex items-center gap-1">
-                              <span>👍</span>
-                              <span>Thanks ({activity.engagement.thanks})</span>
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <span>💡</span>
-                              <span>Insightful ({activity.engagement.insightful})</span>
-                            </span>
+                          {/* Engagement Actions - Updated with Share button */}
+                          <div className="flex items-center gap-6 mt-4">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => toggleComments(activity.id)}
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                            >
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              Comment ({activity.engagement.comments})
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                              <ThumbsUp className="w-4 h-4 mr-1" />
+                              Thanks ({activity.engagement.thanks})
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                              <Star className="w-4 h-4 mr-1" />
+                              Insightful ({activity.engagement.insightful})
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                              <Share className="w-4 h-4 mr-1" />
+                              Share
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                              <Bookmark className="w-4 h-4" />
+                            </Button>
                           </div>
+
+                          {/* Expandable Comment Section */}
+                          {expandedComments[activity.id] && (
+                            <div className="mt-4 pl-4 border-l-2 border-cmo-border">
+                              <div className="flex gap-3">
+                                <Avatar className="w-8 h-8">
+                                  <AvatarImage src={mockProfileData.photoUrl} />
+                                  <AvatarFallback className="text-xs">
+                                    {mockProfileData.firstName.charAt(0)}{mockProfileData.lastName.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                  <Textarea
+                                    placeholder="Write a comment..."
+                                    value={commentText[activity.id] || ''}
+                                    onChange={(e) => handleCommentChange(activity.id, e.target.value)}
+                                    className="min-h-[80px] mb-2"
+                                  />
+                                  <div className="flex justify-end gap-2">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      onClick={() => toggleComments(activity.id)}
+                                    >
+                                      Cancel
+                                    </Button>
+                                    <Button 
+                                      size="sm" 
+                                      onClick={() => handleSubmitComment(activity.id)}
+                                      disabled={!commentText[activity.id]?.trim()}
+                                      className="bg-cmo-primary hover:bg-cmo-primary/90"
+                                    >
+                                      <Send className="w-4 h-4 mr-1" />
+                                      Comment
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -384,55 +479,53 @@ export default function ProfilePage() {
             </Card>
           </div>
 
-          {/* Right Column - Intro Sidebar */}
-          <div className="space-y-6">
-            <Card>
+          {/* Right Sidebar */}
+          <div className="lg:col-span-1">
+            {/* Intro Card */}
+            <Card className="mb-6">
               <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-cmo-text-primary mb-4">Intro</h2>
+                <h3 className="font-semibold mb-4">Intro</h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <Briefcase className="w-4 h-4 text-cmo-text-secondary" />
-                    <span className="text-sm text-cmo-text-secondary">CMO at SingleFire</span>
+                    <Building className="w-5 h-5 text-cmo-primary" />
+                    <span className="text-sm">{mockProfileData.positionDesignation}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <GraduationCap className="w-4 h-4 text-cmo-text-secondary" />
-                    <span className="text-sm text-cmo-text-secondary">Went to Oxford International</span>
+                    <Users className="w-5 h-5 text-cmo-primary" />
+                    <span className="text-sm">{mockProfileData.followersCount} followers</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <MapPin className="w-4 h-4 text-cmo-text-secondary" />
-                    <span className="text-sm text-cmo-text-secondary">Lives in {mockProfileData.city}, {mockProfileData.state}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Users className="w-4 h-4 text-cmo-text-secondary" />
-                    <span className="text-sm text-cmo-text-secondary">Followed by 12.5k people</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-4 h-4 text-cmo-text-secondary" />
-                    <a href={`mailto:${mockProfileData.email}`} className="text-sm text-cmo-primary hover:underline">
-                      {mockProfileData.email}
-                    </a>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Globe className="w-4 h-4 text-cmo-text-secondary" />
-                    <span className="text-sm text-cmo-primary hover:underline cursor-pointer">
-                      john.s
-                    </span>
+                    <Calendar className="w-5 h-5 text-cmo-primary" />
+                    <span className="text-sm">Joined {new Date(mockProfileData.createdTime).getFullYear()}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            {/* Skills Expertise */}
+            <Card className="mb-6">
               <CardContent className="p-6">
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-cmo-primary">Vendors (32)</span>
-                    <span className="text-sm font-medium text-cmo-primary">Advice (18)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm font-medium text-cmo-primary">Experts (52)</span>
-                    <span className="text-sm font-medium text-cmo-primary">Followers (142)</span>
-                  </div>
+                <h3 className="font-semibold mb-4">Skills Expertise</h3>
+                <div className="flex flex-wrap gap-2">
+                  {mockProfileData.skills.map((skill) => (
+                    <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
+                      {skill}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Languages Known */}
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <h3 className="font-semibold mb-4">Languages Known</h3>
+                <div className="flex flex-wrap gap-2">
+                  {mockProfileData.language.map((lang) => (
+                    <Badge key={lang} variant="outline">
+                      {lang}
+                    </Badge>
+                  ))}
                 </div>
               </CardContent>
             </Card>
@@ -440,29 +533,21 @@ export default function ProfilePage() {
             {/* Popular Filters */}
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">Popular filters</h3>
+                <h3 className="font-semibold mb-4">Popular Filters</h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-cmo-primary hover:underline cursor-pointer">All Topics (23)</span>
-                    <span className="text-sm text-cmo-primary hover:underline cursor-pointer">#SaaS (10)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-cmo-primary hover:underline cursor-pointer">#LeadAds (8)</span>
-                    <span className="text-sm text-cmo-primary hover:underline cursor-pointer">#Inbound (3)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-cmo-primary hover:underline cursor-pointer">#Europe (2)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-cmo-primary hover:underline cursor-pointer">#performance-marketing (2)</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-cmo-primary hover:underline cursor-pointer">#facebook-advertising (2)</span>
-                  </div>
+                  <Button variant="ghost" className="w-full justify-start text-sm">
+                    Questions & Answers
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-sm">
+                    Articles & Posts
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-sm">
+                    Industry Updates
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-sm">
+                    Job Opportunities
+                  </Button>
                 </div>
-                <Button variant="link" className="text-cmo-primary p-0 h-auto mt-4">
-                  Show more
-                </Button>
               </CardContent>
             </Card>
           </div>
