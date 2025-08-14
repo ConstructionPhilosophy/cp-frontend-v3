@@ -1,14 +1,15 @@
-import Header from "@/components/layout/header";
-import SidebarLeft from "@/components/layout/sidebar-left";
-import SidebarRight from "@/components/layout/sidebar-right";
-import QuestionCard from "@/components/question-card";
-import AnswerCard from "@/components/answer-card";
-import MobileNavigation from "@/components/mobile-navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { mockQuestions, mockUsers } from "@/lib/mock-data";
-import { useIsMobile } from "@/hooks/use-mobile";
+import React from "react";
+import Header from "../components/layout/header";
+import SidebarLeft from "../components/layout/sidebar-left";
+import SidebarRight from "../components/layout/sidebar-right";
+import QuestionCard from "../components/question-card";
+import AnswerCard from "../components/answer-card";
+import MobileNavigation from "../components/mobile-navigation";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { mockQuestions, mockUsers } from "../lib/mock-data";
+import { useIsMobile } from "../hooks/use-mobile";
 
 export default function Home() {
   const isMobile = useIsMobile();

@@ -1,4 +1,4 @@
-import type { User, Question, Space, Vendor } from "@shared/schema";
+import type { User, Question, Space, Vendor } from "../types/schema";
 
 export const mockUsers: User[] = [
   {

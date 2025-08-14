@@ -1,3 +1,4 @@
+import React from "react";
 import { Home, Users, Book, TrendingUp, Building } from "lucide-react";
 
 export default function MobileNavigation() {

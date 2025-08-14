@@ -1,7 +1,8 @@
+import React from "react";
 import { Search, Menu, Home, Users, Book, TrendingUp, Building, Handshake } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { useIsMobile } from "../../hooks/use-mobile";
 
 export default function Header() {
   const isMobile = useIsMobile();

@@ -1,6 +1,13 @@
 # Overview
 
-This is a full-stack web application built as a Q&A community platform similar to a forum or professional networking site. The application allows users to ask questions, provide answers, and engage with a community around topics like marketing, branding, and business expertise. It features a modern, responsive design with a clean interface optimized for both desktop and mobile experiences.
+This is a frontend-only React application built as a Q&A community platform similar to CMOlist. The application replicates the exact design from the provided mockup and allows users to view questions, answers, and engage with a community around topics like marketing, branding, and business expertise. It features a modern, responsive design with a clean interface optimized for both desktop and mobile experiences.
+
+## Recent Changes (August 14, 2025)
+- **Converted to Frontend-Only**: Removed all Express/Node server code, backend scripts, and database dependencies
+- **Updated Architecture**: Now uses pure React with react-router-dom for client-side routing
+- **Simplified Structure**: Moved to standard src/ folder structure with components, pages, hooks, and assets
+- **Removed Server Dependencies**: Eliminated TanStack Query, Drizzle ORM, and all server-side code
+- **Maintained Design**: Preserved exact UI design and styling from original CMOlist mockup
 
 # User Preferences
 

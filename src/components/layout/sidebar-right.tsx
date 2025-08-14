@@ -1,7 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { mockUsers, mockSpaces, mockVendors } from "@/lib/mock-data";
+import React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { mockUsers, mockSpaces, mockVendors } from "../../lib/mock-data";
 
 export default function SidebarRight() {
   return (
