@@ -185,31 +185,33 @@ export default function ProfilePage() {
               />
               
               <CardContent className="relative p-6">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {/* Profile Info Section - Fixed Overlap */}
+                <div className="flex flex-col sm:flex-row gap-6 pt-4">
                   {/* Avatar */}
-                  <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
-                    <AvatarImage src={mockProfileData.photoUrl} />
-                    <AvatarFallback className="text-2xl">
-                      {mockProfileData.firstName.charAt(0)}{mockProfileData.lastName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <div className="flex-shrink-0">
+                    <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
+                      <AvatarImage src={mockProfileData.photoUrl} />
+                      <AvatarFallback className="text-2xl">
+                        {mockProfileData.firstName.charAt(0)}{mockProfileData.lastName.charAt(0)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
                   
-                  {/* Profile Info - Better Aligned */}
-                  <div className="flex-1 sm:-mt-16">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                      <div>
-                        <h1 className="text-3xl font-bold text-cmo-text-primary">
+                  {/* Profile Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h1 className="text-3xl font-bold text-cmo-text-primary truncate">
                           {mockProfileData.firstName} {mockProfileData.lastName}
                         </h1>
-                        <p className="text-lg text-cmo-text-secondary mb-2">
+                        <p className="text-lg text-cmo-text-secondary mb-3">
                           {mockProfileData.title}
                         </p>
-                        <div className="flex items-center gap-4 text-sm text-cmo-text-secondary">
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-cmo-text-secondary">
                           <span className="flex items-center gap-1">
                             <MapPin className="w-4 h-4" />
                             {mockProfileData.city}, {mockProfileData.state}
                           </span>
-                          {/* Followers/Following Count */}
                           <span className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
                             {mockProfileData.followersCount} followers
@@ -221,7 +223,7 @@ export default function ProfilePage() {
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-3 flex-shrink-0">
                         <Button variant="outline" size="sm">
                           <MessageSquare className="w-4 h-4 mr-2" />
                           Message
@@ -264,37 +266,37 @@ export default function ProfilePage() {
                   <p className="text-cmo-text-secondary leading-relaxed">{mockProfileData.about}</p>
                 </div>
 
-                {/* Contact Information */}
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-5 h-5 text-cmo-primary" />
-                    <span>{mockProfileData.email}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-cmo-primary" />
-                    <span>{mockProfileData.phoneNumber}</span>
-                  </div>
-                </div>
+
               </CardContent>
             </Card>
 
             {/* Education Section */}
             <Card className="mb-6">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <GraduationCap className="w-6 h-6 text-cmo-primary" />
-                  Education
-                </h3>
-                <div className="space-y-4">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                    Education
+                  </h3>
+                  <Button variant="ghost" size="icon">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="space-y-6">
                   {mockEducation.map((edu) => (
-                    <div key={edu.id} className="border-l-4 border-cmo-primary pl-4">
-                      <h4 className="font-semibold text-lg">{edu.degree}</h4>
-                      <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
-                      <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
-                      <p className="text-sm text-cmo-text-secondary mt-1">
-                        {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
-                        {edu.grade && ` • ${edu.grade}`}
-                      </p>
+                    <div key={edu.id} className="flex gap-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-lg">{edu.degree}</h4>
+                        <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
+                        <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
+                        <p className="text-sm text-cmo-text-secondary mt-1">
+                          {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
+                          {edu.grade && ` • ${edu.grade}`}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -304,23 +306,33 @@ export default function ProfilePage() {
             {/* Experience Section */}
             <Card className="mb-6">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <Briefcase className="w-6 h-6 text-cmo-primary" />
-                  Experience
-                </h3>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <Briefcase className="w-6 h-6 text-cmo-primary" />
+                    Experience
+                  </h3>
+                  <Button variant="ghost" size="icon">
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
                 <div className="space-y-6">
                   {mockExperience.map((exp) => (
-                    <div key={exp.id} className="border-l-4 border-cmo-primary pl-4">
-                      <h4 className="font-semibold text-lg">{exp.role}</h4>
-                      <p className="text-cmo-primary font-medium">{exp.company}</p>
-                      <p className="text-cmo-text-secondary flex items-center gap-1">
-                        <MapPin className="w-4 h-4" />
-                        {exp.location}
-                      </p>
-                      <p className="text-sm text-cmo-text-secondary mt-1">
-                        {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
-                      </p>
-                      <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
+                    <div key={exp.id} className="flex gap-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Building className="w-6 h-6 text-cmo-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-lg">{exp.role}</h4>
+                        <p className="text-cmo-primary font-medium">{exp.company}</p>
+                        <p className="text-cmo-text-secondary flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {exp.location}
+                        </p>
+                        <p className="text-sm text-cmo-text-secondary mt-1">
+                          {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
+                        </p>
+                        <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -497,6 +509,18 @@ export default function ProfilePage() {
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-cmo-primary" />
                     <span className="text-sm">Joined {new Date(mockProfileData.createdTime).getFullYear()}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-cmo-primary" />
+                    <span className="text-sm">j••••@e••••.com</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-cmo-primary" />
+                    <span className="text-sm">+91••••••••90</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Globe className="w-5 h-5 text-cmo-primary" />
+                    <span className="text-sm">LinkedIn Profile</span>
                   </div>
                 </div>
               </CardContent>
