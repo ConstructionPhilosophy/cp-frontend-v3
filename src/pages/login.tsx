@@ -12,9 +12,9 @@ export function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Side - Hero Section */}
-      <div className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 relative overflow-hidden">
+      <div className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 relative overflow-hidden lg:flex hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-cmo-primary/10 to-purple-600/20"></div>
         
         {/* Geometric Background Pattern */}
@@ -50,8 +50,18 @@ export function LoginPage() {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-white min-h-screen lg:min-h-auto">
         <div className="w-full max-w-sm">
+          {/* Mobile Header - Only visible on mobile */}
+          <div className="lg:hidden text-center mb-8">
+            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+              Welcome to CMOlist
+            </h1>
+            <p className="text-sm text-gray-600">
+              World-class network of CMOs
+            </p>
+          </div>
+
           {/* Logo */}
           <div className="flex items-center mb-8">
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
