@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Debug Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/index-DmExVhvI.css">
+    <style>
+      .debug-box {
+        padding: 20px;
+        margin: 20px;
+        border: 2px solid red;
+        background: yellow;
+      }
+    </style>
+</head>
+<body>
+    <div class="debug-box">
+        <h1>Debug Test</h1>
+        <p>This should have yellow background and red border from inline CSS</p>
+    </div>
+    
+    <div class="bg-blue-500 text-white p-4 rounded-lg">
+        This should be blue with white text if Tailwind CSS is working from the external CSS file.
+    </div>
+    
+    <div class="bg-cmo-bg-main text-cmo-text-primary p-4">
+        This should use custom CMO variables if CSS is working.
+    </div>
+    
+    <script>
+        console.log('CSS Debug Test loaded');
+        const links = document.getElementsByTagName('link');
+        console.log('Found', links.length, 'link tags');
+        for (let i = 0; i < links.length; i++) {
+            console.log('Link', i, ':', links[i].href, 'rel:', links[i].rel);
+        }
+    </script>
+</body>
+</html>
