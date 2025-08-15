@@ -330,20 +330,16 @@ export function SignupPage() {
             </div>
           </form>
 
-          {/* Footer - Fixed alignment */}
+          {/* Footer - Properly aligned as in reference */}
           <div className="mt-8">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm text-gray-500 space-y-2 sm:space-y-0">
-              <p>© 2024 CP Inc. All rights reserved.</p>
-              <div className="flex space-x-6">
-                <Link href="/privacy-policy">
-                  <Button variant="link" className="p-0 h-auto text-sm text-gray-500 hover:text-gray-700">
-                    Privacy Policy
-                  </Button>
+            <div className="flex justify-between items-center text-sm text-gray-500">
+              <span>© 2024 CP Inc. All rights reserved.</span>
+              <div className="flex space-x-4">
+                <Link href="/privacy-policy" className="hover:text-gray-700">
+                  Privacy Policy
                 </Link>
-                <Link href="/terms-conditions">
-                  <Button variant="link" className="p-0 h-auto text-sm text-gray-500 hover:text-gray-700">
-                    Terms & Conditions
-                  </Button>
+                <Link href="/terms-conditions" className="hover:text-gray-700">
+                  Terms & Conditions
                 </Link>
               </div>
             </div>
