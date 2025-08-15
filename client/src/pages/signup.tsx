@@ -137,7 +137,7 @@ export function SignupPage() {
       </div>
 
       {/* Right Side - Signup Form */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-white min-h-screen lg:min-h-auto">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-white min-h-screen lg:min-h-auto relative">
         <div className="w-full max-w-sm">
           {/* Mobile Header - Only visible on mobile */}
           <div className="lg:hidden text-center mb-8">
@@ -329,19 +329,19 @@ export function SignupPage() {
               </Link>
             </div>
           </form>
-
-          {/* Footer - Properly aligned as in reference */}
-          <div className="mt-8">
-            <div className="flex justify-between items-center text-sm text-gray-500">
-              <span>© 2024 CP Inc. All rights reserved.</span>
-              <div className="flex space-x-4">
-                <Link href="/privacy-policy" className="hover:text-gray-700">
-                  Privacy Policy
-                </Link>
-                <Link href="/terms-conditions" className="hover:text-gray-700">
-                  Terms & Conditions
-                </Link>
-              </div>
+        </div>
+        
+        {/* Footer - Outside form container, at bottom of page */}
+        <div className="absolute bottom-4 left-4 right-4">
+          <div className="flex justify-between items-center text-sm text-gray-500">
+            <span>© 2024 CP Inc. All rights reserved.</span>
+            <div className="flex space-x-4">
+              <Link href="/privacy-policy" className="hover:text-gray-700">
+                Privacy Policy
+              </Link>
+              <Link href="/terms-conditions" className="hover:text-gray-700">
+                Terms & Conditions
+              </Link>
             </div>
           </div>
         </div>
