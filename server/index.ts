@@ -8,8 +8,85 @@ const app = express();
 // API routes middleware
 app.use('/api', express.json());
 
-// Register API routes
+// Register API routes FIRST - before static files
 registerRoutes(app);
+
+// Debug endpoint to check server state
+app.get('/api/debug', (req, res) => {
+  res.json({ 
+    timestamp: new Date().toISOString(),
+    message: 'Server running with emergency inline CSS fix',
+    staticPath,
+    deployment: !!process.env.REPLIT_DEPLOYMENT,
+    nodeEnv: process.env.NODE_ENV
+  });
+});
+
+// Emergency HTML with inline CSS - serve BEFORE static files
+app.get('/', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Professional Networking Platform - STYLED</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --background: hsl(0 0% 100%);
+        --foreground: hsl(0 0% 10.2%);
+        --primary: hsl(217 89% 61%);
+        --border: hsl(0 0% 87.8%);
+        --cmo-primary: hsl(217 89% 61%);
+        --cmo-bg-main: hsl(0 0% 98%);
+        --cmo-bg-card: hsl(0 0% 100%);
+        --cmo-text-primary: hsl(0 0% 10.2%);
+        --cmo-text-secondary: hsl(0 0% 40%);
+        --cmo-border: hsl(0 0% 87.8%);
+        --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      }
+      * { 
+        box-sizing: border-box; 
+        margin: 0; 
+        padding: 0; 
+      }
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: var(--font-sans);
+        color: var(--cmo-text-primary);
+        line-height: 1.5;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      #root { 
+        min-height: 100vh; 
+        background: var(--cmo-bg-main);
+      }
+      .test-message {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #ff0000;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-weight: bold;
+        z-index: 9999;
+      }
+    </style>
+</head>
+<body>
+    <div class="test-message">CSS IS WORKING - STYLED VERSION LOADED!</div>
+    <div id="root"></div>
+    <script type="module" crossorigin src="/assets/index-DRud4M9E.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DmExVhvI.css">
+</body>
+</html>`);
+});
 
 // Serve static files from the built client directory with cache-busting headers
 const staticPath = path.join(process.cwd(), 'dist', 'public');
@@ -33,95 +110,7 @@ app.use(express.static(staticPath, {
   }
 }));
 
-// Debug endpoint to check server state
-app.get('/api/debug', (req, res) => {
-  res.json({ 
-    timestamp: new Date().toISOString(),
-    message: 'Server running with inline CSS fix',
-    staticPath,
-    deployment: !!process.env.REPLIT_DEPLOYMENT,
-    htmlExists: require('fs').existsSync(path.join(staticPath, 'index.html'))
-  });
-});
 
-// Emergency HTML with inline CSS - bypass all file serving issues
-app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.send(`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Professional Networking Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      :root {
-        --background: hsl(0 0% 100%);
-        --foreground: hsl(0 0% 10.2%);
-        --primary: hsl(217 89% 61%);
-        --border: hsl(0 0% 87.8%);
-        --cmo-primary: hsl(217 89% 61%);
-        --cmo-bg-main: hsl(0 0% 98%);
-        --cmo-bg-card: hsl(0 0% 100%);
-        --cmo-text-primary: hsl(0 0% 10.2%);
-        --cmo-text-secondary: hsl(0 0% 40%);
-        --cmo-border: hsl(0 0% 87.8%);
-        --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-      }
-      * { 
-        box-sizing: border-box; 
-        margin: 0; 
-        padding: 0; 
-      }
-      body {
-        background-color: var(--cmo-bg-main);
-        font-family: var(--font-sans);
-        color: var(--cmo-text-primary);
-        line-height: 1.5;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      #root { 
-        min-height: 100vh; 
-      }
-      /* Basic layout styling */
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 1rem;
-      }
-      .header {
-        background: white;
-        border-bottom: 1px solid var(--cmo-border);
-        padding: 1rem 0;
-        margin-bottom: 2rem;
-      }
-      .btn {
-        background: var(--cmo-primary);
-        color: white;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 0.375rem;
-        cursor: pointer;
-        font-family: inherit;
-      }
-      .card {
-        background: var(--cmo-bg-card);
-        border: 1px solid var(--cmo-border);
-        border-radius: 0.5rem;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-      }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
-    <script type="module" crossorigin src="/assets/index-DRud4M9E.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DmExVhvI.css">
-</body>
-</html>`);
-});
 
 // Fallback for SPA routes - only for non-API and non-asset routes
 app.use((req, res, next) => {
