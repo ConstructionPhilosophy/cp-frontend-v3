@@ -41,7 +41,7 @@ export const signInWithGoogle = async () => {
       firstName: user.displayName?.split(' ')[0] || '',
       lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
       email: user.email || '',
-      profilePicture: user.photoURL || '',
+      profilePic: user.photoURL || '',
     });
 
     return user;
@@ -69,13 +69,13 @@ export const signUpWithEmail = async (
       handleCodeInApp: true,
     });
 
-    // Call external signup API with email user data
+    // Call external signup API with email user data  
     await callExternalSignupAPI({
       firstName,
       lastName,
       email,
       hasBasicInfo: false,
-    });
+    }, user);
 
     return user;
   } catch (error) {
@@ -115,15 +115,23 @@ const callExternalSignupAPI = async (userData: {
   firstName: string;
   lastName: string;
   email: string;
-  profilePicture?: string;
+  profilePic?: string;
   hasBasicInfo?: boolean;
-}) => {
+}, user?: User) => {
   try {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    // Add bearer token if user is provided
+    if (user) {
+      const token = await user.getIdToken();
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(userData),
     });
 
