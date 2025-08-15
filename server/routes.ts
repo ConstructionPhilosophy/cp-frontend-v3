@@ -1,10 +1,14 @@
 import type { Express, Request, Response } from "express";
-import { createServer, type Server } from "http";
 import { z } from "zod";
 import { storage } from "./storage";
 import { insertSecurityAssessmentSchema } from "../shared/schema";
 
-export function registerRoutes(app: Express): Server {
+export function registerRoutes(app: Express): void {
+  // Health check endpoint
+  app.get("/api/health", (req: Request, res: Response) => {
+    res.json({ status: "OK", timestamp: new Date().toISOString() });
+  });
+
   // Get current user (mocked for now)
   app.get("/api/user", async (req: Request, res: Response) => {
     try {
@@ -96,6 +100,5 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  const httpServer = createServer(app);
-  return httpServer;
+
 }
