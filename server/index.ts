@@ -22,22 +22,42 @@ async function startServer() {
       res.sendFile(path.join(staticPath, 'index.html'));
     });
 
-    // Deployment configuration - use PORT environment variable, fallback to 80 for production, 5000 for dev
-    const PORT = parseInt(process.env.PORT || (process.env.NODE_ENV === 'production' ? '80' : '5000'), 10);
-    const HOST = process.env.HOST || '0.0.0.0'; // Explicitly bind to 0.0.0.0 for Cloud Run compatibility
+    // Cloud Run deployment configuration
+    const isDeployment = process.env.REPLIT_DEPLOYMENT === '1';
+    const isProduction = process.env.NODE_ENV === 'production' || isDeployment;
     
-    console.log(`Starting server with NODE_ENV=${process.env.NODE_ENV || 'development'}`);
-    console.log(`Server will bind to ${HOST}:${PORT}`);
+    // For Cloud Run: use PORT env var, fallback to 80 for production, 5000 for dev
+    let PORT: number;
+    if (process.env.PORT) {
+      PORT = parseInt(process.env.PORT, 10);
+    } else {
+      PORT = isProduction ? 80 : 5000;
+    }
+    
+    // Always bind to 0.0.0.0 for Cloud Run compatibility - never localhost
+    const HOST = '0.0.0.0';
+    
+    console.log(`Environment Detection:`);
+    console.log(`  REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT || 'undefined'}`);
+    console.log(`  NODE_ENV: ${process.env.NODE_ENV || 'undefined'}`);
+    console.log(`  PORT env var: ${process.env.PORT || 'undefined'}`);
+    console.log(`  Is Deployment: ${isDeployment}`);
+    console.log(`  Is Production: ${isProduction}`);
+    console.log(`Server Configuration:`);
+    console.log(`  Host: ${HOST}`);
+    console.log(`  Port: ${PORT}`);
     
     const server = app.listen(PORT, HOST, (error?: Error) => {
       if (error) {
-        console.error("Failed to start server:", error);
-        console.error("Error details:", error.message);
-        return;
+        console.error("❌ Failed to start server:", error);
+        console.error("❌ Error details:", error.message);
+        process.exit(1);
       }
-      console.log(`✓ Server successfully listening on ${HOST}:${PORT}`);
-      console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'} mode`);
-      console.log(`✓ Ready to accept connections`);
+      console.log(`✅ Server successfully bound to ${HOST}:${PORT}`);
+      console.log(`✅ Server address: ${server.address()}`);
+      console.log(`✅ Environment: ${isProduction ? 'production' : 'development'} mode`);
+      console.log(`✅ Deployment context: ${isDeployment ? 'Cloud Run' : 'Local'}`);
+      console.log(`✅ Ready to accept connections`);
     });
 
     // Handle server errors
