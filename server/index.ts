@@ -22,16 +22,22 @@ async function startServer() {
       res.sendFile(path.join(staticPath, 'index.html'));
     });
 
-    // Use port 80 for production deployments, 5000 for development
+    // Deployment configuration - use PORT environment variable, fallback to 80 for production, 5000 for dev
     const PORT = parseInt(process.env.PORT || (process.env.NODE_ENV === 'production' ? '80' : '5000'), 10);
-    const HOST = '0.0.0.0';
+    const HOST = process.env.HOST || '0.0.0.0'; // Explicitly bind to 0.0.0.0 for Cloud Run compatibility
+    
+    console.log(`Starting server with NODE_ENV=${process.env.NODE_ENV || 'development'}`);
+    console.log(`Server will bind to ${HOST}:${PORT}`);
     
     const server = app.listen(PORT, HOST, (error?: Error) => {
       if (error) {
         console.error("Failed to start server:", error);
+        console.error("Error details:", error.message);
         return;
       }
-      console.log(`Server running on ${HOST}:${PORT} (${process.env.NODE_ENV || 'development'} mode)`);
+      console.log(`✓ Server successfully listening on ${HOST}:${PORT}`);
+      console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'} mode`);
+      console.log(`✓ Ready to accept connections`);
     });
 
     // Handle server errors
