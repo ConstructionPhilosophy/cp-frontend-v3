@@ -52,69 +52,6 @@ app.get('/test-css', (req, res) => {
 </html>`);
 });
 
-// Emergency HTML with inline CSS - serve BEFORE static files
-app.get('/', (req, res) => {
-  res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  res.send(`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Professional Networking Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-      :root {
-        --background: hsl(0 0% 100%);
-        --foreground: hsl(0 0% 10.2%);
-        --primary: hsl(217 89% 61%);
-        --border: hsl(0 0% 87.8%);
-        --cmo-primary: hsl(217 89% 61%);
-        --cmo-bg-main: hsl(0 0% 98%);
-        --cmo-bg-card: hsl(0 0% 100%);
-        --cmo-text-primary: hsl(0 0% 10.2%);
-        --cmo-text-secondary: hsl(0 0% 40%);
-        --cmo-border: hsl(0 0% 87.8%);
-        --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-      }
-      * { 
-        box-sizing: border-box; 
-        margin: 0; 
-        padding: 0; 
-      }
-      body {
-        background-color: var(--cmo-bg-main);
-        font-family: var(--font-sans);
-        color: var(--cmo-text-primary);
-        line-height: 1.5;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      #root { 
-        min-height: 100vh; 
-      }
-    </style>
-</head>
-<body>
-    <div id="root"></div>
-    <script>
-      // Debug React app loading
-      window.addEventListener('load', () => {
-        console.log('Page loaded');
-        setTimeout(() => {
-          const root = document.getElementById('root');
-          if (root && root.innerHTML.trim() === '') {
-            root.innerHTML = '<div style="padding: 20px; background: #fee; color: #c00;">React app failed to load. Check browser console for errors.</div>';
-          }
-        }, 3000);
-      });
-    </script>
-    <script type="module" crossorigin src="/assets/index-DRud4M9E.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DmExVhvI.css">
-</body>
-</html>`);
-});
-
 // Serve static files from the built client directory with cache-busting headers
 const staticPath = path.join(process.cwd(), 'dist', 'public');
 app.use(express.static(staticPath, {
@@ -139,13 +76,21 @@ app.use(express.static(staticPath, {
 
 
 
-// Fallback for SPA routes - only for non-API and non-asset routes
+// Fallback for SPA routes - serve the built React app for all routes
 app.use((req, res, next) => {
-  if (!req.path.startsWith('/api/') && !req.path.startsWith('/assets/')) {
-    res.sendFile(path.join(staticPath, 'index.html'));
-  } else {
-    next();
+  // Skip API routes and assets
+  if (req.path.startsWith('/api/') || req.path.startsWith('/assets/') || req.path === '/test-css') {
+    return next();
   }
+  
+  // Serve the built React app
+  const indexPath = path.join(staticPath, 'index.html');
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      console.error('Error serving index.html:', err);
+      res.status(500).send('Error loading application');
+    }
+  });
 });
 
 // Deployment-ready server configuration
