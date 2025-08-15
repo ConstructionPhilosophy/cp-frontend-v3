@@ -36,13 +36,14 @@ export const signInWithGoogle = async () => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
-    // Call external signup API with Google user data
+    // Call external signup API with Google user data and bearer token
     await callExternalSignupAPI({
       firstName: user.displayName?.split(' ')[0] || '',
       lastName: user.displayName?.split(' ').slice(1).join(' ') || '',
       email: user.email || '',
       profilePic: user.photoURL || '',
-    });
+      hasBasicInfo: false,
+    }, user);
 
     return user;
   } catch (error) {
@@ -110,7 +111,7 @@ export const onAuthStateChange = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, callback);
 };
 
-// Call external signup API
+// Call external signup API with FormData
 const callExternalSignupAPI = async (userData: {
   firstName: string;
   lastName: string;
@@ -119,9 +120,7 @@ const callExternalSignupAPI = async (userData: {
   hasBasicInfo?: boolean;
 }, user?: User) => {
   try {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
+    const headers: HeadersInit = {};
 
     // Add bearer token if user is provided
     if (user) {
@@ -129,14 +128,27 @@ const callExternalSignupAPI = async (userData: {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    // Create FormData instead of JSON
+    const formData = new FormData();
+    formData.append('email', userData.email);
+    formData.append('firstName', userData.firstName);
+    formData.append('lastName', userData.lastName);
+    formData.append('hasBasicInfo', userData.hasBasicInfo?.toString() || 'false');
+    
+    // Only add profilePic if it exists
+    if (userData.profilePic) {
+      formData.append('profilePic', userData.profilePic);
+    }
+
     const response = await fetch(`${API_BASE_URL}/auth/signup`, {
       method: 'POST',
       headers,
-      body: JSON.stringify(userData),
+      body: formData,
     });
 
     if (!response.ok) {
-      throw new Error(`API call failed: ${response.statusText}`);
+      const errorText = await response.text();
+      throw new Error(`API call failed: ${response.status} ${response.statusText} - ${errorText}`);
     }
 
     return await response.json();
