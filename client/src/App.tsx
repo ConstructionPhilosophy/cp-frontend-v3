@@ -20,6 +20,17 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* Public auth routes */}
+        <Route path="/login" component={() => <LoginPage />} />
+        <Route path="/signup" component={() => <SignupPage />} />
+        <Route path="/check-email" component={() => <CheckEmailPage />} />
+        <Route path="/verification-success" component={() => <VerificationSuccessPage />} />
+        <Route path="/forgot-password" component={() => <ForgotPasswordPage />} />
+        <Route path="/check-email-reset" component={() => <CheckEmailResetPage />} />
+        <Route path="/reset-password" component={() => <ResetPasswordPage />} />
+        <Route path="/password-reset-success" component={() => <PasswordResetSuccessPage />} />
+        
+        {/* Protected routes */}
         <Route path="/" component={() => (
           <ProtectedRoute>
             <HomePage />
@@ -35,14 +46,8 @@ function App() {
             <SecurityDashboard />
           </ProtectedRoute>
         )} />
-        <Route path="/login" component={() => <LoginPage />} />
-        <Route path="/signup" component={() => <SignupPage />} />
-        <Route path="/check-email" component={() => <CheckEmailPage />} />
-        <Route path="/verification-success" component={() => <VerificationSuccessPage />} />
-        <Route path="/forgot-password" component={() => <ForgotPasswordPage />} />
-        <Route path="/check-email-reset" component={() => <CheckEmailResetPage />} />
-        <Route path="/reset-password" component={() => <ResetPasswordPage />} />
-        <Route path="/password-reset-success" component={() => <PasswordResetSuccessPage />} />
+        
+        {/* 404 fallback - must be last */}
         <Route component={NotFoundPage} />
       </Router>
       <Toaster />
