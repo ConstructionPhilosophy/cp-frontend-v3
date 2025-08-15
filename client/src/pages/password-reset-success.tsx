@@ -25,11 +25,11 @@ export function PasswordResetSuccessPage() {
         <div className="relative z-10 flex items-center justify-center w-full p-12">
           <div className="text-center max-w-md">
             <h1 className="text-4xl font-bold text-gray-800 mb-6">
-              World-class network of CMOs
+              Professional network for construction industry
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Only for heads of marketing from hyper-growth companies.
-              Every member is carefully vetted.
+              Connect with construction professionals, engineers, and project managers.
+              Build your professional network in the construction sector.
             </p>
           </div>
         </div>
@@ -50,7 +50,7 @@ export function PasswordResetSuccessPage() {
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <span className="text-xl font-bold text-cmo-text-primary">CMOlist</span>
+            <span className="text-xl font-bold text-cmo-text-primary">CP</span>
           </div>
 
           {/* Success Icon */}
@@ -78,7 +78,7 @@ export function PasswordResetSuccessPage() {
 
           {/* Footer */}
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500 mb-4">© 2024 CMOlist Inc. All rights reserved.</p>
+            <p className="text-sm text-gray-500 mb-4">© 2024 CP Inc. All rights reserved.</p>
             <div className="flex justify-center space-x-6 text-sm text-gray-500">
               <Link href="/privacy-policy">
                 <Button variant="link" className="p-0 h-auto text-sm text-gray-500 hover:text-gray-700">

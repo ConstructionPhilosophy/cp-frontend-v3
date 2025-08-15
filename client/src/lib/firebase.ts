@@ -8,6 +8,9 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  sendPasswordResetEmail,
+  confirmPasswordReset,
+  verifyPasswordResetCode,
   User
 } from "firebase/auth";
 
@@ -154,6 +157,58 @@ const callExternalSignupAPI = async (userData: {
     return await response.json();
   } catch (error) {
     console.error('External API call error:', error);
+    throw error;
+  }
+};
+
+// Auth state change listener
+export const onAuthStateChange = (callback: (user: User | null) => void) => {
+  return onAuthStateChanged(auth, callback);
+};
+
+// Send Password Reset Email
+export const sendPasswordReset = async (email: string) => {
+  try {
+    await sendPasswordResetEmail(auth, email, {
+      url: `${window.location.origin}/login`,
+      handleCodeInApp: false,
+    });
+    console.log('Password reset email sent successfully');
+  } catch (error) {
+    console.error('Send password reset error:', error);
+    throw error;
+  }
+};
+
+// Verify Password Reset Code
+export const verifyResetCode = async (code: string) => {
+  try {
+    const email = await verifyPasswordResetCode(auth, code);
+    return email;
+  } catch (error) {
+    console.error('Verify reset code error:', error);
+    throw error;
+  }
+};
+
+// Confirm Password Reset
+export const resetPassword = async (code: string, newPassword: string) => {
+  try {
+    await confirmPasswordReset(auth, code, newPassword);
+    console.log('Password reset successfully');
+  } catch (error) {
+    console.error('Reset password error:', error);
+    throw error;
+  }
+};
+
+// Sign Out
+export const signOutUser = async () => {
+  try {
+    await signOut(auth);
+    console.log('User signed out successfully');
+  } catch (error) {
+    console.error('Sign out error:', error);
     throw error;
   }
 };

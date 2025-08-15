@@ -1,9 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'wouter';
 import { Button } from '../components/ui/button';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
+import { sendPasswordReset } from '../lib/firebase';
+import { useToast } from '../hooks/use-toast';
 
 export function CheckEmailResetPage() {
+  const [resending, setResending] = useState(false);
+  const { toast } = useToast();
+
+  const handleResendEmail = async () => {
+    setResending(true);
+    try {
+      // Get email from localStorage or URL params if available
+      const email = localStorage.getItem('resetEmail') || '';
+      if (!email) {
+        toast({
+          title: "Email not found",
+          description: "Please go back to the forgot password page and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      await sendPasswordReset(email);
+      
+      toast({
+        title: "Email resent!",
+        description: "Please check your email for the new reset link.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Failed to resend email",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setResending(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Side - Hero Section */}
@@ -25,11 +61,11 @@ export function CheckEmailResetPage() {
         <div className="relative z-10 flex items-center justify-center w-full p-12">
           <div className="text-center max-w-md">
             <h1 className="text-4xl font-bold text-gray-800 mb-6">
-              World-class network of CMOs
+              Professional network for construction industry
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Only for heads of marketing from hyper-growth companies.
-              Every member is carefully vetted.
+              Connect with construction professionals, engineers, and project managers.
+              Build your professional network in the construction sector.
             </p>
           </div>
         </div>
@@ -50,7 +86,7 @@ export function CheckEmailResetPage() {
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <span className="text-xl font-bold text-cmo-text-primary">CMOlist</span>
+            <span className="text-xl font-bold text-cmo-text-primary">CP</span>
           </div>
 
           {/* Email Icon */}
@@ -77,15 +113,27 @@ export function CheckEmailResetPage() {
             
             <p className="text-sm text-cmo-text-secondary">
               Didn't receive the email? Check your spam folder or{' '}
-              <Button variant="link" className="p-0 h-auto text-sm text-cmo-primary hover:text-cmo-primary/80">
-                resend reset email
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-sm text-cmo-primary hover:text-cmo-primary/80"
+                onClick={handleResendEmail}
+                disabled={resending}
+              >
+                {resending ? (
+                  <>
+                    <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                    resending...
+                  </>
+                ) : (
+                  'resend reset email'
+                )}
               </Button>
             </p>
           </div>
 
           {/* Footer */}
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500 mb-4">© 2024 CMOlist Inc. All rights reserved.</p>
+            <p className="text-sm text-gray-500 mb-4">© 2024 CP Inc. All rights reserved.</p>
             <div className="flex justify-center space-x-6 text-sm text-gray-500">
               <Link href="/privacy-policy">
                 <Button variant="link" className="p-0 h-auto text-sm text-gray-500 hover:text-gray-700">
