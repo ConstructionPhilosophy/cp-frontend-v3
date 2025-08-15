@@ -3,6 +3,24 @@
 This is a frontend-only React application built as a Q&A community platform similar to CMOlist. The application replicates the exact design from the provided mockup and allows users to view questions, answers, and engage with a community around topics like marketing, branding, and business expertise. It features a modern, responsive design with a clean interface optimized for both desktop and mobile experiences.
 
 ## Recent Changes (August 15, 2025)
+- **External API Integration Fixed**: Corrected form data format and field names for external signup API
+  - Changed "profilePicture" to "profileURL" field name as required by external API
+  - Implemented FormData instead of JSON for API requests
+  - Added bearer token authentication for both Google and email signup flows
+  - Firebase ID tokens now properly sent with Authorization header
+- **Authentication System Complete**: Implemented full login/signup functionality with session management
+  - Added Google signin functionality to login page matching signup page behavior
+  - Implemented email/password login with proper Firebase authentication
+  - Created authentication context and protected routes for session management
+  - Session persistence: Firebase auth sessions last ~1 hour (default), extended with "Remember Me" option
+  - Protected routes now redirect unauthenticated users to login page
+- **UI/UX Improvements**: Updated branding and layout for construction industry focus
+  - Changed all "CMOlist" references to "CP" throughout the application
+  - Updated text content to focus on construction and civil engineering professionals
+  - Implemented side-by-side Google/Facebook social login buttons layout
+  - Changed "Apple" button to "Facebook" as requested
+  - Fixed footer layout: copyright aligned left, privacy/terms links aligned right
+  - Updated signup link text: "Create an account? SignUp" instead of "New on CMOlist? Apply now"
 - **CSS Loading Issue COMPLETELY RESOLVED**: Fixed critical server routing issue preventing React app from loading
   - Root cause: Custom HTML route for '/' was overriding the built React app serving
   - Fixed server routing to properly serve the built React app from dist/public/index.html

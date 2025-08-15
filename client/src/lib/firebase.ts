@@ -135,9 +135,9 @@ const callExternalSignupAPI = async (userData: {
     formData.append('lastName', userData.lastName);
     formData.append('hasBasicInfo', userData.hasBasicInfo?.toString() || 'false');
     
-    // Only add profilePic if it exists
+    // Only add profileURL if it exists
     if (userData.profilePic) {
-      formData.append('profilePic', userData.profilePic);
+      formData.append('profileURL', userData.profilePic);
     }
 
     const response = await fetch(`${API_BASE_URL}/auth/signup`, {

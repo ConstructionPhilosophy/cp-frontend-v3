@@ -12,23 +12,41 @@ import { CheckEmailResetPage } from "./pages/check-email-reset";
 import { ResetPasswordPage } from "./pages/reset-password";
 import { PasswordResetSuccessPage } from "./pages/password-reset-success";
 import { SecurityDashboard } from "./pages/security-dashboard-simple";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { Toaster } from "./components/ui/toaster";
 
 function App() {
   return (
-    <Router>
-      <Route path="/" component={HomePage} />
-      <Route path="/profile" component={ProfilePage} />
-      <Route path="/security" component={() => <SecurityDashboard />} />
-      <Route path="/login" component={() => <LoginPage />} />
-      <Route path="/signup" component={() => <SignupPage />} />
-      <Route path="/check-email" component={() => <CheckEmailPage />} />
-      <Route path="/verification-success" component={() => <VerificationSuccessPage />} />
-      <Route path="/forgot-password" component={() => <ForgotPasswordPage />} />
-      <Route path="/check-email-reset" component={() => <CheckEmailResetPage />} />
-      <Route path="/reset-password" component={() => <ResetPasswordPage />} />
-      <Route path="/password-reset-success" component={() => <PasswordResetSuccessPage />} />
-      <Route component={NotFoundPage} />
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Route path="/" component={() => (
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        )} />
+        <Route path="/profile" component={() => (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        )} />
+        <Route path="/security" component={() => (
+          <ProtectedRoute>
+            <SecurityDashboard />
+          </ProtectedRoute>
+        )} />
+        <Route path="/login" component={() => <LoginPage />} />
+        <Route path="/signup" component={() => <SignupPage />} />
+        <Route path="/check-email" component={() => <CheckEmailPage />} />
+        <Route path="/verification-success" component={() => <VerificationSuccessPage />} />
+        <Route path="/forgot-password" component={() => <ForgotPasswordPage />} />
+        <Route path="/check-email-reset" component={() => <CheckEmailResetPage />} />
+        <Route path="/reset-password" component={() => <ResetPasswordPage />} />
+        <Route path="/password-reset-success" component={() => <PasswordResetSuccessPage />} />
+        <Route component={NotFoundPage} />
+      </Router>
+      <Toaster />
+    </AuthProvider>
   );
 }
 
