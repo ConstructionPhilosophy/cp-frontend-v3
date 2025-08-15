@@ -107,7 +107,11 @@ export default function Home() {
                             content: "We are a series A B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith, Would love your thoughts as well.",
                             questionId: question.id,
                             authorId: "2",
-                            createdAt: new Date()
+                            author: mockUsers[1],
+                            createdAt: new Date(),
+                            updatedAt: new Date(),
+                            upvotes: 3,
+                            downvotes: 0
                           }}
                           author={mockUsers[1]}
                         />

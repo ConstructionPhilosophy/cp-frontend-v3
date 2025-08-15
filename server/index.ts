@@ -25,6 +25,33 @@ app.get('/api/debug', (req, res) => {
   });
 });
 
+// Test route to verify CSS is working
+app.get('/test-css', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.send(`<!DOCTYPE html>
+<html>
+<head>
+    <title>CSS Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/index-DmExVhvI.css">
+    <style>
+      body { font-family: 'Inter', sans-serif; margin: 20px; }
+      .test-bg { background-color: var(--cmo-bg-main, #f8f9fa); padding: 20px; }
+      .test-text { color: var(--cmo-primary, #4285f4); font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div class="test-bg">
+        <h1 class="test-text">CSS Test Page</h1>
+        <p>If you see styled text with Inter font and light gray background, CSS is working.</p>
+        <div class="bg-blue-500 text-white p-4 rounded-lg mt-4">
+            This should be blue with white text if Tailwind CSS is working.
+        </div>
+    </div>
+</body>
+</html>`);
+});
+
 // Emergency HTML with inline CSS - serve BEFORE static files
 app.get('/', (req, res) => {
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -70,6 +97,18 @@ app.get('/', (req, res) => {
 </head>
 <body>
     <div id="root"></div>
+    <script>
+      // Debug React app loading
+      window.addEventListener('load', () => {
+        console.log('Page loaded');
+        setTimeout(() => {
+          const root = document.getElementById('root');
+          if (root && root.innerHTML.trim() === '') {
+            root.innerHTML = '<div style="padding: 20px; background: #fee; color: #c00;">React app failed to load. Check browser console for errors.</div>';
+          }
+        }, 3000);
+      });
+    </script>
     <script type="module" crossorigin src="/assets/index-DRud4M9E.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-DmExVhvI.css">
 </body>
