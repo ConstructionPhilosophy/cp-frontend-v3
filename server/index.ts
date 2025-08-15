@@ -11,18 +11,28 @@ app.use('/api', express.json());
 // Register API routes
 registerRoutes(app);
 
-// Serve static files from the built client directory
+// Serve static files from the built client directory with proper headers
 const staticPath = path.join(process.cwd(), 'dist', 'public');
-app.use(express.static(staticPath));
+app.use(express.static(staticPath, {
+  maxAge: '1y',
+  etag: false,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    } else if (filePath.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+}));
 
 // SPA fallback - serve index.html for non-API routes
 app.get('/', (req, res) => {
   res.sendFile(path.join(staticPath, 'index.html'));
 });
 
-// Fallback for SPA routes (avoid catch-all that causes path-to-regexp issues)
+// Fallback for SPA routes - only for non-API and non-asset routes
 app.use((req, res, next) => {
-  if (!req.path.startsWith('/api/')) {
+  if (!req.path.startsWith('/api/') && !req.path.startsWith('/assets/')) {
     res.sendFile(path.join(staticPath, 'index.html'));
   } else {
     next();
