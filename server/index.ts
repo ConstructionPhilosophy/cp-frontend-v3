@@ -1,6 +1,7 @@
 import express from "express";
 import { registerRoutes } from "./routes";
 import path from "path";
+import fs from "fs";
 
 // Create Express app
 const app = express();
@@ -13,12 +14,14 @@ registerRoutes(app);
 
 // Debug endpoint to check server state
 app.get('/api/debug', (req, res) => {
+  const staticPath = path.join(process.cwd(), 'dist', 'public');
   res.json({ 
     timestamp: new Date().toISOString(),
     message: 'Server running with emergency inline CSS fix',
     staticPath,
     deployment: !!process.env.REPLIT_DEPLOYMENT,
-    nodeEnv: process.env.NODE_ENV
+    nodeEnv: process.env.NODE_ENV,
+    htmlExists: fs.existsSync(path.join(staticPath, 'index.html'))
   });
 });
 
