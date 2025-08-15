@@ -11,16 +11,24 @@ app.use('/api', express.json());
 // Register API routes
 registerRoutes(app);
 
-// Serve static files from the built client directory with proper headers
+// Serve static files from the built client directory with cache-busting headers
 const staticPath = path.join(process.cwd(), 'dist', 'public');
 app.use(express.static(staticPath, {
-  maxAge: '1y',
-  etag: false,
+  maxAge: 0,
+  etag: true,
+  lastModified: true,
   setHeaders: (res, filePath) => {
+    // Force fresh CSS and JS files - no caching during development
     if (filePath.endsWith('.css')) {
-      res.setHeader('Content-Type', 'text/css');
+      res.setHeader('Content-Type', 'text/css; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
     } else if (filePath.endsWith('.js')) {
-      res.setHeader('Content-Type', 'application/javascript');
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
     }
   }
 }));

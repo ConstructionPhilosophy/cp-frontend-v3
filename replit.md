@@ -3,12 +3,12 @@
 This is a frontend-only React application built as a Q&A community platform similar to CMOlist. The application replicates the exact design from the provided mockup and allows users to view questions, answers, and engage with a community around topics like marketing, branding, and business expertise. It features a modern, responsive design with a clean interface optimized for both desktop and mobile experiences.
 
 ## Recent Changes (August 15, 2025)
-- **CSS Loading Issue Fixed**: Resolved static asset serving problems in production deployment
-  - Enhanced static file serving with proper Content-Type headers for CSS and JS files
+- **CSS Loading Issue with Cache-Busting Fix**: Implementing aggressive cache-busting to resolve browser caching issues
+  - Changed from long-term caching (max-age: 1y) to no-cache headers for CSS and JS files
+  - Added Cache-Control: no-cache, no-store, must-revalidate headers to force fresh asset loading
+  - Vite build system generates new hashed filenames on each build for cache-busting
+  - Enhanced static file serving with proper Content-Type headers and charset specification
   - Fixed SPA fallback middleware to exclude /assets/ routes from HTML serving
-  - Added proper cache headers (max-age: 1y) for optimal asset loading performance
-  - Confirmed CSS and JS files are served correctly with proper MIME types
-  - Static assets now loading properly in both development and deployment environments
 - **Deployment Issues COMPLETELY RESOLVED**: Fixed all Cloud Run deployment and build configuration issues
   - Verified client directory structure is complete with proper Vite entry points
   - Confirmed client/index.html exists and properly references /src/main.tsx
