@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Professional Networking Platform - STYLED</title>
+    <title>Professional Networking Platform</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
@@ -56,34 +56,19 @@ app.get('/', (req, res) => {
         padding: 0; 
       }
       body {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background-color: var(--cmo-bg-main);
         font-family: var(--font-sans);
         color: var(--cmo-text-primary);
         line-height: 1.5;
-        min-height: 100vh;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
       #root { 
         min-height: 100vh; 
-        background: var(--cmo-bg-main);
-      }
-      .test-message {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: #ff0000;
-        color: white;
-        padding: 10px;
-        text-align: center;
-        font-weight: bold;
-        z-index: 9999;
       }
     </style>
 </head>
 <body>
-    <div class="test-message">CSS IS WORKING - STYLED VERSION LOADED!</div>
     <div id="root"></div>
     <script type="module" crossorigin src="/assets/index-DRud4M9E.js"></script>
     <link rel="stylesheet" crossorigin href="/assets/index-DmExVhvI.css">
