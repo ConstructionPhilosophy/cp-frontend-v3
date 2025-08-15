@@ -282,9 +282,9 @@ export function LoginPage() {
             </div>
           </form>
 
-          {/* Footer */}
+          {/* Footer - Fixed alignment */}
           <div className="mt-8">
-            <div className="flex justify-between items-center text-sm text-gray-500">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center text-sm text-gray-500 space-y-2 sm:space-y-0">
               <p>© 2024 CP Inc. All rights reserved.</p>
               <div className="flex space-x-6">
                 <Link href="/privacy-policy">
