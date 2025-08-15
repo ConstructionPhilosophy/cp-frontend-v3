@@ -1,3 +1,4 @@
+import React from "react";
 import { Route, Router } from "wouter";
 import HomePage from "./pages/home";
 import ProfilePage from "./pages/profile";

@@ -1,98 +1,133 @@
-import React from 'react';
-import { Link } from 'wouter';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'wouter';
 import { Button } from '../components/ui/button';
-import { CheckCircle } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { CheckCircle, Loader2 } from 'lucide-react';
+import { auth } from '../lib/firebase';
+import { useToast } from '../hooks/use-toast';
 
 export function VerificationSuccessPage() {
+  const [loading, setLoading] = useState(true);
+  const [verified, setVerified] = useState(false);
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const checkVerification = async () => {
+      try {
+        // Wait for auth state to be resolved
+        await new Promise((resolve) => {
+          const unsubscribe = auth.onAuthStateChanged((user) => {
+            unsubscribe();
+            resolve(user);
+          });
+        });
+
+        // Reload user to get updated verification status
+        if (auth.currentUser) {
+          await auth.currentUser.reload();
+          
+          if (auth.currentUser.emailVerified) {
+            setVerified(true);
+            toast({
+              title: "Email verified successfully!",
+              description: "You can now access all features of CMOlist.",
+            });
+          } else {
+            toast({
+              title: "Email not verified",
+              description: "Please check your email and click the verification link.",
+              variant: "destructive",
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Verification check error:", error);
+        toast({
+          title: "Verification check failed",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkVerification();
+  }, [toast]);
+
+  const handleContinue = () => {
+    setLocation('/');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-cmo-primary" />
+              <h3 className="text-lg font-semibold mb-2">Verifying your email...</h3>
+              <p className="text-gray-600">Please wait while we verify your email address.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left Side - Hero Section */}
-      <div className="flex-1 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 relative overflow-hidden lg:flex hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-cmo-primary/10 to-purple-600/20"></div>
-        
-        {/* Geometric Background Pattern */}
-        <div className="absolute inset-0 opacity-20">
-          <svg className="w-full h-full" viewBox="0 0 400 400" fill="none">
-            <defs>
-              <pattern id="hexagons" x="0" y="0" width="50" height="43.4" patternUnits="userSpaceOnUse">
-                <path d="M25 0L50 14.4V35.6L25 50L0 35.6V14.4L25 0Z" stroke="currentColor" strokeWidth="1" fill="none"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#hexagons)" className="text-cmo-primary/30"/>
-          </svg>
-        </div>
-
-        <div className="relative z-10 flex items-center justify-center w-full p-12">
-          <div className="text-center max-w-md">
-            <h1 className="text-4xl font-bold text-gray-800 mb-6">
-              World-class network of CMOs
-            </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
-              Only for heads of marketing from hyper-growth companies.
-              Every member is carefully vetted.
-            </p>
-          </div>
-        </div>
-
-        {/* Navigation Dots */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          <div className="w-2 h-2 bg-cmo-primary rounded-full"></div>
-          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-        </div>
-      </div>
-
-      {/* Right Side - Success Content */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-white min-h-screen lg:min-h-auto">
-        <div className="w-full max-w-sm text-center">
-          {/* Logo */}
-          <div className="flex items-center justify-center mb-8">
-            <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
-              <div className="w-4 h-4 bg-white rounded-sm"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <div className="mx-auto mb-4">
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
+              verified ? 'bg-green-100' : 'bg-red-100'
+            }`}>
+              <CheckCircle className={`w-8 h-8 ${
+                verified ? 'text-green-600' : 'text-red-600'
+              }`} />
             </div>
-            <span className="text-xl font-bold text-cmo-text-primary">CMOlist</span>
           </div>
-
-          {/* Success Icon */}
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-
-          {/* Content */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-cmo-text-primary mb-4">Email verified successfully!</h2>
-            <p className="text-cmo-text-secondary leading-relaxed">
-              Your email address has been verified. Your account is now active and you can start exploring the CMOlist community.
-            </p>
-          </div>
-
-          {/* Actions */}
-          <div className="space-y-4">
-            <Link href="/login">
-              <Button className="w-full h-11 bg-cmo-primary hover:bg-cmo-primary/90">
-                Continue to login
+          <CardTitle className="text-2xl">
+            {verified ? 'Email Verified!' : 'Verification Pending'}
+          </CardTitle>
+          <CardDescription>
+            {verified 
+              ? 'Your email has been successfully verified. Welcome to CMOlist!'
+              : 'Your email has not been verified yet. Please check your email and click the verification link.'
+            }
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {verified ? (
+            <Button 
+              onClick={handleContinue}
+              className="w-full bg-cmo-primary hover:bg-cmo-primary/90"
+            >
+              Continue to CMOlist
+            </Button>
+          ) : (
+            <div className="space-y-3">
+              <Button 
+                onClick={() => window.location.reload()}
+                variant="outline"
+                className="w-full"
+              >
+                Check Again
               </Button>
-            </Link>
-          </div>
-
-          {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500 mb-4">© 2024 CMOlist Inc. All rights reserved.</p>
-            <div className="flex justify-center space-x-6 text-sm text-gray-500">
-              <Link href="/privacy-policy">
-                <Button variant="link" className="p-0 h-auto text-sm text-gray-500 hover:text-gray-700">
-                  Privacy Policy
-                </Button>
-              </Link>
-              <Link href="/terms-conditions">
-                <Button variant="link" className="p-0 h-auto text-sm text-gray-500 hover:text-gray-700">
-                  Terms & Conditions
+              <Link href="/login">
+                <Button 
+                  variant="ghost"
+                  className="w-full"
+                >
+                  Back to Login
                 </Button>
               </Link>
             </div>
-          </div>
-        </div>
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
