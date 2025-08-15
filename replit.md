@@ -3,6 +3,11 @@
 This is a frontend-only React application built as a Q&A community platform similar to CMOlist. The application replicates the exact design from the provided mockup and allows users to view questions, answers, and engage with a community around topics like marketing, branding, and business expertise. It features a modern, responsive design with a clean interface optimized for both desktop and mobile experiences.
 
 ## Recent Changes (August 15, 2025)
+- **Deployment Configuration Fixed**: Resolved Cloud Run deployment issues with proper host and port binding
+  - Updated server to explicitly bind to 0.0.0.0 host (required for Cloud Run)
+  - Added dynamic port configuration: port 80 for production, port 5000 for development
+  - Server now properly handles NODE_ENV environment variable for deployment contexts
+  - Fixed port mapping between internal (80) and external (80) ports for production deployments
 - **Deployment Issue Fixed**: Resolved build failures by restructuring project for proper Vite configuration
   - Created client directory structure with index.html entry point
   - Moved src folder to client/src to match Vite config expectations
