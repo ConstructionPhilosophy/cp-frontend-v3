@@ -284,8 +284,8 @@ export function LoginPage() {
         </div>
         
         {/* Footer - Outside form container, at bottom of page */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex justify-between items-center text-sm text-gray-500">
+        <div className="absolute bottom-6 left-4 right-4">
+          <div className="flex justify-between items-center text-xs text-gray-500">
             <span>© 2024 CP Inc. All rights reserved.</span>
             <div className="flex space-x-4">
               <Link href="/privacy-policy" className="hover:text-gray-700">

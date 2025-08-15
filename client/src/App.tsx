@@ -48,7 +48,7 @@ function App() {
         )} />
         
         {/* 404 fallback - must be last */}
-        <Route component={NotFoundPage} />
+        <Route path="*" component={NotFoundPage} />
       </Router>
       <Toaster />
     </AuthProvider>

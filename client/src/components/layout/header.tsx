@@ -1,5 +1,6 @@
 import React from "react";
 import { Search, MoreHorizontal, Home, User, Edit, Flag, Share, Settings, FileText, Briefcase, Users, MessageSquare, RefreshCw } from "lucide-react";
+import { Link } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { 
@@ -72,6 +73,12 @@ export default function Header() {
               <RefreshCw className="w-5 h-5" />
               <span className="text-xs mt-1">Updates</span>
             </a>
+            <Link href="/profile">
+              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+                <User className="w-5 h-5" />
+                <span className="text-xs mt-1">My Profile</span>
+              </a>
+            </Link>
           </nav>
 
           {/* Right Section */}
@@ -88,10 +95,12 @@ export default function Header() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>View Profile</span>
-                </DropdownMenuItem>
+                <Link href="/profile">
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>View Profile</span>
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem>
                   <Edit className="mr-2 h-4 w-4" />
                   <span>Edit Profile</span>
