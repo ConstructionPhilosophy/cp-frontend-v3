@@ -11,6 +11,7 @@ import { ForgotPasswordPage } from "./pages/forgot-password";
 import { CheckEmailResetPage } from "./pages/check-email-reset";
 import { ResetPasswordPage } from "./pages/reset-password";
 import { PasswordResetSuccessPage } from "./pages/password-reset-success";
+import { BasicInfoPage } from "./pages/basic-info";
 import { SecurityDashboard } from "./pages/security-dashboard-simple";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -44,6 +45,10 @@ function App() {
           <Route
             path="/password-reset-success"
             component={() => <PasswordResetSuccessPage />}
+          />
+          <Route
+            path="/basic-info"
+            component={() => <BasicInfoPage />}
           />
 
           {/* Protected routes */}
