@@ -33,6 +33,53 @@ googleProvider.addScope('profile');
 // External API base URL
 const API_BASE_URL = 'https://cp-backend-service-test-972540571952.asia-south1.run.app';
 
+// Call external signup API with FormData
+const callExternalSignupAPI = async (userData: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  profilePic?: string;
+  hasBasicInfo?: boolean;
+}, user?: User) => {
+  try {
+    const headers: HeadersInit = {};
+
+    // Add bearer token if user is provided
+    if (user) {
+      const token = await user.getIdToken();
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Create FormData instead of JSON
+    const formData = new FormData();
+    formData.append('email', userData.email);
+    formData.append('firstName', userData.firstName);
+    formData.append('lastName', userData.lastName);
+    formData.append('hasBasicInfo', userData.hasBasicInfo?.toString() || 'false');
+    
+    // Only add profileURL if it exists
+    if (userData.profilePic) {
+      formData.append('profileURL', userData.profilePic);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API call failed: ${response.status} ${response.statusText} - ${errorText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('External API call error:', error);
+    throw error;
+  }
+};
+
 // Google Sign In
 export const signInWithGoogle = async () => {
   try {
@@ -95,55 +142,6 @@ export const signInWithEmail = async (email: string, password: string) => {
     return result.user;
   } catch (error) {
     console.error('Email sign-in error:', error);
-    throw error;
-  }
-};
-
-// Removed duplicate exports - keeping the complete versions below
-
-// Call external signup API with FormData
-const callExternalSignupAPI = async (userData: {
-  firstName: string;
-  lastName: string;
-  email: string;
-  profilePic?: string;
-  hasBasicInfo?: boolean;
-}, user?: User) => {
-  try {
-    const headers: HeadersInit = {};
-
-    // Add bearer token if user is provided
-    if (user) {
-      const token = await user.getIdToken();
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    // Create FormData instead of JSON
-    const formData = new FormData();
-    formData.append('email', userData.email);
-    formData.append('firstName', userData.firstName);
-    formData.append('lastName', userData.lastName);
-    formData.append('hasBasicInfo', userData.hasBasicInfo?.toString() || 'false');
-    
-    // Only add profileURL if it exists
-    if (userData.profilePic) {
-      formData.append('profileURL', userData.profilePic);
-    }
-
-    const response = await fetch(`${API_BASE_URL}/auth/signup`, {
-      method: 'POST',
-      headers,
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`API call failed: ${response.status} ${response.statusText} - ${errorText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('External API call error:', error);
     throw error;
   }
 };
