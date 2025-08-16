@@ -99,20 +99,7 @@ export const signInWithEmail = async (email: string, password: string) => {
   }
 };
 
-// Sign Out
-export const signOutUser = async () => {
-  try {
-    await signOut(auth);
-  } catch (error) {
-    console.error('Sign-out error:', error);
-    throw error;
-  }
-};
-
-// Auth State Listener
-export const onAuthStateChange = (callback: (user: User | null) => void) => {
-  return onAuthStateChanged(auth, callback);
-};
+// Removed duplicate exports - keeping the complete versions below
 
 // Call external signup API with FormData
 const callExternalSignupAPI = async (userData: {
