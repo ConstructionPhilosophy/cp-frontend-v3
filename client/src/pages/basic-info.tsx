@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Calendar } from '../components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
-import { CalendarIcon, Camera, Loader2, Upload, Plus, X } from 'lucide-react';
+import { CalendarIcon, Camera, Loader2, Upload, Plus, X, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../lib/utils';
 import { userApiService } from '../lib/userApi';
@@ -62,51 +62,44 @@ const JOB_TITLES = [
   'Other (Specify)',
 ];
 
-const COUNTRIES = [
-  { code: 'IN', name: 'India' },
-  { code: 'US', name: 'United States' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'AU', name: 'Australia' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'FR', name: 'France' },
-  { code: 'JP', name: 'Japan' },
-  { code: 'BR', name: 'Brazil' },
-  { code: 'CN', name: 'China' },
+const COUNTRY_CODES = [
+  { code: '+1', country: 'US', name: 'United States' },
+  { code: '+91', country: 'IN', name: 'India' },
+  { code: '+44', country: 'GB', name: 'United Kingdom' },
+  { code: '+61', country: 'AU', name: 'Australia' },
+  { code: '+1', country: 'CA', name: 'Canada' },
+  { code: '+49', country: 'DE', name: 'Germany' },
+  { code: '+33', country: 'FR', name: 'France' },
+  { code: '+81', country: 'JP', name: 'Japan' },
+  { code: '+55', country: 'BR', name: 'Brazil' },
+  { code: '+86', country: 'CN', name: 'China' },
+  { code: '+971', country: 'AE', name: 'UAE' },
+  { code: '+65', country: 'SG', name: 'Singapore' },
+  { code: '+60', country: 'MY', name: 'Malaysia' },
+  { code: '+66', country: 'TH', name: 'Thailand' },
+  { code: '+84', country: 'VN', name: 'Vietnam' },
 ];
 
-const STATES_BY_COUNTRY: Record<string, string[]> = {
-  'IN': [
-    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh', 'Goa',
-    'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka', 'Kerala',
-    'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland',
-    'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
-    'Uttar Pradesh', 'Uttarakhand', 'West Bengal', 'Delhi', 'Jammu and Kashmir', 'Ladakh'
-  ],
-  'US': [
-    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
-    'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
-    'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
-    'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
-    'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
-    'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
-    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-    'Wisconsin', 'Wyoming'
-  ],
-  'CA': ['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia', 'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'],
-  'GB': ['England', 'Scotland', 'Wales', 'Northern Ireland'],
-  'AU': ['Australian Capital Territory', 'New South Wales', 'Northern Territory', 'Queensland', 'South Australia', 'Tasmania', 'Victoria', 'Western Australia'],
-};
+interface Country {
+  id: number;
+  name: string;
+  iso2: string;
+  phone_code: string;
+}
 
-const CITIES_BY_STATE: Record<string, string[]> = {
-  'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Trichy', 'Salem', 'Tirunelveli', 'Erode', 'Vellore', 'Tuticorin', 'Thanjavur'],
-  'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Aurangabad', 'Solapur', 'Amravati', 'Kolhapur', 'Sangli', 'Dhule'],
-  'Karnataka': ['Bangalore', 'Mysore', 'Hubli', 'Mangalore', 'Belgaum', 'Gulbarga', 'Davangere', 'Bellary', 'Bijapur', 'Shimoga'],
-  'Delhi': ['New Delhi', 'North Delhi', 'South Delhi', 'East Delhi', 'West Delhi', 'Central Delhi', 'North East Delhi', 'North West Delhi', 'South East Delhi', 'South West Delhi'],
-  'California': ['Los Angeles', 'San Francisco', 'San Diego', 'San Jose', 'Fresno', 'Sacramento', 'Long Beach', 'Oakland', 'Bakersfield', 'Anaheim'],
-  'New York': ['New York City', 'Buffalo', 'Rochester', 'Yonkers', 'Syracuse', 'Albany', 'New Rochelle', 'Mount Vernon', 'Schenectady', 'Utica'],
-  'Texas': ['Houston', 'San Antonio', 'Dallas', 'Austin', 'Fort Worth', 'El Paso', 'Arlington', 'Corpus Christi', 'Plano', 'Laredo'],
-};
+interface State {
+  id: number;
+  name: string;
+  country_code: string;
+  state_code: string;
+}
+
+interface City {
+  id: number;
+  name: string;
+  state_code: string;
+  country_code: string;
+}
 
 export function BasicInfoPage() {
   const [, setLocation] = useLocation();
@@ -120,6 +113,19 @@ export function BasicInfoPage() {
   const [profileImagePreview, setProfileImagePreview] = useState<string>('');
   const [coverImagePreview, setCoverImagePreview] = useState<string>('');
   
+  // Location data from API
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [states, setStates] = useState<State[]>([]);
+  const [cities, setCities] = useState<City[]>([]);
+  const [loadingLocations, setLoadingLocations] = useState(false);
+
+  // Phone verification
+  const [phoneCodeSent, setPhoneCodeSent] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [sendingCode, setSendingCode] = useState(false);
+  const [verifyingCode, setVerifyingCode] = useState(false);
+  
   const profileFileRef = useRef<HTMLInputElement>(null);
   const coverFileRef = useRef<HTMLInputElement>(null);
 
@@ -127,6 +133,7 @@ export function BasicInfoPage() {
     gender: '',
     dateOfBirth: '',
     phoneNumber: '',
+    countryCode: '+91',
     country: '',
     state: '',
     city: '',
@@ -137,6 +144,186 @@ export function BasicInfoPage() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Load countries on component mount
+  useEffect(() => {
+    loadCountries();
+  }, []);
+
+  const loadCountries = async () => {
+    try {
+      setLoadingLocations(true);
+      const response = await fetch('https://api.countrystatecity.in/v1/countries', {
+        headers: {
+          'X-CSCAPI-KEY': 'YOUR_API_KEY' // We'll use REST Countries as fallback
+        }
+      });
+      
+      if (!response.ok) {
+        // Fallback to REST Countries API
+        const restResponse = await fetch('https://restcountries.com/v3.1/all?fields=name,cca2,idd');
+        const restData = await restResponse.json();
+        
+        const formattedCountries = restData.map((country: any, index: number) => ({
+          id: index + 1,
+          name: country.name.common,
+          iso2: country.cca2,
+          phone_code: country.idd?.root ? `${country.idd.root}${country.idd.suffixes?.[0] || ''}` : ''
+        })).sort((a: Country, b: Country) => a.name.localeCompare(b.name));
+        
+        setCountries(formattedCountries);
+      } else {
+        const data = await response.json();
+        setCountries(data);
+      }
+    } catch (error) {
+      console.error('Error loading countries:', error);
+      toast({
+        title: "Error Loading Countries",
+        description: "Failed to load country data. Please refresh the page.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingLocations(false);
+    }
+  };
+
+  const loadStates = async (countryCode: string) => {
+    try {
+      setLoadingLocations(true);
+      const response = await fetch(`https://api.countrystatecity.in/v1/countries/${countryCode}/states`, {
+        headers: {
+          'X-CSCAPI-KEY': 'YOUR_API_KEY'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setStates(data);
+      } else {
+        // Fallback static data for major countries
+        const staticStates = getStaticStates(countryCode);
+        setStates(staticStates);
+      }
+    } catch (error) {
+      console.error('Error loading states:', error);
+      const staticStates = getStaticStates(countryCode);
+      setStates(staticStates);
+    } finally {
+      setLoadingLocations(false);
+    }
+  };
+
+  const loadCities = async (countryCode: string, stateCode: string) => {
+    try {
+      setLoadingLocations(true);
+      const response = await fetch(`https://api.countrystatecity.in/v1/countries/${countryCode}/states/${stateCode}/cities`, {
+        headers: {
+          'X-CSCAPI-KEY': 'YOUR_API_KEY'
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCities(data);
+      } else {
+        // Fallback static data
+        const staticCities = getStaticCities(countryCode, stateCode);
+        setCities(staticCities);
+      }
+    } catch (error) {
+      console.error('Error loading cities:', error);
+      const staticCities = getStaticCities(countryCode, stateCode);
+      setCities(staticCities);
+    } finally {
+      setLoadingLocations(false);
+    }
+  };
+
+  const getStaticStates = (countryCode: string): State[] => {
+    const staticData: Record<string, State[]> = {
+      'IN': [
+        { id: 1, name: 'Andhra Pradesh', country_code: 'IN', state_code: 'AP' },
+        { id: 2, name: 'Arunachal Pradesh', country_code: 'IN', state_code: 'AR' },
+        { id: 3, name: 'Assam', country_code: 'IN', state_code: 'AS' },
+        { id: 4, name: 'Bihar', country_code: 'IN', state_code: 'BR' },
+        { id: 5, name: 'Chhattisgarh', country_code: 'IN', state_code: 'CG' },
+        { id: 6, name: 'Goa', country_code: 'IN', state_code: 'GA' },
+        { id: 7, name: 'Gujarat', country_code: 'IN', state_code: 'GJ' },
+        { id: 8, name: 'Haryana', country_code: 'IN', state_code: 'HR' },
+        { id: 9, name: 'Himachal Pradesh', country_code: 'IN', state_code: 'HP' },
+        { id: 10, name: 'Jharkhand', country_code: 'IN', state_code: 'JH' },
+        { id: 11, name: 'Karnataka', country_code: 'IN', state_code: 'KA' },
+        { id: 12, name: 'Kerala', country_code: 'IN', state_code: 'KL' },
+        { id: 13, name: 'Madhya Pradesh', country_code: 'IN', state_code: 'MP' },
+        { id: 14, name: 'Maharashtra', country_code: 'IN', state_code: 'MH' },
+        { id: 15, name: 'Manipur', country_code: 'IN', state_code: 'MN' },
+        { id: 16, name: 'Meghalaya', country_code: 'IN', state_code: 'ML' },
+        { id: 17, name: 'Mizoram', country_code: 'IN', state_code: 'MZ' },
+        { id: 18, name: 'Nagaland', country_code: 'IN', state_code: 'NL' },
+        { id: 19, name: 'Odisha', country_code: 'IN', state_code: 'OR' },
+        { id: 20, name: 'Punjab', country_code: 'IN', state_code: 'PB' },
+        { id: 21, name: 'Rajasthan', country_code: 'IN', state_code: 'RJ' },
+        { id: 22, name: 'Sikkim', country_code: 'IN', state_code: 'SK' },
+        { id: 23, name: 'Tamil Nadu', country_code: 'IN', state_code: 'TN' },
+        { id: 24, name: 'Telangana', country_code: 'IN', state_code: 'TS' },
+        { id: 25, name: 'Tripura', country_code: 'IN', state_code: 'TR' },
+        { id: 26, name: 'Uttar Pradesh', country_code: 'IN', state_code: 'UP' },
+        { id: 27, name: 'Uttarakhand', country_code: 'IN', state_code: 'UK' },
+        { id: 28, name: 'West Bengal', country_code: 'IN', state_code: 'WB' },
+        { id: 29, name: 'Delhi', country_code: 'IN', state_code: 'DL' },
+        { id: 30, name: 'Jammu and Kashmir', country_code: 'IN', state_code: 'JK' },
+        { id: 31, name: 'Ladakh', country_code: 'IN', state_code: 'LA' }
+      ],
+      'US': [
+        { id: 1, name: 'California', country_code: 'US', state_code: 'CA' },
+        { id: 2, name: 'Texas', country_code: 'US', state_code: 'TX' },
+        { id: 3, name: 'Florida', country_code: 'US', state_code: 'FL' },
+        { id: 4, name: 'New York', country_code: 'US', state_code: 'NY' },
+        { id: 5, name: 'Pennsylvania', country_code: 'US', state_code: 'PA' },
+        { id: 6, name: 'Illinois', country_code: 'US', state_code: 'IL' },
+        { id: 7, name: 'Ohio', country_code: 'US', state_code: 'OH' },
+        { id: 8, name: 'Georgia', country_code: 'US', state_code: 'GA' },
+        { id: 9, name: 'North Carolina', country_code: 'US', state_code: 'NC' },
+        { id: 10, name: 'Michigan', country_code: 'US', state_code: 'MI' }
+      ]
+    };
+    return staticData[countryCode] || [];
+  };
+
+  const getStaticCities = (countryCode: string, stateCode: string): City[] => {
+    const staticData: Record<string, City[]> = {
+      'TN': [
+        { id: 1, name: 'Chennai', state_code: 'TN', country_code: 'IN' },
+        { id: 2, name: 'Coimbatore', state_code: 'TN', country_code: 'IN' },
+        { id: 3, name: 'Madurai', state_code: 'TN', country_code: 'IN' },
+        { id: 4, name: 'Trichy', state_code: 'TN', country_code: 'IN' },
+        { id: 5, name: 'Salem', state_code: 'TN', country_code: 'IN' }
+      ],
+      'MH': [
+        { id: 1, name: 'Mumbai', state_code: 'MH', country_code: 'IN' },
+        { id: 2, name: 'Pune', state_code: 'MH', country_code: 'IN' },
+        { id: 3, name: 'Nagpur', state_code: 'MH', country_code: 'IN' },
+        { id: 4, name: 'Nashik', state_code: 'MH', country_code: 'IN' },
+        { id: 5, name: 'Aurangabad', state_code: 'MH', country_code: 'IN' }
+      ],
+      'CA': [
+        { id: 1, name: 'Los Angeles', state_code: 'CA', country_code: 'US' },
+        { id: 2, name: 'San Francisco', state_code: 'CA', country_code: 'US' },
+        { id: 3, name: 'San Diego', state_code: 'CA', country_code: 'US' },
+        { id: 4, name: 'San Jose', state_code: 'CA', country_code: 'US' },
+        { id: 5, name: 'Fresno', state_code: 'CA', country_code: 'US' }
+      ],
+      'NY': [
+        { id: 1, name: 'New York City', state_code: 'NY', country_code: 'US' },
+        { id: 2, name: 'Buffalo', state_code: 'NY', country_code: 'US' },
+        { id: 3, name: 'Rochester', state_code: 'NY', country_code: 'US' },
+        { id: 4, name: 'Yonkers', state_code: 'NY', country_code: 'US' },
+        { id: 5, name: 'Syracuse', state_code: 'NY', country_code: 'US' }
+      ]
+    };
+    return staticData[stateCode] || [];
+  };
 
   const validateRequiredFields = () => {
     const newErrors: Record<string, string> = {};
@@ -149,6 +336,11 @@ export function BasicInfoPage() {
     if (!formData.country) newErrors.country = 'Country is required';
     if (!formData.state) newErrors.state = 'State is required';
     if (!formData.city) newErrors.city = 'City is required';
+    
+    // Phone verification check
+    if (formData.phoneNumber && !phoneVerified) {
+      newErrors.phoneNumber = 'Please verify your phone number';
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -173,15 +365,36 @@ export function BasicInfoPage() {
       }
     }
 
-    // Reset dependent fields when parent changes
+    // Reset dependent fields and phone verification when phone changes
+    if (field === 'phoneNumber') {
+      setPhoneCodeSent(false);
+      setPhoneVerified(false);
+      setVerificationCode('');
+    }
+
+    // Handle location changes
     if (field === 'country') {
       setFormData(prev => ({ ...prev, state: '', city: '' }));
+      setStates([]);
+      setCities([]);
       if (errors.state) setErrors(prev => ({ ...prev, state: '' }));
       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
+      
+      const selectedCountry = countries.find(c => c.name === value);
+      if (selectedCountry) {
+        loadStates(selectedCountry.iso2);
+      }
     }
     if (field === 'state') {
       setFormData(prev => ({ ...prev, city: '' }));
+      setCities([]);
       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
+      
+      const selectedCountry = countries.find(c => c.name === formData.country);
+      const selectedState = states.find(s => s.name === value);
+      if (selectedCountry && selectedState) {
+        loadCities(selectedCountry.iso2, selectedState.state_code);
+      }
     }
   };
 
@@ -241,12 +454,70 @@ export function BasicInfoPage() {
     }
   };
 
-  const getAvailableStates = () => {
-    return STATES_BY_COUNTRY[formData.country] || [];
+  const handleSendVerificationCode = async () => {
+    if (!formData.phoneNumber) {
+      toast({
+        title: "Phone Number Required",
+        description: "Please enter your phone number first",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSendingCode(true);
+    try {
+      // Simulate API call for sending verification code
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setPhoneCodeSent(true);
+      toast({
+        title: "Verification Code Sent",
+        description: `Code sent to ${formData.countryCode}${formData.phoneNumber}`,
+      });
+    } catch (error) {
+      toast({
+        title: "Failed to Send Code",
+        description: "Please try again later",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingCode(false);
+    }
   };
 
-  const getAvailableCities = () => {
-    return CITIES_BY_STATE[formData.state] || [];
+  const handleVerifyCode = async () => {
+    if (!verificationCode || verificationCode.length !== 6) {
+      toast({
+        title: "Invalid Code",
+        description: "Please enter a valid 6-digit code",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setVerifyingCode(true);
+    try {
+      // Simulate API call for verifying code
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // For demo purposes, accept any 6-digit code
+      setPhoneVerified(true);
+      if (errors.phoneNumber) {
+        setErrors(prev => ({ ...prev, phoneNumber: '' }));
+      }
+      toast({
+        title: "Phone Verified!",
+        description: "Your phone number has been verified successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Verification Failed",
+        description: "Invalid code. Please try again",
+        variant: "destructive",
+      });
+    } finally {
+      setVerifyingCode(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -275,7 +546,7 @@ export function BasicInfoPage() {
 
     try {
       const updateData: any = {
-        phoneNumber: formData.phoneNumber || undefined,
+        phoneNumber: formData.phoneNumber ? `${formData.countryCode}${formData.phoneNumber}` : undefined,
         title: showOtherTitle && formData.customTitle ? formData.customTitle : formData.title,
         positionDesignation: formData.positionDesignation,
         gender: formData.gender || undefined,
@@ -284,6 +555,7 @@ export function BasicInfoPage() {
         state: formData.state,
         country: formData.country,
         company: formData.company,
+        hasBasicInfo: true, // Set hasBasicInfo to true
       };
 
       // Add image files if they exist
@@ -313,6 +585,13 @@ export function BasicInfoPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const isSubmitEnabled = () => {
+    const hasRequiredFields = formData.dateOfBirth && formData.title && formData.positionDesignation && 
+                              formData.company && formData.country && formData.state && formData.city;
+    const phoneVerificationValid = !formData.phoneNumber || phoneVerified;
+    return hasRequiredFields && phoneVerificationValid && !loading;
   };
 
   return (
@@ -475,19 +754,84 @@ export function BasicInfoPage() {
                     </Popover>
                     {errors.dateOfBirth && <p className="text-sm text-red-500">{errors.dateOfBirth}</p>}
                   </div>
+                </div>
 
-                  {/* Phone Number */}
-                  <div className="space-y-2">
-                    <Label htmlFor="phoneNumber">Phone Number (Optional)</Label>
+                {/* Phone Number with Verification */}
+                <div className="space-y-4">
+                  <Label>Phone Number (Optional)</Label>
+                  <div className="flex gap-2">
+                    {/* Country Code */}
+                    <Select value={formData.countryCode} onValueChange={(value) => handleInputChange('countryCode', value)}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COUNTRY_CODES.map((item) => (
+                          <SelectItem key={`${item.code}-${item.country}`} value={item.code}>
+                            {item.code} {item.country}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    
+                    {/* Phone Number */}
                     <Input
-                      id="phoneNumber"
                       type="tel"
-                      placeholder="+1234567890"
+                      placeholder="Enter phone number"
                       value={formData.phoneNumber}
                       onChange={(e) => handleInputChange('phoneNumber', e.target.value)}
+                      className={cn("flex-1", errors.phoneNumber && "border-red-500")}
                     />
-                    <p className="text-xs text-gray-500">We'll send you a verification code if provided</p>
+                    
+                    {/* Send Code Button */}
+                    {formData.phoneNumber && !phoneVerified && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleSendVerificationCode}
+                        disabled={sendingCode || phoneCodeSent}
+                        className="whitespace-nowrap"
+                      >
+                        {sendingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        {phoneCodeSent ? 'Code Sent' : 'Send Code'}
+                      </Button>
+                    )}
+                    
+                    {/* Verified Indicator */}
+                    {phoneVerified && (
+                      <div className="flex items-center gap-2 px-3 py-2 bg-green-50 text-green-700 rounded-md">
+                        <Check className="w-4 h-4" />
+                        <span className="text-sm">Verified</span>
+                      </div>
+                    )}
                   </div>
+                  
+                  {/* Verification Code Input */}
+                  {phoneCodeSent && !phoneVerified && (
+                    <div className="flex gap-2">
+                      <Input
+                        type="text"
+                        placeholder="Enter 6-digit code"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        maxLength={6}
+                        className="w-48"
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleVerifyCode}
+                        disabled={verifyingCode || verificationCode.length !== 6}
+                      >
+                        {verifyingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        Verify
+                      </Button>
+                    </div>
+                  )}
+                  
+                  {errors.phoneNumber && <p className="text-sm text-red-500">{errors.phoneNumber}</p>}
+                  <p className="text-xs text-gray-500">
+                    Phone verification is required if you provide a phone number
+                  </p>
                 </div>
               </div>
 
@@ -499,13 +843,17 @@ export function BasicInfoPage() {
                   {/* Country */}
                   <div className="space-y-2">
                     <Label htmlFor="country">Country *</Label>
-                    <Select value={formData.country} onValueChange={(value) => handleInputChange('country', value)}>
+                    <Select 
+                      value={formData.country} 
+                      onValueChange={(value) => handleInputChange('country', value)}
+                      disabled={loadingLocations}
+                    >
                       <SelectTrigger className={errors.country ? "border-red-500" : ""}>
-                        <SelectValue placeholder="Select country" />
+                        <SelectValue placeholder={loadingLocations ? "Loading..." : "Select country"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {COUNTRIES.map((country) => (
-                          <SelectItem key={country.code} value={country.code}>
+                        {countries.map((country) => (
+                          <SelectItem key={country.id} value={country.name}>
                             {country.name}
                           </SelectItem>
                         ))}
@@ -520,15 +868,15 @@ export function BasicInfoPage() {
                     <Select 
                       value={formData.state} 
                       onValueChange={(value) => handleInputChange('state', value)}
-                      disabled={!formData.country}
+                      disabled={!formData.country || loadingLocations}
                     >
                       <SelectTrigger className={errors.state ? "border-red-500" : ""}>
-                        <SelectValue placeholder="Select state" />
+                        <SelectValue placeholder={loadingLocations ? "Loading..." : "Select state"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {getAvailableStates().map((state) => (
-                          <SelectItem key={state} value={state}>
-                            {state}
+                        {states.map((state) => (
+                          <SelectItem key={state.id} value={state.name}>
+                            {state.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -542,15 +890,15 @@ export function BasicInfoPage() {
                     <Select 
                       value={formData.city} 
                       onValueChange={(value) => handleInputChange('city', value)}
-                      disabled={!formData.state}
+                      disabled={!formData.state || loadingLocations}
                     >
                       <SelectTrigger className={errors.city ? "border-red-500" : ""}>
-                        <SelectValue placeholder="Select city" />
+                        <SelectValue placeholder={loadingLocations ? "Loading..." : "Select city"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {getAvailableCities().map((city) => (
-                          <SelectItem key={city} value={city}>
-                            {city}
+                        {cities.map((city) => (
+                          <SelectItem key={city.id} value={city.name}>
+                            {city.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -628,7 +976,11 @@ export function BasicInfoPage() {
 
               {/* Submit Button */}
               <div className="flex justify-end pt-6 border-t">
-                <Button type="submit" disabled={loading} className="min-w-[200px]">
+                <Button 
+                  type="submit" 
+                  disabled={!isSubmitEnabled()} 
+                  className="min-w-[200px]"
+                >
                   {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                   Complete Profile
                 </Button>

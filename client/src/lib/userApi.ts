@@ -33,6 +33,7 @@ export interface UpdateUserData {
   state?: string;
   country?: string;
   company?: string;
+  hasBasicInfo?: boolean;
   profilePic?: File | string;
   bannerPic?: File | string;
 }
