@@ -32,8 +32,9 @@ export interface UpdateUserData {
   city?: string;
   state?: string;
   country?: string;
-  profilePic?: string;
-  bannerPic?: string;
+  company?: string;
+  profilePic?: File | string;
+  bannerPic?: File | string;
 }
 
 class UserApiService {
@@ -101,13 +102,24 @@ class UserApiService {
     try {
       const headers = await this.getAuthHeaders();
       
+      // Create FormData for multipart request
+      const formData = new FormData();
+      
+      // Add all fields to FormData
+      Object.entries(userData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          if (value instanceof File) {
+            formData.append(key, value);
+          } else {
+            formData.append(key, value.toString());
+          }
+        }
+      });
+
       const response = await fetch(`${API_BASE_URL}/users/${uid}`, {
         method: 'PUT',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
+        headers, // Don't set Content-Type header - browser will set it with boundary
+        body: formData,
       });
 
       if (response.status === 401) {
@@ -115,7 +127,8 @@ class UserApiService {
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to update user: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Failed to update user: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const updatedUser: UserProfile = await response.json();

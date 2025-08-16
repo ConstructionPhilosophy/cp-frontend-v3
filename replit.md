@@ -3,9 +3,17 @@
 This is a frontend-only React application built as a Q&A community platform similar to CMOlist. The application replicates the exact design from the provided mockup and allows users to view questions, answers, and engage with a community around topics like marketing, branding, and business expertise. It features a modern, responsive design with a clean interface optimized for both desktop and mobile experiences.
 
 ## Recent Changes (August 16, 2025)
+- **Enhanced Basic Info Form with Professional Features**: Completely redesigned user profile form with comprehensive improvements
+  - Updated job titles dropdown with complete construction industry list including "Other (Specify)" option with custom text input
+  - Implemented professional profile/cover image upload system with drag-and-drop functionality and file explorer integration
+  - Added proper image cropping layout similar to social media platforms with overlay profile picture on cover image
+  - Fixed cascading location dropdowns: Country → State → City with proper dependencies and data clearing
+  - Separated company and position fields to prevent cross-contamination during typing
+  - Added comprehensive field validation for all mandatory fields (DOB, Job Title, Position, Company, Country, State, City)
+  - Enhanced API integration with FormData and multipart requests for file uploads
+  - Improved error handling and user feedback with field-specific validation messages
 - **User Verification and Profile Flow Implementation**: Built complete post-login user verification system
   - Added user profile API integration with external backend using bearer token authentication
-  - Implemented comprehensive basic info collection form with professional fields for construction industry
   - Created user profile caching system with automatic token expiration handling
   - Built route protection that automatically redirects users based on verification and basic info completion status
   - Enhanced profile page to display all user data fetched from external API with refresh functionality
@@ -14,8 +22,8 @@ This is a frontend-only React application built as a Q&A community platform simi
   - Restructured firebase.ts file to prevent future duplicate export issues
   - Verified clean build process with no LSP diagnostics or compilation errors
 - **API Integration Enhanced**: Improved external API communication for user data management
-  - Implemented GET /users/me endpoint integration for fetching user profile data
-  - Added PUT /users/{uid} endpoint integration for updating user basic information
+  - Updated userApi.ts to use FormData and multipart requests for file uploads including company field
+  - Added support for profile and banner image file uploads with proper MIME type validation
   - Built comprehensive error handling for token expiration and authentication failures
   - Created user data caching strategy for optimal performance and profile page usage
 
