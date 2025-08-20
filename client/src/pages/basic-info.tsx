@@ -203,7 +203,7 @@ export function BasicInfoPage() {
   const loadCountries = async () => {
     try {
       setLoadingLocations(true);
-      const response = await fetch('https://geo-api-230500065838.asia-south1.run.app/countries');
+      const response = await fetch('/api/countries');
       
       if (response.ok) {
         const data = await response.json();
@@ -226,7 +226,7 @@ export function BasicInfoPage() {
   const loadStates = async (countryCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await fetch(`https://geo-api-230500065838.asia-south1.run.app/states?country_code=${countryCode}`);
+      const response = await fetch(`/api/states?country_code=${countryCode}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -250,7 +250,7 @@ export function BasicInfoPage() {
   const loadCities = async (countryCode: string, stateCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await fetch(`https://geo-api-230500065838.asia-south1.run.app/cities?country_code=${countryCode}&state_code=${stateCode}`);
+      const response = await fetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -303,8 +303,9 @@ export function BasicInfoPage() {
       if (!businessData.website) newErrors.website = 'Website is required';
       if (!businessData.registrationNumber) newErrors.registrationNumber = 'Registration number is required';
       if (!businessData.companySize) newErrors.companySize = 'Company size is required';
+      if (!businessData.phoneNumber) newErrors.phoneNumber = 'Phone number is required for business profiles';
       
-      // Phone verification check for business
+      // Phone verification check for business (required field)
       if (businessData.phoneNumber && !phoneVerified) {
         newErrors.phoneNumber = 'Please verify your phone number';
       }
@@ -706,8 +707,9 @@ export function BasicInfoPage() {
       const hasRequiredFields = businessData.companyName && businessData.industry && businessData.companyType &&
                                 businessData.description && businessData.addressLine1 && businessData.city &&
                                 businessData.state.name && businessData.country.name && businessData.pincode &&
-                                businessData.website && businessData.registrationNumber && businessData.companySize;
-      const phoneVerificationValid = !businessData.phoneNumber || phoneVerified;
+                                businessData.website && businessData.registrationNumber && businessData.companySize &&
+                                businessData.phoneNumber;
+      const phoneVerificationValid = businessData.phoneNumber && phoneVerified;
       return hasRequiredFields && phoneVerificationValid && !loading;
     }
   };

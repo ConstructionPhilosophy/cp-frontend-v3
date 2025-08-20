@@ -7,6 +7,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ status: "OK", message: "Server is running" });
   });
 
+  // Custom Geo API endpoints
+  app.get("/api/countries", async (req, res) => {
+    try {
+      const response = await fetch('https://geo-api-230500065838.asia-south1.run.app/countries');
+      if (response.ok) {
+        const data = await response.json();
+        res.json(data);
+      } else {
+        throw new Error('Failed to fetch countries');
+      }
+    } catch (error) {
+      console.error('Error fetching countries:', error);
+      res.status(500).json({ error: "Failed to fetch countries" });
+    }
+  });
+
+  app.get("/api/states", async (req, res) => {
+    try {
+      const { country_code } = req.query;
+      if (!country_code) {
+        return res.status(400).json({ error: "country_code parameter is required" });
+      }
+
+      const response = await fetch(`https://geo-api-230500065838.asia-south1.run.app/states?country_code=${country_code}`);
+      if (response.ok) {
+        const data = await response.json();
+        res.json(data);
+      } else {
+        throw new Error('Failed to fetch states');
+      }
+    } catch (error) {
+      console.error('Error fetching states:', error);
+      res.status(500).json({ error: "Failed to fetch states" });
+    }
+  });
+
+  app.get("/api/cities", async (req, res) => {
+    try {
+      const { country_code, state_code } = req.query;
+      if (!country_code || !state_code) {
+        return res.status(400).json({ error: "country_code and state_code parameters are required" });
+      }
+
+      const response = await fetch(`https://geo-api-230500065838.asia-south1.run.app/cities?country_code=${country_code}&state_code=${state_code}`);
+      if (response.ok) {
+        const data = await response.json();
+        res.json(data);
+      } else {
+        throw new Error('Failed to fetch cities');
+      }
+    } catch (error) {
+      console.error('Error fetching cities:', error);
+      res.status(500).json({ error: "Failed to fetch cities" });
+    }
+  });
+
   // SMS/OTP endpoints for phone verification
   app.post("/api/send-otp", async (req, res) => {
     try {
