@@ -15,6 +15,7 @@ import { cn } from '../lib/utils';
 import { userApiService } from '../lib/userApi';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 
 const JOB_TITLES = [
   'Architect',
@@ -97,21 +98,21 @@ const COMPANY_SIZES = [
 ];
 
 const COUNTRY_CODES = [
-  { code: '+1', country: 'US', name: 'United States' },
-  { code: '+91', country: 'IN', name: 'India' },
-  { code: '+44', country: 'GB', name: 'United Kingdom' },
-  { code: '+61', country: 'AU', name: 'Australia' },
-  { code: '+1', country: 'CA', name: 'Canada' },
-  { code: '+49', country: 'DE', name: 'Germany' },
-  { code: '+33', country: 'FR', name: 'France' },
-  { code: '+81', country: 'JP', name: 'Japan' },
-  { code: '+55', country: 'BR', name: 'Brazil' },
-  { code: '+86', country: 'CN', name: 'China' },
-  { code: '+971', country: 'AE', name: 'UAE' },
-  { code: '+65', country: 'SG', name: 'Singapore' },
-  { code: '+60', country: 'MY', name: 'Malaysia' },
-  { code: '+66', country: 'TH', name: 'Thailand' },
-  { code: '+84', country: 'VN', name: 'Vietnam' },
+  { code: '+1', country: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: '+91', country: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: '+44', country: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: '+61', country: 'AU', name: 'Australia', flag: '🇦🇺' },
+  { code: '+1', country: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: '+49', country: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: '+33', country: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: '+81', country: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: '+55', country: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: '+86', country: 'CN', name: 'China', flag: '🇨🇳' },
+  { code: '+971', country: 'AE', name: 'UAE', flag: '🇦🇪' },
+  { code: '+65', country: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: '+60', country: 'MY', name: 'Malaysia', flag: '🇲🇾' },
+  { code: '+66', country: 'TH', name: 'Thailand', flag: '🇹🇭' },
+  { code: '+84', country: 'VN', name: 'Vietnam', flag: '🇻🇳' },
 ];
 
 interface Country {
@@ -154,6 +155,9 @@ export function BasicInfoPage() {
   const [verificationCode, setVerificationCode] = useState('');
   const [sendingCode, setSendingCode] = useState(false);
   const [verifyingCode, setVerifyingCode] = useState(false);
+  const [phoneError, setPhoneError] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
   
   const profileFileRef = useRef<HTMLInputElement>(null);
   const coverFileRef = useRef<HTMLInputElement>(null);
@@ -339,6 +343,16 @@ export function BasicInfoPage() {
       setPhoneCodeSent(false);
       setPhoneVerified(false);
       setVerificationCode('');
+      setPhoneError('');
+      setConfirmationResult(null);
+      
+      // Validate phone number format
+      if (value && typeof value === 'string') {
+        const cleanedValue = value.replace(/\D/g, '');
+        if (cleanedValue && (cleanedValue.length < 10 || cleanedValue.length > 15)) {
+          setPhoneError('Please enter a valid phone number (10-15 digits)');
+        }
+      }
     }
 
     // Handle location changes
@@ -390,6 +404,16 @@ export function BasicInfoPage() {
       setPhoneCodeSent(false);
       setPhoneVerified(false);
       setVerificationCode('');
+      setPhoneError('');
+      setConfirmationResult(null);
+      
+      // Validate phone number format
+      if (value && typeof value === 'string') {
+        const cleanedValue = value.replace(/\D/g, '');
+        if (cleanedValue && (cleanedValue.length < 10 || cleanedValue.length > 15)) {
+          setPhoneError('Please enter a valid phone number (10-15 digits)');
+        }
+      }
     }
 
     // Handle location changes
@@ -473,54 +497,58 @@ export function BasicInfoPage() {
     }
   };
 
-  const sendVerificationCode = async (phoneNumber: string, countryCode: string) => {
-    // Simulate sending OTP - in real implementation, this would call your SMS service
-    try {
-      const response = await fetch('/api/send-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+  // Initialize reCAPTCHA verifier
+  const setupRecaptcha = () => {
+    const auth = getAuth();
+    if (!recaptchaVerifier) {
+      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        size: 'invisible',
+        callback: (response: any) => {
+          // reCAPTCHA solved
         },
-        body: JSON.stringify({
-          phoneNumber: `${countryCode}${phoneNumber}`,
-        }),
       });
+      setRecaptchaVerifier(verifier);
+      return verifier;
+    }
+    return recaptchaVerifier;
+  };
 
-      if (response.ok) {
-        return true;
-      } else {
-        throw new Error('Failed to send OTP');
-      }
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      // For demo purposes, always return success
+  const sendVerificationCode = async (phoneNumber: string, countryCode: string) => {
+    try {
+      const auth = getAuth();
+      const verifier = setupRecaptcha();
+      const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+      
+      const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, verifier);
+      setConfirmationResult(confirmation);
       return true;
+    } catch (error: any) {
+      console.error('Error sending OTP:', error);
+      if (error.code === 'auth/too-many-requests') {
+        throw new Error('Too many requests. Please try again later.');
+      } else if (error.code === 'auth/invalid-phone-number') {
+        throw new Error('Invalid phone number format.');
+      } else {
+        throw new Error('Failed to send verification code. Please try again.');
+      }
     }
   };
 
-  const verifyOtpCode = async (phoneNumber: string, countryCode: string, code: string) => {
-    // Simulate OTP verification - in real implementation, this would verify with your SMS service
+  const verifyOtpCode = async (code: string) => {
     try {
-      const response = await fetch('/api/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          phoneNumber: `${countryCode}${phoneNumber}`,
-          code,
-        }),
-      });
-
-      if (response.ok) {
-        return true;
-      } else {
-        throw new Error('Invalid OTP');
+      if (!confirmationResult) {
+        throw new Error('No verification in progress');
       }
-    } catch (error) {
+      
+      await confirmationResult.confirm(code);
+      return true;
+    } catch (error: any) {
       console.error('Error verifying OTP:', error);
-      // For demo purposes, accept any 6-digit code
-      return code.length === 6;
+      if (error.code === 'auth/invalid-verification-code') {
+        throw new Error('Invalid verification code');
+      } else {
+        throw new Error('Verification failed. Please try again.');
+      }
     }
   };
 
@@ -562,9 +590,6 @@ export function BasicInfoPage() {
   };
 
   const handleVerifyCode = async () => {
-    const currentPhoneNumber = userType === 'personal' ? personalData.phoneNumber : businessData.phoneNumber;
-    const currentCountryCode = userType === 'personal' ? personalData.countryCode : businessData.countryCode;
-    
     if (!verificationCode || verificationCode.length !== 6) {
       toast({
         title: "Invalid Code",
@@ -576,10 +601,11 @@ export function BasicInfoPage() {
 
     setVerifyingCode(true);
     try {
-      const success = await verifyOtpCode(currentPhoneNumber, currentCountryCode, verificationCode);
+      const success = await verifyOtpCode(verificationCode);
       
       if (success) {
         setPhoneVerified(true);
+        setPhoneError('');
         if (errors.phoneNumber) {
           setErrors(prev => ({ ...prev, phoneNumber: '' }));
         }
@@ -590,10 +616,10 @@ export function BasicInfoPage() {
       } else {
         throw new Error('Invalid verification code');
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Verification Failed",
-        description: "Invalid code. Please try again",
+        description: error.message || "Invalid code. Please try again",
         variant: "destructive",
       });
     } finally {
@@ -719,7 +745,7 @@ export function BasicInfoPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-3xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Complete Your Profile</h1>
           <p className="text-gray-600">Provide your information to get started</p>
@@ -737,16 +763,44 @@ export function BasicInfoPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* User Type Selection */}
-              <div className="space-y-3">
-                <Label>Select Profile Type *</Label>
+              <div className="space-y-4">
+                <Label className="text-lg font-semibold">Select Profile Type *</Label>
                 <RadioGroup value={userType} onValueChange={(value: 'personal' | 'business') => setUserType(value)}>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="personal" id="personal" />
-                    <Label htmlFor="personal">Personal Profile</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="business" id="business" />
-                    <Label htmlFor="business">Business Profile</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="relative">
+                      <div className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                        userType === 'personal' 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}>
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="personal" id="personal" />
+                          <div>
+                            <Label htmlFor="personal" className="text-base font-medium cursor-pointer">
+                              Personal Profile
+                            </Label>
+                            <p className="text-sm text-gray-500 mt-1">For individual professionals</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="relative">
+                      <div className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                        userType === 'business' 
+                          ? 'border-blue-500 bg-blue-50' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}>
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="business" id="business" />
+                          <div>
+                            <Label htmlFor="business" className="text-base font-medium cursor-pointer">
+                              Business Profile
+                            </Label>
+                            <p className="text-sm text-gray-500 mt-1">For companies and organizations</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </RadioGroup>
               </div>
@@ -961,13 +1015,16 @@ export function BasicInfoPage() {
                       <div className="flex gap-2">
                         {/* Country Code */}
                         <Select value={personalData.countryCode} onValueChange={(value) => handlePersonalInputChange('countryCode', value)}>
-                          <SelectTrigger className="w-32">
+                          <SelectTrigger className="w-36">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             {COUNTRY_CODES.map((item) => (
                               <SelectItem key={`${item.code}-${item.country}`} value={item.code}>
-                                {item.code} {item.country}
+                                <span className="flex items-center gap-2">
+                                  <span>{item.flag}</span>
+                                  <span>{item.code}</span>
+                                </span>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -979,20 +1036,32 @@ export function BasicInfoPage() {
                           placeholder="Enter phone number"
                           value={personalData.phoneNumber}
                           onChange={(e) => handlePersonalInputChange('phoneNumber', e.target.value)}
-                          className={cn("flex-1", errors.phoneNumber && "border-red-500")}
+                          className={cn("flex-1", (errors.phoneNumber || phoneError) && "border-red-500")}
                         />
                         
-                        {/* Send Code Button */}
+                        {/* Verification Code Input (when code sent) */}
+                        {phoneCodeSent && !phoneVerified && (
+                          <Input
+                            type="text"
+                            placeholder="Enter 6-digit code"
+                            value={verificationCode}
+                            onChange={(e) => setVerificationCode(e.target.value)}
+                            maxLength={6}
+                            className="w-32"
+                          />
+                        )}
+                        
+                        {/* Send/Verify Button */}
                         {personalData.phoneNumber && !phoneVerified && (
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={handleSendVerificationCode}
-                            disabled={sendingCode || phoneCodeSent}
+                            onClick={phoneCodeSent ? handleVerifyCode : handleSendVerificationCode}
+                            disabled={sendingCode || verifyingCode || (phoneCodeSent && verificationCode.length !== 6) || !!phoneError}
                             className="whitespace-nowrap"
                           >
-                            {sendingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                            {phoneCodeSent ? 'Code Sent' : 'Send Code'}
+                            {(sendingCode || verifyingCode) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                            {phoneCodeSent ? 'Verify' : 'Send Code'}
                           </Button>
                         )}
                         
@@ -1005,29 +1074,10 @@ export function BasicInfoPage() {
                         )}
                       </div>
                       
-                      {/* Verification Code Input */}
-                      {phoneCodeSent && !phoneVerified && (
-                        <div className="flex gap-2">
-                          <Input
-                            type="text"
-                            placeholder="Enter 6-digit code"
-                            value={verificationCode}
-                            onChange={(e) => setVerificationCode(e.target.value)}
-                            maxLength={6}
-                            className="w-48"
-                          />
-                          <Button
-                            type="button"
-                            onClick={handleVerifyCode}
-                            disabled={verifyingCode || verificationCode.length !== 6}
-                          >
-                            {verifyingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                            Verify
-                          </Button>
-                        </div>
+                      {/* Error Messages */}
+                      {(errors.phoneNumber || phoneError) && (
+                        <p className="text-sm text-red-500">{errors.phoneNumber || phoneError}</p>
                       )}
-                      
-                      {errors.phoneNumber && <p className="text-sm text-red-500">{errors.phoneNumber}</p>}
                     </div>
 
                     {/* Location Information */}
@@ -1359,13 +1409,16 @@ export function BasicInfoPage() {
                       <div className="flex gap-2">
                         {/* Country Code */}
                         <Select value={businessData.countryCode} onValueChange={(value) => handleBusinessInputChange('countryCode', value)}>
-                          <SelectTrigger className="w-32">
+                          <SelectTrigger className="w-36">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
                             {COUNTRY_CODES.map((item) => (
                               <SelectItem key={`${item.code}-${item.country}`} value={item.code}>
-                                {item.code} {item.country}
+                                <span className="flex items-center gap-2">
+                                  <span>{item.flag}</span>
+                                  <span>{item.code}</span>
+                                </span>
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -1377,20 +1430,32 @@ export function BasicInfoPage() {
                           placeholder="Enter phone number"
                           value={businessData.phoneNumber}
                           onChange={(e) => handleBusinessInputChange('phoneNumber', e.target.value)}
-                          className={cn("flex-1", errors.phoneNumber && "border-red-500")}
+                          className={cn("flex-1", (errors.phoneNumber || phoneError) && "border-red-500")}
                         />
                         
-                        {/* Send Code Button */}
+                        {/* Verification Code Input (when code sent) */}
+                        {phoneCodeSent && !phoneVerified && (
+                          <Input
+                            type="text"
+                            placeholder="Enter 6-digit code"
+                            value={verificationCode}
+                            onChange={(e) => setVerificationCode(e.target.value)}
+                            maxLength={6}
+                            className="w-32"
+                          />
+                        )}
+                        
+                        {/* Send/Verify Button */}
                         {businessData.phoneNumber && !phoneVerified && (
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={handleSendVerificationCode}
-                            disabled={sendingCode || phoneCodeSent}
+                            onClick={phoneCodeSent ? handleVerifyCode : handleSendVerificationCode}
+                            disabled={sendingCode || verifyingCode || (phoneCodeSent && verificationCode.length !== 6) || !!phoneError}
                             className="whitespace-nowrap"
                           >
-                            {sendingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                            {phoneCodeSent ? 'Code Sent' : 'Send Code'}
+                            {(sendingCode || verifyingCode) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                            {phoneCodeSent ? 'Verify' : 'Send Code'}
                           </Button>
                         )}
                         
@@ -1403,29 +1468,10 @@ export function BasicInfoPage() {
                         )}
                       </div>
                       
-                      {/* Verification Code Input */}
-                      {phoneCodeSent && !phoneVerified && (
-                        <div className="flex gap-2">
-                          <Input
-                            type="text"
-                            placeholder="Enter 6-digit code"
-                            value={verificationCode}
-                            onChange={(e) => setVerificationCode(e.target.value)}
-                            maxLength={6}
-                            className="w-48"
-                          />
-                          <Button
-                            type="button"
-                            onClick={handleVerifyCode}
-                            disabled={verifyingCode || verificationCode.length !== 6}
-                          >
-                            {verifyingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                            Verify
-                          </Button>
-                        </div>
+                      {/* Error Messages */}
+                      {(errors.phoneNumber || phoneError) && (
+                        <p className="text-sm text-red-500">{errors.phoneNumber || phoneError}</p>
                       )}
-                      
-                      {errors.phoneNumber && <p className="text-sm text-red-500">{errors.phoneNumber}</p>}
                     </div>
                   </>
                 )}
@@ -1445,6 +1491,9 @@ export function BasicInfoPage() {
             </form>
           </CardContent>
         </Card>
+        
+        {/* reCAPTCHA container for Firebase Phone Auth */}
+        <div id="recaptcha-container"></div>
       </div>
     </div>
   );
