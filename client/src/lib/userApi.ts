@@ -24,15 +24,25 @@ export interface UserProfile {
 }
 
 export interface UpdateUserData {
+  userType?: 'personal' | 'business';
   phoneNumber?: string;
   title?: string;
   positionDesignation?: string;
   gender?: string;
   dateOfBirth?: string;
   city?: string;
-  state?: string;
-  country?: string;
+  state?: { name: string; code: string };
+  country?: { name: string; code: string };
   company?: string;
+  companyName?: string;
+  industry?: string;
+  companyType?: string;
+  description?: string;
+  address?: string;
+  pincode?: string;
+  website?: string;
+  registrationNumber?: string;
+  companySize?: string;
   hasBasicInfo?: boolean;
   profilePic?: File | string;
   bannerPic?: File | string;

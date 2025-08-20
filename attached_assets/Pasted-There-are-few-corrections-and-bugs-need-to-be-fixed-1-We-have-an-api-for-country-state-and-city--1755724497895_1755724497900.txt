@@ -1,0 +1,76 @@
+There are few corrections and bugs need to be fixed.
+1. We have an api for country, state and city.  
+https://geo-api-230500065838.asia-south1.run.app/countries =
+response - We should be getting
+"name": "United States",
+"iso2": "US",
+----
+https://geo-api-230500065838.asia-south1.run.app/states?country_code=IN = response - We should be getting
+"name": "Tamil Nadu",
+                "iso2": "TN",
+----
+https://geo-api-230500065838.asia-south1.run.app/cities?country_code=IN&state_code=TN = response - We should be getting
+"name": "Nagercoil"
+---
+You can use this instead of relaying on other apis.
+
+2. basic info update api /users/{uid} - we need to store the country and state like this,
+"state": {
+    "name": "Delhi",
+    "code": "DL"
+  },
+  "country": {
+    "name": "India",
+    "code": "IN"
+  },
+3. We need to implement one more thing, Now in the basic info what we are currently showing is for personal use. Lets keep all those fields as it is. We need to put a radio button at the top as "Personal" or "Business". So based on the selection if it is personal we can show what we have currently. But if it is for business we need to gather some different details from the user. 
+these are the sample fields as wells as api request params of business ,
+"companyName": "BuildSmart Pvt Ltd",
+  "industry": "Construction" (it's search dropdown. I will give the options.),
+"companyType": "Supplier" (it's search dropdown. I will give the options.),
+  "description": "Revolutionizing the construction supply chain.",
+  "address": "123 Concrete Avenue", (Address line 1 and 2 needed. then merge and send it in the api)
+  "city": "Delhi",
+  "state": {
+    "name": "Delhi",
+    "code": "DL"
+  },
+  "country": {
+    "name": "India",
+    "code": "IN"
+  },
+  "pincode": "110001",
+  "website": "https://buildsmart.com",
+"profilePic": "<file>" (Logo)
+  "bannerPic": "<file>"
+"registrationNumber": "GST03384" (This is GST number),
+"companySize": "10-50"(Give few standard option to select from the dropdown)
+--
+These are the companyTypes,
+Construction Contractor
+Design & Engineering Services
+Project Management & Consultancy
+Cost & Quantity Services
+Construction Material Suppliers
+Construction Equipment & Machinery
+Infrastructure & Utilities
+Prefabrication & Modular Construction
+Green & Sustainable Construction
+Safety & Compliance
+Technology & Software
+Logistics & Support Services
+Testing & Laboratory Services
+--
+Industry dropdown options,
+1. Construction 
+2. Real Estate 
+3. Infrastructure 
+4. Others (if this is selected then there should be an option to type)
+----
+The main important thing is we need to pass the userType. Either it can be "personal" or "business" based on the selection.
+
+-------
+4. In the earlier version I checked the phone number verification but I didn't receive any otp. Please check and fix.
+5. We need to do the same mobile verification in the business. and all the fields in the business are mandatory except the banner image. 
+6. I think there is no session expiration implemented. I can able to be in the home and profile page even after two days. I think the session is not expiring and getting deletd from the browser. Please check.
+7. In the home and profile page, please reduce unwanted spaces and reduce the texts little bit so that it will be compact. reduce the center container section's width if needed. 

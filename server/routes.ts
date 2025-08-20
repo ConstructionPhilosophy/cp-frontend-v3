@@ -1,104 +1,85 @@
-import type { Express, Request, Response } from "express";
-import { z } from "zod";
-import { storage } from "./storage";
-import { insertSecurityAssessmentSchema } from "../shared/schema";
+import type { Express } from "express";
+import { createServer, type Server } from "http";
 
-export function registerRoutes(app: Express): void {
+export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint
-  app.get("/api/health", (req: Request, res: Response) => {
-    res.json({ status: "OK", timestamp: new Date().toISOString() });
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "OK", message: "Server is running" });
   });
 
-  // Get current user (mocked for now)
-  app.get("/api/user", async (req: Request, res: Response) => {
+  // SMS/OTP endpoints for phone verification
+  app.post("/api/send-otp", async (req, res) => {
     try {
-      const user = await storage.getUser("user-1");
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
-
-  // Get user's security assessments
-  app.get("/api/security/assessments", async (req: Request, res: Response) => {
-    try {
-      const userId = "user-1"; // In real app, get from auth
-      const assessments = await storage.getUserAssessments(userId);
-      res.json(assessments);
-    } catch (error) {
-      console.error("Error fetching assessments:", error);
-      res.status(500).json({ message: "Failed to fetch assessments" });
-    }
-  });
-
-  // Get specific assessment with recommendations
-  app.get("/api/security/assessments/:id", async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const assessment = await storage.getSecurityAssessment(id);
-      if (!assessment) {
-        return res.status(404).json({ message: "Assessment not found" });
+      const { phoneNumber } = req.body;
+      
+      if (!phoneNumber) {
+        return res.status(400).json({ error: "Phone number is required" });
       }
 
-      const recommendations = await storage.getAssessmentRecommendations(id);
-      res.json({ ...assessment, recommendations });
-    } catch (error) {
-      console.error("Error fetching assessment:", error);
-      res.status(500).json({ message: "Failed to fetch assessment" });
-    }
-  });
+      // In a real implementation, you would integrate with an SMS service like:
+      // - Twilio
+      // - AWS SNS
+      // - Firebase Phone Auth
+      // - Any other SMS gateway
+      
+      // For demo purposes, we'll simulate sending an OTP
+      console.log(`Sending OTP to ${phoneNumber}`);
+      
+      // Generate a random 6-digit OTP (in real app, store this securely)
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      console.log(`Generated OTP: ${otp} for ${phoneNumber}`);
+      
+      // TODO: Integrate with your SMS service provider
+      // Example with Twilio:
+      // await twilioClient.messages.create({
+      //   body: `Your verification code is: ${otp}`,
+      //   from: process.env.TWILIO_PHONE_NUMBER,
+      //   to: phoneNumber
+      // });
 
-  // Get security metrics for user
-  app.get("/api/security/metrics", async (req: Request, res: Response) => {
-    try {
-      const userId = "user-1"; // In real app, get from auth
-      const { metricType } = req.query;
-      const metrics = await storage.getUserMetrics(userId, metricType as string);
-      res.json(metrics);
-    } catch (error) {
-      console.error("Error fetching metrics:", error);
-      res.status(500).json({ message: "Failed to fetch metrics" });
-    }
-  });
-
-  // Update recommendation implementation status
-  app.patch("/api/security/recommendations/:id", async (req: Request, res: Response) => {
-    try {
-      const { id } = req.params;
-      const updateSchema = z.object({
-        isImplemented: z.boolean().optional(),
-        implementationNotes: z.string().optional(),
+      res.json({ 
+        success: true, 
+        message: "OTP sent successfully",
+        // In production, don't send OTP in response
+        debug: process.env.NODE_ENV === 'development' ? { otp } : undefined
       });
-
-      const updateData = updateSchema.parse(req.body);
-      if (updateData.isImplemented) {
-        (updateData as any).implementedAt = new Date();
-      }
-
-      const updated = await storage.updateRecommendation(id, updateData);
-      if (!updated) {
-        return res.status(404).json({ message: "Recommendation not found" });
-      }
-
-      res.json(updated);
     } catch (error) {
-      console.error("Error updating recommendation:", error);
-      res.status(500).json({ message: "Failed to update recommendation" });
+      console.error('Error sending OTP:', error);
+      res.status(500).json({ error: "Failed to send OTP" });
     }
   });
 
-  // Create new security assessment (for demo purposes)
-  app.post("/api/security/assessments", async (req: Request, res: Response) => {
+  app.post("/api/verify-otp", async (req, res) => {
     try {
-      const assessmentData = insertSecurityAssessmentSchema.parse(req.body);
-      const assessment = await storage.createSecurityAssessment(assessmentData);
-      res.status(201).json(assessment);
+      const { phoneNumber, code } = req.body;
+      
+      if (!phoneNumber || !code) {
+        return res.status(400).json({ error: "Phone number and code are required" });
+      }
+
+      // In a real implementation, you would:
+      // 1. Retrieve the stored OTP for this phone number
+      // 2. Check if it matches the provided code
+      // 3. Check if it hasn't expired (usually 5-10 minutes)
+      // 4. Mark the phone number as verified
+      
+      // For demo purposes, accept any 6-digit code
+      if (code.length === 6 && /^\d{6}$/.test(code)) {
+        res.json({ 
+          success: true, 
+          message: "Phone number verified successfully" 
+        });
+      } else {
+        res.status(400).json({ 
+          error: "Invalid verification code" 
+        });
+      }
     } catch (error) {
-      console.error("Error creating assessment:", error);
-      res.status(500).json({ message: "Failed to create assessment" });
+      console.error('Error verifying OTP:', error);
+      res.status(500).json({ error: "Failed to verify OTP" });
     }
   });
 
-
+  const httpServer = createServer(app);
+  return httpServer;
 }
