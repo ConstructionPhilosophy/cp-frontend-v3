@@ -315,74 +315,121 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Education Section */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <GraduationCap className="w-6 h-6 text-cmo-primary" />
-                    Education
-                  </h3>
-                  <Button variant="ghost" size="icon">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-6">
-                  {mockEducation.map((edu) => (
-                    <div key={edu.id} className="flex gap-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            {(profileData as any).userType === 'business' ? (
+              /* Projects Section for Business */
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-semibold flex items-center gap-2">
+                      <Building className="w-6 h-6 text-cmo-primary" />
+                      Projects
+                    </h3>
+                    <Button variant="ghost" size="icon">
+                      <Plus className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  <div className="space-y-6">
+                    {((profileData as any).projects || []).length > 0 ? (
+                      ((profileData as any).projects || []).map((project: any, index: number) => (
+                        <div key={index} className="flex gap-4">
+                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Building className="w-6 h-6 text-cmo-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-lg">{project.name || project.title}</h4>
+                            <p className="text-cmo-primary font-medium">{project.client || project.company}</p>
+                            <p className="text-cmo-text-secondary flex items-center gap-1">
+                              <MapPin className="w-4 h-4" />
+                              {project.location}
+                            </p>
+                            <p className="text-sm text-cmo-text-secondary mt-1">
+                              {project.startDate && new Date(project.startDate).getFullYear()} - 
+                              {project.endDate ? new Date(project.endDate).getFullYear() : 'Ongoing'}
+                            </p>
+                            {project.description && (
+                              <p className="text-cmo-text-secondary mt-2">{project.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-cmo-text-secondary text-center py-8">No projects added yet</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+              <>
+                {/* Education Section for Personal */}
+                <Card className="mb-6">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-semibold flex items-center gap-2">
                         <GraduationCap className="w-6 h-6 text-cmo-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-lg">{edu.degree}</h4>
-                        <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
-                        <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
-                        <p className="text-sm text-cmo-text-secondary mt-1">
-                          {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
-                          {edu.grade && ` • ${edu.grade}`}
-                        </p>
-                      </div>
+                        Education
+                      </h3>
+                      <Button variant="ghost" size="icon">
+                        <Plus className="w-4 h-4" />
+                      </Button>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    <div className="space-y-6">
+                      {mockEducation.map((edu) => (
+                        <div key={edu.id} className="flex gap-4">
+                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-lg">{edu.degree}</h4>
+                            <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
+                            <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
+                            <p className="text-sm text-cmo-text-secondary mt-1">
+                              {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
+                              {edu.grade && ` • ${edu.grade}`}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
 
-            {/* Experience Section */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <Briefcase className="w-6 h-6 text-cmo-primary" />
-                    Experience
-                  </h3>
-                  <Button variant="ghost" size="icon">
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-                <div className="space-y-6">
-                  {mockExperience.map((exp) => (
-                    <div key={exp.id} className="flex gap-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Building className="w-6 h-6 text-cmo-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-lg">{exp.role}</h4>
-                        <p className="text-cmo-primary font-medium">{exp.company}</p>
-                        <p className="text-cmo-text-secondary flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
-                          {exp.location}
-                        </p>
-                        <p className="text-sm text-cmo-text-secondary mt-1">
-                          {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
-                        </p>
-                        <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
-                      </div>
+                {/* Experience Section for Personal */}
+                <Card className="mb-6">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-semibold flex items-center gap-2">
+                        <Briefcase className="w-6 h-6 text-cmo-primary" />
+                        Experience
+                      </h3>
+                      <Button variant="ghost" size="icon">
+                        <Plus className="w-4 h-4" />
+                      </Button>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    <div className="space-y-6">
+                      {mockExperience.map((exp) => (
+                        <div key={exp.id} className="flex gap-4">
+                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Briefcase className="w-6 h-6 text-cmo-primary" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-lg">{exp.role}</h4>
+                            <p className="text-cmo-primary font-medium">{exp.company}</p>
+                            <p className="text-cmo-text-secondary flex items-center gap-1">
+                              <MapPin className="w-4 h-4" />
+                              {exp.location}
+                            </p>
+                            <p className="text-sm text-cmo-text-secondary mt-1">
+                              {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
+                            </p>
+                            <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
 
             {/* User Activities */}
             <Card>
@@ -628,19 +675,25 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Skills Expertise */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4">Skills Expertise</h3>
-                <div className="flex flex-wrap gap-2">
-                  {((profileData as any).skills || []).map((skill: string) => (
-                    <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Skills Expertise - Only for Personal Profiles */}
+            {(profileData as any).userType !== 'business' && (
+              <Card className="mb-6">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold mb-4">Skills Expertise</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {((profileData as any).skills || []).length > 0 ? (
+                      ((profileData as any).skills || []).map((skill: string) => (
+                        <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
+                          {skill}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="text-cmo-text-secondary text-sm">No skills added yet</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Languages Known */}
             <Card className="mb-6">
