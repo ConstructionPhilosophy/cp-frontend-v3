@@ -416,16 +416,32 @@ export function BasicInfoPage() {
   const loadStates = async (countryCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await fetch(`/api/states?country_code=${countryCode}`);
+      const endpoint = `/api/states?country_code=${countryCode}`;
+      console.log('🏛️ Calling States API:', endpoint);
+      console.log('📍 Parameters:', { countryCode });
+      
+      const response = await fetch(endpoint);
+      console.log('🏛️ States API Response Status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
+        console.log('🏛️ States API Response Data:', data);
+        console.log('🏛️ States Array Length:', Array.isArray(data) ? data.length : 'Not an array');
+        
         setStates(data);
+        
+        if (!data || data.length === 0) {
+          console.warn('⚠️ States API returned empty array for country:', countryCode);
+        } else {
+          console.log('✅ States loaded successfully:', data.length, 'states');
+        }
       } else {
-        throw new Error('Failed to load states');
+        const errorText = await response.text();
+        console.error('❌ States API Error Response:', errorText);
+        throw new Error(`Failed to load states: ${response.status} ${errorText}`);
       }
     } catch (error) {
-      console.error('Error loading states:', error);
+      console.error('💥 Error loading states:', error);
       toast({
         title: "Error Loading States",
         description: "Failed to load state data. Please try again.",
@@ -440,16 +456,34 @@ export function BasicInfoPage() {
   const loadCities = async (countryCode: string, stateCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await fetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
+      const endpoint = `/api/cities?country_code=${countryCode}&state_code=${stateCode}`;
+      console.log('🌆 Calling Cities API:', endpoint);
+      console.log('📍 Parameters:', { countryCode, stateCode });
+      
+      const response = await fetch(endpoint);
+      console.log('🌆 Cities API Response Status:', response.status);
       
       if (response.ok) {
         const data = await response.json();
-        setCities(data.data || []);
+        console.log('🌆 Cities API Response Data:', data);
+        console.log('🌆 Cities Array Length:', Array.isArray(data) ? data.length : 'Not an array');
+        
+        // Cities API returns direct array like states API, not wrapped in data property
+        const citiesArray = Array.isArray(data) ? data : (data.data || []);
+        setCities(citiesArray);
+        
+        if (citiesArray.length === 0) {
+          console.warn('⚠️ Cities API returned empty array for:', { countryCode, stateCode });
+        } else {
+          console.log('✅ Cities loaded successfully:', citiesArray.length, 'cities');
+        }
       } else {
-        throw new Error('Failed to load cities');
+        const errorText = await response.text();
+        console.error('❌ Cities API Error Response:', errorText);
+        throw new Error(`Failed to load cities: ${response.status} ${errorText}`);
       }
     } catch (error) {
-      console.error('Error loading cities:', error);
+      console.error('💥 Error loading cities:', error);
       toast({
         title: "Error Loading Cities",
         description: "Failed to load city data. Please try again.",
