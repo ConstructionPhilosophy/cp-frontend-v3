@@ -20,12 +20,12 @@ function Calendar({
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
-        caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
-        caption_dropdowns: "flex justify-center gap-1",
-        dropdown_month: "flex items-center",
-        dropdown_year: "flex items-center", 
-        dropdown: "h-8 text-sm",
+        caption: "flex justify-center pt-1 relative items-center h-10",
+        caption_label: "text-sm font-medium sr-only",
+        caption_dropdowns: "flex justify-center gap-2 items-center",
+        dropdown_month: "relative",
+        dropdown_year: "relative", 
+        dropdown: "h-8 text-sm px-2 bg-white border border-gray-300 rounded text-center min-w-[80px]",
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
