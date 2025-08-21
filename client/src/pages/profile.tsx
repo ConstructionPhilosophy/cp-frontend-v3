@@ -285,10 +285,12 @@ export default function ProfilePage() {
                 </div>
 
                 {/* About Section */}
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-3">About</h3>
-                  <p className="text-cmo-text-secondary leading-relaxed">{mockProfileData.about}</p>
-                </div>
+                {(profileData as any).about && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold mb-3">About</h3>
+                    <p className="text-cmo-text-secondary leading-relaxed">{(profileData as any).about}</p>
+                  </div>
+                )}
 
 
               </CardContent>
@@ -397,9 +399,9 @@ export default function ProfilePage() {
                     <div key={activity.id} className="border-b border-cmo-border pb-6 last:border-b-0">
                       <div className="flex gap-3">
                         <Avatar className="w-12 h-12">
-                          <AvatarImage src={mockProfileData.photoUrl} />
+                          <AvatarImage src={profileData.profilePic || ""} />
                           <AvatarFallback>
-                            {mockProfileData.firstName.charAt(0)}{mockProfileData.lastName.charAt(0)}
+                            {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
@@ -407,7 +409,7 @@ export default function ProfilePage() {
                             <div>
                               <h4 className="font-medium text-cmo-text-primary">{activity.title}</h4>
                               <div className="flex items-center gap-2 text-sm text-cmo-text-secondary mt-1">
-                                <span>{mockProfileData.firstName} {mockProfileData.lastName}</span>
+                                <span>{profileData.firstName || ''} {profileData.lastName || ''}</span>
                                 <span>•</span>
                                 <span>{activity.timestamp}</span>
                                 <Badge variant="secondary" className="text-xs">
@@ -472,9 +474,9 @@ export default function ProfilePage() {
                             <div className="mt-4 pl-4 border-l-2 border-cmo-border">
                               <div className="flex gap-3">
                                 <Avatar className="w-8 h-8">
-                                  <AvatarImage src={mockProfileData.photoUrl} />
+                                  <AvatarImage src={profileData.profilePic || ""} />
                                   <AvatarFallback className="text-xs">
-                                    {mockProfileData.firstName.charAt(0)}{mockProfileData.lastName.charAt(0)}
+                                    {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
@@ -524,15 +526,15 @@ export default function ProfilePage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <Building className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">{mockProfileData.positionDesignation}</span>
+                    <span className="text-sm">{(profileData as any).positionDesignation || (profileData as any).title || 'Professional'}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Users className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">{mockProfileData.followersCount} followers</span>
+                    <span className="text-sm">0 followers</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">Joined {new Date(mockProfileData.createdTime).getFullYear()}</span>
+                    <span className="text-sm">Joined {profileData.createdAt ? new Date(profileData.createdAt).getFullYear() : new Date().getFullYear()}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Mail className="w-5 h-5 text-cmo-primary" />
@@ -555,7 +557,7 @@ export default function ProfilePage() {
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Skills Expertise</h3>
                 <div className="flex flex-wrap gap-2">
-                  {mockProfileData.skills.map((skill) => (
+                  {((profileData as any).skills || []).map((skill: string) => (
                     <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
                       {skill}
                     </Badge>
@@ -569,7 +571,7 @@ export default function ProfilePage() {
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Languages Known</h3>
                 <div className="flex flex-wrap gap-2">
-                  {mockProfileData.language.map((lang) => (
+                  {((profileData as any).languages || []).map((lang: string) => (
                     <Badge key={lang} variant="outline">
                       {lang}
                     </Badge>

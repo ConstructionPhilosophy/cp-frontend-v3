@@ -110,7 +110,7 @@ export default function Header() {
             {/* My Profile Button - Direct redirect */}
             <Button 
               variant="ghost" 
-              className="p-1 text-cmo-text-secondary hover:text-cmo-primary"
+              className="flex items-center gap-2 text-cmo-text-secondary hover:text-cmo-primary"
               onClick={handleProfileClick}
             >
               <Avatar className="w-8 h-8">
@@ -119,6 +119,7 @@ export default function Header() {
                   {userProfile?.firstName?.charAt(0) || 'U'}{userProfile?.lastName?.charAt(0) || ''}
                 </AvatarFallback>
               </Avatar>
+              <span>My Profile</span>
             </Button>
 
             {/* Three Dots Menu */}
