@@ -19,6 +19,10 @@ This is a frontend-only React application built as a Q&A community platform simi
   - Fixed country code flags display consistency between desktop and mobile views
   - Corrected API endpoint format for cities: using country_code and state_code parameters as required
   - Optimized all dropdown components with React.useMemo and proper data structure for maximum performance
+  - Added hidePhoneNumber checkbox field to both personal and business forms for privacy control
+  - Replaced all remaining Select components with searchable Combobox for consistent user experience
+  - Fixed country code display to show flag + code + country name format for better identification
+  - Ensured all location dropdowns cascade properly (Country → State → City) with proper API integration
 - **Enhanced Basic Info Form with Professional Features**: Completely redesigned user profile form with comprehensive improvements
   - Updated job titles dropdown with complete construction industry list including "Other (Specify)" option with custom text input
   - Implemented professional profile/cover image upload system with drag-and-drop functionality and file explorer integration

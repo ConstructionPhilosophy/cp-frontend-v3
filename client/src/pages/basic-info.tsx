@@ -357,6 +357,7 @@ export function BasicInfoPage() {
     positionDesignation: '',
     company: '',
     customTitle: '',
+    hidePhoneNumber: false,
   });
 
   // Business form data
@@ -377,6 +378,7 @@ export function BasicInfoPage() {
     companySize: '',
     phoneNumber: '',
     countryCode: '+91',
+    hidePhoneNumber: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -436,7 +438,7 @@ export function BasicInfoPage() {
   const loadCities = async (countryCode: string, stateCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await fetch(`${GEO_API_BASE_URL}/cities?country_code=${countryCode}&state_code=${stateCode}`);
+      const response = await fetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -929,27 +931,25 @@ export function BasicInfoPage() {
   const countryCodeComboOptions = useMemo(() => 
     COUNTRY_CODES.map((item) => ({
       value: item.code,
-      label: item.code,
+      label: `${item.code} ${item.name}`,
       flag: item.flag,
     })), []
   );
 
   // Memoize job titles for better performance
-  const jobTitleOptions = useMemo(() => 
-    JOB_TITLES.map((title) => (
-      <SelectItem key={title} value={title}>
-        {title}
-      </SelectItem>
-    )), []
+  const jobTitleComboOptions = useMemo(() => 
+    JOB_TITLES.map((title) => ({
+      value: title,
+      label: title,
+    })), []
   );
 
   // Memoize company sizes for better performance
-  const companySizeOptions = useMemo(() => 
-    COMPANY_SIZES.map((size) => (
-      <SelectItem key={size} value={size}>
-        {size}
-      </SelectItem>
-    )), []
+  const companySizeComboOptions = useMemo(() => 
+    COMPANY_SIZES.map((size) => ({
+      value: size,
+      label: size,
+    })), []
   );
 
   // Memoize countries for better performance
@@ -1248,7 +1248,11 @@ export function BasicInfoPage() {
                             <SelectValue placeholder="Select job title" />
                           </SelectTrigger>
                           <SelectContent className="max-h-60">
-                            {jobTitleOptions}
+                            {jobTitleComboOptions.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
                           </SelectContent>
                         </Select>
                         {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
@@ -1355,6 +1359,22 @@ export function BasicInfoPage() {
                       {(errors.phoneNumber || phoneError) && (
                         <p className="text-sm text-red-500">{errors.phoneNumber || phoneError}</p>
                       )}
+                      
+                      {/* Hide Phone Number */}
+                      {personalData.phoneNumber && (
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="hidePhonePersonal"
+                            checked={personalData.hidePhoneNumber}
+                            onChange={(e) => handlePersonalInputChange('hidePhoneNumber', e.target.checked)}
+                            className="h-4 w-4 text-cmo-primary border-gray-300 rounded focus:ring-cmo-primary"
+                          />
+                          <Label htmlFor="hidePhonePersonal" className="text-sm">
+                            Hide phone number from public profile
+                          </Label>
+                        </div>
+                      )}
                     </div>
 
                     {/* Location Information */}
@@ -1365,76 +1385,51 @@ export function BasicInfoPage() {
                         {/* Country */}
                         <div className="space-y-2">
                           <Label>Country *</Label>
-                          <Select 
-                            value={personalData.country.name} 
+                          <Combobox
+                            options={countryComboOptions}
+                            value={personalData.country.name ? JSON.stringify(personalData.country) : ''}
                             onValueChange={(value) => {
-                              const country = countries.find(c => c.name === value);
-                              if (country) {
-                                handlePersonalInputChange('country', { name: country.name, code: country.iso2 });
-                              }
+                              const country = value ? JSON.parse(value) : { name: '', code: '' };
+                              handlePersonalInputChange('country', country);
                             }}
+                            placeholder={loadingLocations ? "Loading..." : "Select country"}
+                            searchPlaceholder="Search countries..."
                             disabled={loadingLocations}
-                          >
-                            <SelectTrigger className={errors.country ? "border-red-500" : ""}>
-                              <SelectValue placeholder={loadingLocations ? "Loading..." : "Select country"} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {countries.map((country) => (
-                                <SelectItem key={country.iso2} value={country.name}>
-                                  {country.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            error={!!errors.country}
+                          />
                           {errors.country && <p className="text-sm text-red-500">{errors.country}</p>}
                         </div>
 
                         {/* State */}
                         <div className="space-y-2">
                           <Label>State/Province *</Label>
-                          <Select 
-                            value={personalData.state.name} 
+                          <Combobox
+                            options={stateComboOptions}
+                            value={personalData.state.name ? JSON.stringify(personalData.state) : ''}
                             onValueChange={(value) => {
-                              const state = states.find(s => s.name === value);
-                              if (state) {
-                                handlePersonalInputChange('state', { name: state.name, code: state.iso2 });
-                              }
+                              const state = value ? JSON.parse(value) : { name: '', code: '' };
+                              handlePersonalInputChange('state', state);
                             }}
+                            placeholder={!personalData.country.name ? "Select country first" : loadingLocations ? "Loading..." : "Select state"}
+                            searchPlaceholder="Search states..."
                             disabled={!personalData.country.name || loadingLocations}
-                          >
-                            <SelectTrigger className={errors.state ? "border-red-500" : ""}>
-                              <SelectValue placeholder={loadingLocations ? "Loading..." : "Select state"} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {states.map((state) => (
-                                <SelectItem key={state.iso2} value={state.name}>
-                                  {state.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            error={!!errors.state}
+                          />
                           {errors.state && <p className="text-sm text-red-500">{errors.state}</p>}
                         </div>
 
                         {/* City */}
                         <div className="space-y-2">
                           <Label>City *</Label>
-                          <Select 
-                            value={personalData.city} 
+                          <Combobox
+                            options={cityComboOptions}
+                            value={personalData.city}
                             onValueChange={(value) => handlePersonalInputChange('city', value)}
+                            placeholder={!personalData.state.name ? "Select state first" : loadingLocations ? "Loading..." : "Select city"}
+                            searchPlaceholder="Search cities..."
                             disabled={!personalData.state.name || loadingLocations}
-                          >
-                            <SelectTrigger className={errors.city ? "border-red-500" : ""}>
-                              <SelectValue placeholder={loadingLocations ? "Loading..." : "Select city"} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {cities.map((city) => (
-                                <SelectItem key={city.name} value={city.name}>
-                                  {city.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            error={!!errors.city}
+                          />
                           {errors.city && <p className="text-sm text-red-500">{errors.city}</p>}
                         </div>
                       </div>
@@ -1461,18 +1456,14 @@ export function BasicInfoPage() {
                       {/* Industry */}
                       <div className="space-y-2">
                         <Label>Industry *</Label>
-                        <Select value={businessData.industry} onValueChange={(value) => handleBusinessInputChange('industry', value)}>
-                          <SelectTrigger className={errors.industry ? "border-red-500" : ""}>
-                            <SelectValue placeholder="Select industry" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {INDUSTRIES.map((industry) => (
-                              <SelectItem key={industry} value={industry}>
-                                {industry}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Combobox
+                          options={INDUSTRIES.map(industry => ({ value: industry, label: industry }))}
+                          value={businessData.industry}
+                          onValueChange={(value) => handleBusinessInputChange('industry', value)}
+                          placeholder="Select industry"
+                          searchPlaceholder="Search industries..."
+                          error={!!errors.industry}
+                        />
                         {errors.industry && <p className="text-sm text-red-500">{errors.industry}</p>}
                       </div>
 
@@ -1741,6 +1732,22 @@ export function BasicInfoPage() {
                       {/* Error Messages */}
                       {(errors.phoneNumber || phoneError) && (
                         <p className="text-sm text-red-500">{errors.phoneNumber || phoneError}</p>
+                      )}
+                      
+                      {/* Hide Phone Number */}
+                      {businessData.phoneNumber && (
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id="hidePhoneBusiness"
+                            checked={businessData.hidePhoneNumber}
+                            onChange={(e) => handleBusinessInputChange('hidePhoneNumber', e.target.checked)}
+                            className="h-4 w-4 text-cmo-primary border-gray-300 rounded focus:ring-cmo-primary"
+                          />
+                          <Label htmlFor="hidePhoneBusiness" className="text-sm">
+                            Hide phone number from public profile
+                          </Label>
+                        </div>
                       )}
                     </div>
                   </>
