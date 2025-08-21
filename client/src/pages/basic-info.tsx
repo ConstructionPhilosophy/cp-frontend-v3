@@ -306,6 +306,7 @@ interface Country {
 interface State {
   name: string;
   iso2: string;
+  state_code: string;
 }
 
 interface City {
@@ -1435,7 +1436,7 @@ export function BasicInfoPage() {
                             onValueChange={(value) => {
                               const state = states.find(s => s.name === value);
                               if (state) {
-                                handlePersonalInputChange('state', { name: state.name, code: state.iso2 });
+                                handlePersonalInputChange('state', { name: state.name, code: state.state_code });
                               }
                             }}
                             disabled={!personalData.country.name || loadingLocations}
@@ -1445,7 +1446,7 @@ export function BasicInfoPage() {
                             </SelectTrigger>
                             <SelectContent>
                               {states.map((state) => (
-                                <SelectItem key={state.iso2} value={state.name}>
+                                <SelectItem key={state.state_code} value={state.name}>
                                   {state.name}
                                 </SelectItem>
                               ))}
@@ -1659,7 +1660,7 @@ export function BasicInfoPage() {
                             onValueChange={(value) => {
                               const state = states.find(s => s.name === value);
                               if (state) {
-                                handleBusinessInputChange('state', { name: state.name, code: state.iso2 });
+                                handleBusinessInputChange('state', { name: state.name, code: state.state_code });
                               }
                             }}
                             disabled={!businessData.country.name || loadingLocations}
@@ -1669,7 +1670,7 @@ export function BasicInfoPage() {
                             </SelectTrigger>
                             <SelectContent>
                               {states.map((state) => (
-                                <SelectItem key={state.iso2} value={state.name}>
+                                <SelectItem key={state.state_code} value={state.name}>
                                   {state.name}
                                 </SelectItem>
                               ))}
