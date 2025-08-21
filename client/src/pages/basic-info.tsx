@@ -19,7 +19,7 @@ import { cn } from '../lib/utils';
 import { userApiService } from '../lib/userApi';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult, PhoneAuthProvider, linkWithCredential } from 'firebase/auth';
 
 const GEO_API_BASE_URL = 'https://geo-api-230500065838.asia-south1.run.app';
 
@@ -695,9 +695,9 @@ export function BasicInfoPage() {
 
   // Initialize reCAPTCHA verifier
   const setupRecaptcha = () => {
-    const auth = getAuth();
+    const authInstance = getAuth();
     if (!recaptchaVerifier) {
-      const verifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+      const verifier = new RecaptchaVerifier(authInstance, 'recaptcha-container', {
         size: 'invisible',
         callback: (response: any) => {
           // reCAPTCHA solved
@@ -711,12 +711,22 @@ export function BasicInfoPage() {
 
   const sendVerificationCode = async (phoneNumber: string, countryCode: string) => {
     try {
-      const auth = getAuth();
+      const authInstance = getAuth();
+      const currentUser = authInstance.currentUser;
+      
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
+      
       const verifier = setupRecaptcha();
       const fullPhoneNumber = `${countryCode}${phoneNumber}`;
       
-      const confirmation = await signInWithPhoneNumber(auth, fullPhoneNumber, verifier);
-      setConfirmationResult(confirmation);
+      // Use PhoneAuthProvider to send verification code without signing in
+      const phoneProvider = new PhoneAuthProvider(authInstance);
+      const verificationId = await phoneProvider.verifyPhoneNumber(fullPhoneNumber, verifier);
+      
+      // Store verification ID instead of confirmation result
+      setConfirmationResult({ verificationId } as any);
       return true;
     } catch (error: any) {
       console.error('Error sending OTP:', error);
@@ -732,27 +742,32 @@ export function BasicInfoPage() {
 
   const verifyOtpCode = async (code: string) => {
     try {
-      if (!confirmationResult) {
+      if (!confirmationResult || !(confirmationResult as any).verificationId) {
         throw new Error('No verification in progress');
       }
       
-      // Store the current user before phone verification
-      const currentUser = auth.currentUser;
-      const currentUserToken = currentUser ? await currentUser.getIdToken() : null;
+      const authInstance = getAuth();
+      const currentUser = authInstance.currentUser;
       
-      // Verify the phone number
-      const result = await confirmationResult.confirm(code);
+      if (!currentUser) {
+        throw new Error('User not authenticated');
+      }
       
-      // After phone verification, if it signed in with phone auth, 
-      // we need to ensure we don't lose the original email-based user session
-      if (currentUser && currentUserToken && result.user.uid !== currentUser.uid) {
-        // Phone verification created a new user, we just want to verify the phone
-        // Sign back in with the original email user
-        try {
-          await auth.updateCurrentUser(currentUser);
-        } catch (err) {
-          console.warn('Could not restore original user session:', err);
-          // The phone verification was successful anyway
+      // Create phone credential from verification ID and code
+      const verificationId = (confirmationResult as any).verificationId;
+      const phoneCredential = PhoneAuthProvider.credential(verificationId, code);
+      
+      // Link phone credential to existing user instead of signing in
+      try {
+        await linkWithCredential(currentUser, phoneCredential);
+        console.log('Phone number linked successfully to existing user');
+      } catch (linkError: any) {
+        // If linking fails due to phone number already being used by another account,
+        // we'll still consider the verification successful for our purposes
+        if (linkError.code === 'auth/credential-already-in-use') {
+          console.log('Phone number verified (already linked to another account)');
+        } else {
+          throw linkError;
         }
       }
       
@@ -761,6 +776,9 @@ export function BasicInfoPage() {
       console.error('Error verifying OTP:', error);
       if (error.code === 'auth/invalid-verification-code') {
         throw new Error('Invalid verification code');
+      } else if (error.code === 'auth/credential-already-in-use') {
+        // Still count as success since the phone number is valid
+        return true;
       } else {
         throw new Error('Verification failed. Please try again.');
       }
