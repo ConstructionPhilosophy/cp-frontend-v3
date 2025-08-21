@@ -1025,7 +1025,6 @@ export function BasicInfoPage() {
                       companySize: '',
                       phoneNumber: '',
                       countryCode: '+91',
-                      hidePhoneNumber: false,
                     });
                     // Reset verification states
                     setPhoneCodeSent(false);
