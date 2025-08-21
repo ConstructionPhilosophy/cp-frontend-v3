@@ -108,19 +108,21 @@ export default function Header() {
           {/* Right Section */}
           <div className="flex items-center space-x-4">
             {/* My Profile Button - Direct redirect */}
-            <Button 
-              variant="ghost" 
-              className="flex items-center gap-2 text-cmo-text-secondary hover:text-cmo-primary"
-              onClick={handleProfileClick}
-            >
-              <Avatar className="w-8 h-8">
-                <AvatarImage src={userProfile?.profilePic || ""} />
-                <AvatarFallback>
-                  {userProfile?.firstName?.charAt(0) || 'U'}{userProfile?.lastName?.charAt(0) || ''}
-                </AvatarFallback>
-              </Avatar>
-              <span>My Profile</span>
-            </Button>
+            <div className="flex flex-col items-center">
+              <Button 
+                variant="ghost" 
+                className="p-1 text-cmo-text-secondary hover:text-cmo-primary"
+                onClick={handleProfileClick}
+              >
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={userProfile?.photoUrl || userProfile?.profilePic || ""} />
+                  <AvatarFallback>
+                    {userProfile?.firstName?.charAt(0) || 'U'}{userProfile?.lastName?.charAt(0) || ''}
+                  </AvatarFallback>
+                </Avatar>
+              </Button>
+              <span className="text-xs mt-1 text-cmo-text-secondary">My Profile</span>
+            </div>
 
             {/* Three Dots Menu */}
             <DropdownMenu>

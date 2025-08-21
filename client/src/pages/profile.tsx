@@ -197,7 +197,7 @@ export default function ProfilePage() {
               <div 
                 className="h-48 bg-gradient-to-r from-blue-500 to-purple-600"
                 style={{
-                  backgroundImage: profileData.bannerPic ? `url(${profileData.bannerPic})` : undefined,
+                  backgroundImage: (profileData as any).bannerUrl ? `url(${(profileData as any).bannerUrl})` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
@@ -209,7 +209,7 @@ export default function ProfilePage() {
                   {/* Avatar */}
                   <div className="flex-shrink-0">
                     <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
-                      <AvatarImage src={profileData.profilePic || ""} />
+                      <AvatarImage src={(profileData as any).photoUrl || (profileData as any).profilePic || ""} />
                       <AvatarFallback className="text-2xl">
                         {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
                       </AvatarFallback>
@@ -224,7 +224,7 @@ export default function ProfilePage() {
                           {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
                         <p className="text-lg text-cmo-text-secondary mb-3">
-                          {(profileData as any).title || (profileData as any).positionDesignation || 'Professional'}
+                          {(profileData as any).businessProfile?.companyName || (profileData as any).title || (profileData as any).positionDesignation || 'Professional'}
                         </p>
                         <div className="flex flex-wrap items-center gap-4 text-sm text-cmo-text-secondary">
                           <span className="flex items-center gap-1">
@@ -237,10 +237,18 @@ export default function ProfilePage() {
                               {(profileData as any).phoneNumber}
                             </span>
                           )}
-                          {((profileData as any).city || (profileData as any).state) && (
+                          {(profileData as any).businessProfile?.location && (
                             <span className="flex items-center gap-1">
                               <MapPin className="w-4 h-4" />
-                              {(profileData as any).city}, {(profileData as any).state}
+                              {(profileData as any).businessProfile.location.city}, {(profileData as any).businessProfile.location.state.name}
+                            </span>
+                          )}
+                          {(profileData as any).businessProfile?.website && (
+                            <span className="flex items-center gap-1">
+                              <Globe className="w-4 h-4" />
+                              <a href={(profileData as any).businessProfile.website} target="_blank" rel="noopener noreferrer" className="text-cmo-primary hover:underline">
+                                Website
+                              </a>
                             </span>
                           )}
                         </div>
@@ -285,10 +293,10 @@ export default function ProfilePage() {
                 </div>
 
                 {/* About Section */}
-                {(profileData as any).about && (
+                {(profileData as any).businessProfile?.description && (
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-3">About</h3>
-                    <p className="text-cmo-text-secondary leading-relaxed">{(profileData as any).about}</p>
+                    <p className="text-cmo-text-secondary leading-relaxed">{(profileData as any).businessProfile.description}</p>
                   </div>
                 )}
 
@@ -399,7 +407,7 @@ export default function ProfilePage() {
                     <div key={activity.id} className="border-b border-cmo-border pb-6 last:border-b-0">
                       <div className="flex gap-3">
                         <Avatar className="w-12 h-12">
-                          <AvatarImage src={profileData.profilePic || ""} />
+                          <AvatarImage src={(profileData as any).photoUrl || (profileData as any).profilePic || ""} />
                           <AvatarFallback>
                             {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
                           </AvatarFallback>
@@ -474,7 +482,7 @@ export default function ProfilePage() {
                             <div className="mt-4 pl-4 border-l-2 border-cmo-border">
                               <div className="flex gap-3">
                                 <Avatar className="w-8 h-8">
-                                  <AvatarImage src={profileData.profilePic || ""} />
+                                  <AvatarImage src={(profileData as any).photoUrl || (profileData as any).profilePic || ""} />
                                   <AvatarFallback className="text-xs">
                                     {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
                                   </AvatarFallback>
@@ -524,30 +532,46 @@ export default function ProfilePage() {
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Intro</h3>
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Building className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">{(profileData as any).positionDesignation || (profileData as any).title || 'Professional'}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">0 followers</span>
-                  </div>
+                  {(profileData as any).businessProfile?.companyName && (
+                    <div className="flex items-center gap-3">
+                      <Building className="w-5 h-5 text-cmo-primary" />
+                      <span className="text-sm">{(profileData as any).businessProfile.companyName}</span>
+                    </div>
+                  )}
+                  {(profileData as any).businessProfile?.industry && (
+                    <div className="flex items-center gap-3">
+                      <Briefcase className="w-5 h-5 text-cmo-primary" />
+                      <span className="text-sm">{(profileData as any).businessProfile.industry}</span>
+                    </div>
+                  )}
+                  {(profileData as any).businessProfile?.companySize && (
+                    <div className="flex items-center gap-3">
+                      <Users className="w-5 h-5 text-cmo-primary" />
+                      <span className="text-sm">{(profileData as any).businessProfile.companySize} employees</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">Joined {profileData.createdAt ? new Date(profileData.createdAt).getFullYear() : new Date().getFullYear()}</span>
+                    <span className="text-sm">Joined {(profileData as any).createdTime ? new Date((profileData as any).createdTime).getFullYear() : new Date().getFullYear()}</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Mail className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">j••••@e••••.com</span>
+                    <span className="text-sm">{profileData.email}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">+91••••••••90</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Globe className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">LinkedIn Profile</span>
-                  </div>
+                  {(profileData as any).businessProfile?.registrationNumber && (
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-cmo-primary" />
+                      <span className="text-sm">Reg: {(profileData as any).businessProfile.registrationNumber}</span>
+                    </div>
+                  )}
+                  {(profileData as any).businessProfile?.website && (
+                    <div className="flex items-center gap-3">
+                      <Globe className="w-5 h-5 text-cmo-primary" />
+                      <a href={(profileData as any).businessProfile.website} target="_blank" rel="noopener noreferrer" className="text-sm text-cmo-primary hover:underline">
+                        Website
+                      </a>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
