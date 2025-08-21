@@ -856,14 +856,17 @@ export function BasicInfoPage() {
       if (userType === 'personal') {
         updateData = {
           ...updateData,
-          phoneNumber: personalData.phoneNumber ? `${personalData.countryCode}${personalData.phoneNumber}` : undefined,
+          phoneNumber: personalData.phoneNumber || undefined,
+          phoneCountryCode: personalData.countryCode || undefined,
           title: showOtherTitle && personalData.customTitle ? personalData.customTitle : personalData.title,
           positionDesignation: personalData.positionDesignation,
           gender: personalData.gender || undefined,
           dateOfBirth: personalData.dateOfBirth,
           city: personalData.city,
-          state: personalData.state,
-          country: personalData.country,
+          stateName: personalData.state.name,
+          stateCode: personalData.state.code,
+          countryName: personalData.country.name,
+          countryCode: personalData.country.code,
           company: personalData.company,
         };
       } else {
@@ -880,13 +883,16 @@ export function BasicInfoPage() {
           description: businessData.description,
           address,
           city: businessData.city,
-          state: businessData.state,
-          country: businessData.country,
+          stateName: businessData.state.name,
+          stateCode: businessData.state.code,
+          countryName: businessData.country.name,
+          countryCode: businessData.country.code,
           pincode: businessData.pincode,
           website: businessData.website,
           registrationNumber: businessData.registrationNumber,
           companySize: businessData.companySize,
-          phoneNumber: businessData.phoneNumber ? `${businessData.countryCode}${businessData.phoneNumber}` : undefined,
+          phoneNumber: businessData.phoneNumber || undefined,
+          phoneCountryCode: businessData.countryCode || undefined,
         };
       }
 
