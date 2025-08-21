@@ -224,7 +224,10 @@ export default function ProfilePage() {
                           {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
                         <p className="text-lg text-cmo-text-secondary mb-3">
-                          {(profileData as any).businessProfile?.companyName || (profileData as any).title || (profileData as any).positionDesignation || 'Professional'}
+                          {(profileData as any).userType === 'business' 
+                            ? (profileData as any).businessProfile?.companyName 
+                            : ((profileData as any).title || (profileData as any).positionDesignation || 'Professional')
+                          }
                         </p>
                         <div className="flex flex-wrap items-center gap-4 text-sm text-cmo-text-secondary">
                           <span className="flex items-center gap-1">
@@ -237,13 +240,16 @@ export default function ProfilePage() {
                               {(profileData as any).phoneNumber}
                             </span>
                           )}
-                          {(profileData as any).businessProfile?.location && (
+                          {((profileData as any).userType === 'business' ? (profileData as any).businessProfile?.location : ((profileData as any).city || (profileData as any).stateName)) && (
                             <span className="flex items-center gap-1">
                               <MapPin className="w-4 h-4" />
-                              {(profileData as any).businessProfile.location.city}, {(profileData as any).businessProfile.location.state.name}
+                              {(profileData as any).userType === 'business' 
+                                ? `${(profileData as any).businessProfile.location.city}, ${(profileData as any).businessProfile.location.state.name}`
+                                : `${(profileData as any).city || ''}, ${(profileData as any).stateName || ''}`
+                              }
                             </span>
                           )}
-                          {(profileData as any).businessProfile?.website && (
+                          {(profileData as any).userType === 'business' && (profileData as any).businessProfile?.website && (
                             <span className="flex items-center gap-1">
                               <Globe className="w-4 h-4" />
                               <a href={(profileData as any).businessProfile.website} target="_blank" rel="noopener noreferrer" className="text-cmo-primary hover:underline">
@@ -293,10 +299,15 @@ export default function ProfilePage() {
                 </div>
 
                 {/* About Section */}
-                {(profileData as any).businessProfile?.description && (
+                {((profileData as any).userType === 'business' ? (profileData as any).businessProfile?.description : (profileData as any).about) && (
                   <div className="mt-6">
                     <h3 className="text-lg font-semibold mb-3">About</h3>
-                    <p className="text-cmo-text-secondary leading-relaxed">{(profileData as any).businessProfile.description}</p>
+                    <p className="text-cmo-text-secondary leading-relaxed">
+                      {(profileData as any).userType === 'business' 
+                        ? (profileData as any).businessProfile.description 
+                        : (profileData as any).about
+                      }
+                    </p>
                   </div>
                 )}
 
@@ -532,24 +543,73 @@ export default function ProfilePage() {
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Intro</h3>
                 <div className="space-y-3">
-                  {(profileData as any).businessProfile?.companyName && (
-                    <div className="flex items-center gap-3">
-                      <Building className="w-5 h-5 text-cmo-primary" />
-                      <span className="text-sm">{(profileData as any).businessProfile.companyName}</span>
-                    </div>
+                  {(profileData as any).userType === 'business' ? (
+                    <>
+                      {/* Business Profile Info */}
+                      {(profileData as any).businessProfile?.companyName && (
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">{(profileData as any).businessProfile.companyName}</span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.industry && (
+                        <div className="flex items-center gap-3">
+                          <Briefcase className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">{(profileData as any).businessProfile.industry}</span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.companySize && (
+                        <div className="flex items-center gap-3">
+                          <Users className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">{(profileData as any).businessProfile.companySize} employees</span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.registrationNumber && (
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">Reg: {(profileData as any).businessProfile.registrationNumber}</span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.website && (
+                        <div className="flex items-center gap-3">
+                          <Globe className="w-5 h-5 text-cmo-primary" />
+                          <a href={(profileData as any).businessProfile.website} target="_blank" rel="noopener noreferrer" className="text-sm text-cmo-primary hover:underline">
+                            Website
+                          </a>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {/* Personal Profile Info */}
+                      {((profileData as any).title || (profileData as any).positionDesignation) && (
+                        <div className="flex items-center gap-3">
+                          <Briefcase className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">{(profileData as any).title || (profileData as any).positionDesignation}</span>
+                        </div>
+                      )}
+                      {(profileData as any).company && (
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">{(profileData as any).company}</span>
+                        </div>
+                      )}
+                      {(profileData as any).gender && (
+                        <div className="flex items-center gap-3">
+                          <User className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">{(profileData as any).gender}</span>
+                        </div>
+                      )}
+                      {(profileData as any).dateOfBirth && (
+                        <div className="flex items-center gap-3">
+                          <Calendar className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">Born {new Date((profileData as any).dateOfBirth).getFullYear()}</span>
+                        </div>
+                      )}
+                    </>
                   )}
-                  {(profileData as any).businessProfile?.industry && (
-                    <div className="flex items-center gap-3">
-                      <Briefcase className="w-5 h-5 text-cmo-primary" />
-                      <span className="text-sm">{(profileData as any).businessProfile.industry}</span>
-                    </div>
-                  )}
-                  {(profileData as any).businessProfile?.companySize && (
-                    <div className="flex items-center gap-3">
-                      <Users className="w-5 h-5 text-cmo-primary" />
-                      <span className="text-sm">{(profileData as any).businessProfile.companySize} employees</span>
-                    </div>
-                  )}
+                  
+                  {/* Common Info */}
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-cmo-primary" />
                     <span className="text-sm">Joined {(profileData as any).createdTime ? new Date((profileData as any).createdTime).getFullYear() : new Date().getFullYear()}</span>
@@ -558,18 +618,10 @@ export default function ProfilePage() {
                     <Mail className="w-5 h-5 text-cmo-primary" />
                     <span className="text-sm">{profileData.email}</span>
                   </div>
-                  {(profileData as any).businessProfile?.registrationNumber && (
+                  {(profileData as any).phoneNumber && (
                     <div className="flex items-center gap-3">
-                      <FileText className="w-5 h-5 text-cmo-primary" />
-                      <span className="text-sm">Reg: {(profileData as any).businessProfile.registrationNumber}</span>
-                    </div>
-                  )}
-                  {(profileData as any).businessProfile?.website && (
-                    <div className="flex items-center gap-3">
-                      <Globe className="w-5 h-5 text-cmo-primary" />
-                      <a href={(profileData as any).businessProfile.website} target="_blank" rel="noopener noreferrer" className="text-sm text-cmo-primary hover:underline">
-                        Website
-                      </a>
+                      <Phone className="w-5 h-5 text-cmo-primary" />
+                      <span className="text-sm">{(profileData as any).phoneNumber}</span>
                     </div>
                   )}
                 </div>
