@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
@@ -12,6 +12,9 @@ import {
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
 import Header from '../components/layout/header';
+import { useAuth } from '../contexts/AuthContext';
+import { userApiService, UserProfile } from '../lib/userApi';
+import { Loader2 } from 'lucide-react';
 import { 
   MapPin, 
   Mail, 
@@ -36,42 +39,7 @@ import {
   Briefcase
 } from 'lucide-react';
 
-// Mock data based on API structure
-const mockProfileData = {
-  uid: "abc123",
-  email: "john.smith@example.com",
-  emailVerified: true,
-  firstName: "John",
-  lastName: "Smith",
-  phoneNumber: "+911234567890",
-  photoUrl: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=200",
-  bannerUrl: "https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=300",
-  title: "CMO at SingleFire",
-  positionDesignation: "Chief Marketing Officer",
-  gender: "Male",
-  dateOfBirth: "1985-03-15",
-  city: "Virginia",
-  state: "NY",
-  country: "United States",
-  about: "I'm the model of the new CMO. I've combined a deep background in brand management at blue chip CPG companies with eCommerce growth marketing at the world's biggest retailer. I've run SingleFire I've created world-class campaigns; I've built digital marketing organisations from the ground up. I have over 20 years experience leading... See more",
-  skills: [
-    "Leadership",
-    "Marketing",
-    "Public-relations", 
-    "Branding"
-  ],
-  language: [
-    "English",
-    "Spanish"
-  ],
-  followersCount: 142,
-  followingCount: 80,
-  postCount: 15,
-  messageCount: 5,
-  createdTime: "2020-05-01T12:00:00Z",
-  updatedTime: "2025-07-01T09:30:00Z",
-  isFollowing: false
-};
+
 
 const mockEducation = [
   {
@@ -140,8 +108,33 @@ export default function ProfilePage() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
   const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
+  const [profileData, setProfileData] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { user, userProfile } = useAuth();
 
   const filters = ['All', 'News', 'Posts', 'Articles', 'Videos', 'Jobs'];
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!user) return;
+      
+      setLoading(true);
+      try {
+        const data = await userApiService.getCurrentUser(true);
+        setProfileData(data);
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+        // Fallback to context data if API fails
+        if (userProfile) {
+          setProfileData(userProfile);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [user, userProfile]);
 
   const toggleComments = (postId: string) => {
     setExpandedComments(prev => ({
@@ -165,6 +158,32 @@ export default function ProfilePage() {
     }));
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-cmo-bg">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="w-8 h-8 animate-spin text-cmo-primary" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!profileData) {
+    return (
+      <div className="min-h-screen bg-cmo-bg">
+        <Header />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <p className="text-cmo-text-secondary">Unable to load profile data.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-cmo-bg">
       <Header />
@@ -178,7 +197,7 @@ export default function ProfilePage() {
               <div 
                 className="h-48 bg-gradient-to-r from-blue-500 to-purple-600"
                 style={{
-                  backgroundImage: `url(${mockProfileData.bannerUrl})`,
+                  backgroundImage: profileData.bannerPic ? `url(${profileData.bannerPic})` : undefined,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center'
                 }}
@@ -190,9 +209,9 @@ export default function ProfilePage() {
                   {/* Avatar */}
                   <div className="flex-shrink-0">
                     <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
-                      <AvatarImage src={mockProfileData.photoUrl} />
+                      <AvatarImage src={profileData.profilePic || ""} />
                       <AvatarFallback className="text-2xl">
-                        {mockProfileData.firstName.charAt(0)}{mockProfileData.lastName.charAt(0)}
+                        {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
                       </AvatarFallback>
                     </Avatar>
                   </div>
@@ -202,23 +221,28 @@ export default function ProfilePage() {
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <h1 className="text-3xl font-bold text-cmo-text-primary truncate">
-                          {mockProfileData.firstName} {mockProfileData.lastName}
+                          {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
                         <p className="text-lg text-cmo-text-secondary mb-3">
-                          {mockProfileData.title}
+                          {(profileData as any).title || (profileData as any).positionDesignation || 'Professional'}
                         </p>
                         <div className="flex flex-wrap items-center gap-4 text-sm text-cmo-text-secondary">
                           <span className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            {mockProfileData.city}, {mockProfileData.state}
+                            <Mail className="w-4 h-4" />
+                            {profileData.email}
                           </span>
-                          <span className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            {mockProfileData.followersCount} followers
-                          </span>
-                          <span>
-                            {mockProfileData.followingCount} following
-                          </span>
+                          {(profileData as any).phoneNumber && (
+                            <span className="flex items-center gap-1">
+                              <Phone className="w-4 h-4" />
+                              {(profileData as any).phoneNumber}
+                            </span>
+                          )}
+                          {((profileData as any).city || (profileData as any).state) && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-4 h-4" />
+                              {(profileData as any).city}, {(profileData as any).state}
+                            </span>
+                          )}
                         </div>
                       </div>
                       
