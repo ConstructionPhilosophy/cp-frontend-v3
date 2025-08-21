@@ -8,6 +8,8 @@ import { Combobox } from '../components/ui/combobox';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Calendar } from '../components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
+import { CustomDatePicker } from '../components/ui/custom-date-picker';
+import { CountryCodeSelector } from '../components/ui/country-code-selector';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Textarea } from '../components/ui/textarea';
 import { CalendarIcon, Camera, Loader2, Upload, Plus, X, Check } from 'lucide-react';
@@ -1202,35 +1204,12 @@ export function BasicInfoPage() {
                       {/* Date of Birth */}
                       <div className="space-y-2">
                         <Label>Date of Birth *</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full justify-start text-left font-normal",
-                                !selectedDate && "text-muted-foreground",
-                                errors.dateOfBirth && "border-red-500"
-                              )}
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0">
-                            <Calendar
-                              mode="single"
-                              selected={selectedDate}
-                              onSelect={handleDateSelect}
-                              defaultMonth={selectedDate || new Date(2000, 0)}
-                              fromYear={1940}
-                              toYear={new Date().getFullYear() - 13}
-                              captionLayout="dropdown-buttons"
-                              showOutsideDays={false}
-                              initialFocus
-                              disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <CustomDatePicker
+                          selected={selectedDate}
+                          onSelect={handleDateSelect}
+                          placeholder="Pick a date"
+                          error={!!errors.dateOfBirth}
+                        />
                         {errors.dateOfBirth && <p className="text-sm text-red-500">{errors.dateOfBirth}</p>}
                       </div>
 
@@ -1292,12 +1271,10 @@ export function BasicInfoPage() {
                       <Label>Phone Number (Optional)</Label>
                       <div className="flex gap-2">
                         {/* Country Code */}
-                        <Combobox
-                          options={countryCodeComboOptions}
+                        <CountryCodeSelector
                           value={personalData.countryCode}
                           onValueChange={(value) => handlePersonalInputChange('countryCode', value)}
                           placeholder="Select code"
-                          searchPlaceholder="Search country codes..."
                           className="w-36"
                         />
                         
@@ -1694,12 +1671,10 @@ export function BasicInfoPage() {
                       <Label>Phone Number *</Label>
                       <div className="flex gap-2">
                         {/* Country Code */}
-                        <Combobox
-                          options={countryCodeComboOptions}
+                        <CountryCodeSelector
                           value={businessData.countryCode}
                           onValueChange={(value) => handleBusinessInputChange('countryCode', value)}
                           placeholder="Select code"
-                          searchPlaceholder="Search country codes..."
                           className="w-36"
                         />
                         
