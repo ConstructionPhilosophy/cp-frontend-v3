@@ -952,29 +952,7 @@ export function BasicInfoPage() {
     })), []
   );
 
-  // Memoize countries for better performance
-  const countryComboOptions = useMemo(() => 
-    countries.map((country) => ({
-      value: JSON.stringify(country),
-      label: country.name,
-    })), [countries]
-  );
-
-  // Memoize states for better performance  
-  const stateComboOptions = useMemo(() => 
-    states.map((state) => ({
-      value: JSON.stringify(state),
-      label: state.name,
-    })), [states]
-  );
-
-  // Memoize cities for better performance
-  const cityComboOptions = useMemo(() => 
-    cities.map((city) => ({
-      value: city.name,
-      label: city.name,
-    })), [cities]
-  );
+  // No longer need these memoized options since we're using Select components
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 md:py-8">
@@ -1391,51 +1369,76 @@ export function BasicInfoPage() {
                         {/* Country */}
                         <div className="space-y-2">
                           <Label>Country *</Label>
-                          <Combobox
-                            options={countryComboOptions}
-                            value={personalData.country.name ? JSON.stringify(personalData.country) : ''}
+                          <Select 
+                            value={personalData.country.name} 
                             onValueChange={(value) => {
-                              const country = value ? JSON.parse(value) : { name: '', code: '' };
-                              handlePersonalInputChange('country', country);
+                              const country = countries.find(c => c.name === value);
+                              if (country) {
+                                handlePersonalInputChange('country', { name: country.name, code: country.iso2 });
+                              }
                             }}
-                            placeholder={loadingLocations ? "Loading..." : "Select country"}
-                            searchPlaceholder="Search countries..."
                             disabled={loadingLocations}
-                            error={!!errors.country}
-                          />
+                          >
+                            <SelectTrigger className={errors.country ? "border-red-500" : ""}>
+                              <SelectValue placeholder={loadingLocations ? "Loading..." : "Select country"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {countries.map((country) => (
+                                <SelectItem key={country.iso2} value={country.name}>
+                                  {country.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           {errors.country && <p className="text-sm text-red-500">{errors.country}</p>}
                         </div>
 
                         {/* State */}
                         <div className="space-y-2">
                           <Label>State/Province *</Label>
-                          <Combobox
-                            options={stateComboOptions}
-                            value={personalData.state.name ? JSON.stringify(personalData.state) : ''}
+                          <Select 
+                            value={personalData.state.name} 
                             onValueChange={(value) => {
-                              const state = value ? JSON.parse(value) : { name: '', code: '' };
-                              handlePersonalInputChange('state', state);
+                              const state = states.find(s => s.name === value);
+                              if (state) {
+                                handlePersonalInputChange('state', { name: state.name, code: state.iso2 });
+                              }
                             }}
-                            placeholder={!personalData.country.name ? "Select country first" : loadingLocations ? "Loading..." : "Select state"}
-                            searchPlaceholder="Search states..."
                             disabled={!personalData.country.name || loadingLocations}
-                            error={!!errors.state}
-                          />
+                          >
+                            <SelectTrigger className={errors.state ? "border-red-500" : ""}>
+                              <SelectValue placeholder={!personalData.country.name ? "Select country first" : loadingLocations ? "Loading..." : "Select state"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {states.map((state) => (
+                                <SelectItem key={state.iso2} value={state.name}>
+                                  {state.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           {errors.state && <p className="text-sm text-red-500">{errors.state}</p>}
                         </div>
 
                         {/* City */}
                         <div className="space-y-2">
                           <Label>City *</Label>
-                          <Combobox
-                            options={cityComboOptions}
-                            value={personalData.city}
+                          <Select 
+                            value={personalData.city} 
                             onValueChange={(value) => handlePersonalInputChange('city', value)}
-                            placeholder={!personalData.state.name ? "Select state first" : loadingLocations ? "Loading..." : "Select city"}
-                            searchPlaceholder="Search cities..."
                             disabled={!personalData.state.name || loadingLocations}
-                            error={!!errors.city}
-                          />
+                          >
+                            <SelectTrigger className={errors.city ? "border-red-500" : ""}>
+                              <SelectValue placeholder={!personalData.state.name ? "Select state first" : loadingLocations ? "Loading..." : "Select city"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {cities.map((city) => (
+                                <SelectItem key={city.name} value={city.name}>
+                                  {city.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                           {errors.city && <p className="text-sm text-red-500">{errors.city}</p>}
                         </div>
                       </div>
