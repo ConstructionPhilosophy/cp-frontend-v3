@@ -590,16 +590,23 @@ export function BasicInfoPage() {
     }
     if (field === 'state') {
       const stateObj = value as { name: string; code: string };
+      console.log('🔄 State selection changed for PERSONAL form:', stateObj);
       setPersonalData(prev => ({ ...prev, city: '' }));
       setCities([]);
       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
       
       // Use current country code from state since personalData hasn't updated yet
       const currentCountryCode = personalData.country.code;
+      console.log('🔍 Current country code for personal form:', currentCountryCode);
+      console.log('🔍 State code received:', stateObj.code);
+      
       if (currentCountryCode && stateObj.code) {
+        console.log('✅ Triggering cities API call for personal form...');
         setTimeout(() => {
           loadCities(currentCountryCode, stateObj.code);
         }, 0);
+      } else {
+        console.warn('❌ Missing data for cities API call:', { currentCountryCode, stateCode: stateObj.code });
       }
     }
   };
@@ -655,16 +662,23 @@ export function BasicInfoPage() {
     }
     if (field === 'state') {
       const stateObj = value as { name: string; code: string };
+      console.log('🔄 State selection changed for BUSINESS form:', stateObj);
       setBusinessData(prev => ({ ...prev, city: '' }));
       setCities([]);
       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
       
       // Use current country code from state since businessData hasn't updated yet
       const currentCountryCode = businessData.country.code;
+      console.log('🔍 Current country code for business form:', currentCountryCode);
+      console.log('🔍 State code received:', stateObj.code);
+      
       if (currentCountryCode && stateObj.code) {
+        console.log('✅ Triggering cities API call for business form...');
         setTimeout(() => {
           loadCities(currentCountryCode, stateObj.code);
         }, 0);
+      } else {
+        console.warn('❌ Missing data for cities API call:', { currentCountryCode, stateCode: stateObj.code });
       }
     }
   };
