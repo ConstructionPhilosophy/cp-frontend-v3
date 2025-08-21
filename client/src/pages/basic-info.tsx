@@ -8,7 +8,7 @@ import { Combobox } from '../components/ui/combobox';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Calendar } from '../components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
-import { CustomDatePicker } from '../components/ui/custom-date-picker';
+
 import { CountryCodeSelector } from '../components/ui/country-code-selector';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Textarea } from '../components/ui/textarea';
@@ -417,32 +417,16 @@ export function BasicInfoPage() {
   const loadStates = async (countryCode: string) => {
     try {
       setLoadingLocations(true);
-      const endpoint = `/api/states?country_code=${countryCode}`;
-      console.log('🏛️ Calling States API:', endpoint);
-      console.log('📍 Parameters:', { countryCode });
-      
-      const response = await fetch(endpoint);
-      console.log('🏛️ States API Response Status:', response.status);
+      const response = await fetch(`/api/states?country_code=${countryCode}`);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('🏛️ States API Response Data:', data);
-        console.log('🏛️ States Array Length:', Array.isArray(data) ? data.length : 'Not an array');
-        
         setStates(data);
-        
-        if (!data || data.length === 0) {
-          console.warn('⚠️ States API returned empty array for country:', countryCode);
-        } else {
-          console.log('✅ States loaded successfully:', data.length, 'states');
-        }
       } else {
-        const errorText = await response.text();
-        console.error('❌ States API Error Response:', errorText);
-        throw new Error(`Failed to load states: ${response.status} ${errorText}`);
+        throw new Error('Failed to load states');
       }
     } catch (error) {
-      console.error('💥 Error loading states:', error);
+      console.error('Error loading states:', error);
       toast({
         title: "Error Loading States",
         description: "Failed to load state data. Please try again.",
@@ -457,34 +441,17 @@ export function BasicInfoPage() {
   const loadCities = async (countryCode: string, stateCode: string) => {
     try {
       setLoadingLocations(true);
-      const endpoint = `/api/cities?country_code=${countryCode}&state_code=${stateCode}`;
-      console.log('🌆 Calling Cities API:', endpoint);
-      console.log('📍 Parameters:', { countryCode, stateCode });
-      
-      const response = await fetch(endpoint);
-      console.log('🌆 Cities API Response Status:', response.status);
+      const response = await fetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('🌆 Cities API Response Data:', data);
-        console.log('🌆 Cities Array Length:', Array.isArray(data) ? data.length : 'Not an array');
-        
-        // Cities API returns direct array like states API, not wrapped in data property
         const citiesArray = Array.isArray(data) ? data : (data.data || []);
         setCities(citiesArray);
-        
-        if (citiesArray.length === 0) {
-          console.warn('⚠️ Cities API returned empty array for:', { countryCode, stateCode });
-        } else {
-          console.log('✅ Cities loaded successfully:', citiesArray.length, 'cities');
-        }
       } else {
-        const errorText = await response.text();
-        console.error('❌ Cities API Error Response:', errorText);
-        throw new Error(`Failed to load cities: ${response.status} ${errorText}`);
+        throw new Error('Failed to load cities');
       }
     } catch (error) {
-      console.error('💥 Error loading cities:', error);
+      console.error('Error loading cities:', error);
       toast({
         title: "Error Loading Cities",
         description: "Failed to load city data. Please try again.",
@@ -591,23 +558,16 @@ export function BasicInfoPage() {
     }
     if (field === 'state') {
       const stateObj = value as { name: string; code: string };
-      console.log('🔄 State selection changed for PERSONAL form:', stateObj);
       setPersonalData(prev => ({ ...prev, city: '' }));
       setCities([]);
       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
       
       // Use current country code from state since personalData hasn't updated yet
       const currentCountryCode = personalData.country.code;
-      console.log('🔍 Current country code for personal form:', currentCountryCode);
-      console.log('🔍 State code received:', stateObj.code);
-      
       if (currentCountryCode && stateObj.code) {
-        console.log('✅ Triggering cities API call for personal form...');
         setTimeout(() => {
           loadCities(currentCountryCode, stateObj.code);
         }, 0);
-      } else {
-        console.warn('❌ Missing data for cities API call:', { currentCountryCode, stateCode: stateObj.code });
       }
     }
   };
@@ -663,23 +623,16 @@ export function BasicInfoPage() {
     }
     if (field === 'state') {
       const stateObj = value as { name: string; code: string };
-      console.log('🔄 State selection changed for BUSINESS form:', stateObj);
       setBusinessData(prev => ({ ...prev, city: '' }));
       setCities([]);
       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
       
       // Use current country code from state since businessData hasn't updated yet
       const currentCountryCode = businessData.country.code;
-      console.log('🔍 Current country code for business form:', currentCountryCode);
-      console.log('🔍 State code received:', stateObj.code);
-      
       if (currentCountryCode && stateObj.code) {
-        console.log('✅ Triggering cities API call for business form...');
         setTimeout(() => {
           loadCities(currentCountryCode, stateObj.code);
         }, 0);
-      } else {
-        console.warn('❌ Missing data for cities API call:', { currentCountryCode, stateCode: stateObj.code });
       }
     }
   };
@@ -1253,12 +1206,33 @@ export function BasicInfoPage() {
                       {/* Date of Birth */}
                       <div className="space-y-2">
                         <Label>Date of Birth *</Label>
-                        <CustomDatePicker
-                          selected={selectedDate}
-                          onSelect={handleDateSelect}
-                          placeholder="Pick a date"
-                          error={!!errors.dateOfBirth}
-                        />
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                "w-full justify-start text-left font-normal",
+                                !selectedDate && "text-muted-foreground",
+                                errors.dateOfBirth && "border-red-500"
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={selectedDate}
+                              onSelect={handleDateSelect}
+                              initialFocus
+                              captionLayout="dropdown-buttons"
+                              fromYear={1950}
+                              toYear={new Date().getFullYear()}
+                              defaultMonth={selectedDate || new Date(1990, 0)}
+                            />
+                          </PopoverContent>
+                        </Popover>
                         {errors.dateOfBirth && <p className="text-sm text-red-500">{errors.dateOfBirth}</p>}
                       </div>
 
