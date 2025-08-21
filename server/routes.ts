@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { API_ENDPOINTS } from "../shared/config";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Health check endpoint
@@ -10,7 +11,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Custom Geo API endpoints
   app.get("/api/countries", async (req, res) => {
     try {
-      const response = await fetch('https://geo-api-230500065838.asia-south1.run.app/countries');
+      const response = await fetch(API_ENDPOINTS.GEO_COUNTRIES);
       if (response.ok) {
         const data = await response.json();
         res.json(data);
@@ -30,7 +31,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "country_code parameter is required" });
       }
 
-      const response = await fetch(`https://geo-api-230500065838.asia-south1.run.app/states?country_code=${country_code}`);
+      const response = await fetch(`${API_ENDPOINTS.GEO_STATES}?country_code=${country_code}`);
       if (response.ok) {
         const data = await response.json();
         res.json(data);
@@ -50,7 +51,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "country_code and state_code parameters are required" });
       }
 
-      const response = await fetch(`https://geo-api-230500065838.asia-south1.run.app/cities?country_code=${country_code}&state_code=${state_code}`);
+      const response = await fetch(`${API_ENDPOINTS.GEO_CITIES}?country_code=${country_code}&state_code=${state_code}`);
       if (response.ok) {
         const data = await response.json();
         res.json(data);

@@ -14,6 +14,7 @@ import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Textarea } from '../components/ui/textarea';
 import { CalendarIcon, Camera, Loader2, Upload, Plus, X, Check } from 'lucide-react';
 import { format } from 'date-fns';
+
 import { cn } from '../lib/utils';
 import { userApiService } from '../lib/userApi';
 import { useAuth } from '../contexts/AuthContext';
@@ -381,7 +382,6 @@ export function BasicInfoPage() {
     companySize: '',
     phoneNumber: '',
     countryCode: '+91',
-    hidePhoneNumber: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -1753,21 +1753,7 @@ export function BasicInfoPage() {
                         <p className="text-sm text-red-500">{errors.phoneNumber || phoneError}</p>
                       )}
                       
-                      {/* Hide Phone Number */}
-                      {businessData.phoneNumber && (
-                        <div className="flex items-center space-x-2">
-                          <input
-                            type="checkbox"
-                            id="hidePhoneBusiness"
-                            checked={businessData.hidePhoneNumber}
-                            onChange={(e) => handleBusinessInputChange('hidePhoneNumber', e.target.checked)}
-                            className="h-4 w-4 text-cmo-primary border-gray-300 rounded focus:ring-cmo-primary"
-                          />
-                          <Label htmlFor="hidePhoneBusiness" className="text-sm">
-                            Hide phone number from public profile
-                          </Label>
-                        </div>
-                      )}
+
                     </div>
                   </>
                 )}
