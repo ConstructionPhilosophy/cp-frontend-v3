@@ -12,6 +12,13 @@ This is a frontend-only React application built as a Q&A community platform simi
   - Added CORS headers and debugging logs to resolve external API connectivity issues (/users/me endpoint)
   - Implemented smooth form switching between personal and business profiles with proper state reset
   - Added loading indicators during profile type switching to enhance user feedback
+- **Complete UX Fixes and Enhanced Dropdown Performance**: Resolved all user-reported issues for optimal experience
+  - Fixed radio button clickable area by wrapping entire card with Label element for full area responsiveness
+  - Created custom searchable Combobox component to replace slow Select components with instant search functionality
+  - Implemented searchable dropdowns for all location fields (countries, states, cities) and country codes
+  - Fixed country code flags display consistency between desktop and mobile views
+  - Corrected API endpoint format for cities: using country_code and state_code parameters as required
+  - Optimized all dropdown components with React.useMemo and proper data structure for maximum performance
 - **Enhanced Basic Info Form with Professional Features**: Completely redesigned user profile form with comprehensive improvements
   - Updated job titles dropdown with complete construction industry list including "Other (Specify)" option with custom text input
   - Implemented professional profile/cover image upload system with drag-and-drop functionality and file explorer integration

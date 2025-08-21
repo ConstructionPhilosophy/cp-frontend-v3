@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Combobox } from '../components/ui/combobox';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Calendar } from '../components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover';
@@ -16,6 +17,8 @@ import { userApiService } from '../lib/userApi';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
+
+const GEO_API_BASE_URL = 'https://geo-api-230500065838.asia-south1.run.app';
 
 const JOB_TITLES = [
   'Architect',
@@ -433,11 +436,11 @@ export function BasicInfoPage() {
   const loadCities = async (countryCode: string, stateCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await fetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
+      const response = await fetch(`${GEO_API_BASE_URL}/cities?country_code=${countryCode}&state_code=${stateCode}`);
       
       if (response.ok) {
         const data = await response.json();
-        setCities(data);
+        setCities(data.data || []);
       } else {
         throw new Error('Failed to load cities');
       }
@@ -923,15 +926,12 @@ export function BasicInfoPage() {
   const currentCountryCode = userType === 'personal' ? personalData.countryCode : businessData.countryCode;
 
   // Memoize country codes for better performance
-  const countryCodeOptions = useMemo(() => 
-    COUNTRY_CODES.map((item) => (
-      <SelectItem key={`${item.code}-${item.country}`} value={item.code}>
-        <span className="flex items-center gap-2">
-          <span>{item.flag}</span>
-          <span>{item.code}</span>
-        </span>
-      </SelectItem>
-    )), []
+  const countryCodeComboOptions = useMemo(() => 
+    COUNTRY_CODES.map((item) => ({
+      value: item.code,
+      label: item.code,
+      flag: item.flag,
+    })), []
   );
 
   // Memoize job titles for better performance
@@ -953,30 +953,27 @@ export function BasicInfoPage() {
   );
 
   // Memoize countries for better performance
-  const countryOptions = useMemo(() => 
-    countries.map((country) => (
-      <SelectItem key={country.code} value={JSON.stringify(country)}>
-        {country.name}
-      </SelectItem>
-    )), [countries]
+  const countryComboOptions = useMemo(() => 
+    countries.map((country) => ({
+      value: JSON.stringify(country),
+      label: country.name,
+    })), [countries]
   );
 
-  // Memoize states for better performance
-  const stateOptions = useMemo(() => 
-    states.map((state) => (
-      <SelectItem key={state.code} value={JSON.stringify(state)}>
-        {state.name}
-      </SelectItem>
-    )), [states]
+  // Memoize states for better performance  
+  const stateComboOptions = useMemo(() => 
+    states.map((state) => ({
+      value: JSON.stringify(state),
+      label: state.name,
+    })), [states]
   );
 
   // Memoize cities for better performance
-  const cityOptions = useMemo(() => 
-    cities.map((city) => (
-      <SelectItem key={city} value={city}>
-        {city}
-      </SelectItem>
-    )), [cities]
+  const cityComboOptions = useMemo(() => 
+    cities.map((city) => ({
+      value: city.name,
+      label: city.name,
+    })), [cities]
   );
 
   return (
@@ -1050,38 +1047,42 @@ export function BasicInfoPage() {
                 >
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
-                      <div className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                        userType === 'personal' 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}>
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="personal" id="personal" />
-                          <div>
-                            <Label htmlFor="personal" className="text-base font-medium cursor-pointer">
-                              Personal Profile
-                            </Label>
-                            <p className="text-sm text-gray-500 mt-1">For individual professionals</p>
+                      <Label htmlFor="personal" className="block cursor-pointer">
+                        <div className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                          userType === 'personal' 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}>
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="personal" id="personal" />
+                            <div>
+                              <div className="text-base font-medium cursor-pointer">
+                                Personal Profile
+                              </div>
+                              <p className="text-sm text-gray-500 mt-1">For individual professionals</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Label>
                     </div>
                     <div className="relative">
-                      <div className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                        userType === 'business' 
-                          ? 'border-blue-500 bg-blue-50' 
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}>
-                        <div className="flex items-center space-x-3">
-                          <RadioGroupItem value="business" id="business" />
-                          <div>
-                            <Label htmlFor="business" className="text-base font-medium cursor-pointer">
-                              Business Profile
-                            </Label>
-                            <p className="text-sm text-gray-500 mt-1">For companies and organizations</p>
+                      <Label htmlFor="business" className="block cursor-pointer">
+                        <div className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                          userType === 'business' 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}>
+                          <div className="flex items-center space-x-3">
+                            <RadioGroupItem value="business" id="business" />
+                            <div>
+                              <div className="text-base font-medium cursor-pointer">
+                                Business Profile
+                              </div>
+                              <p className="text-sm text-gray-500 mt-1">For companies and organizations</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Label>
                     </div>
                   </div>
                 </RadioGroup>
@@ -1297,14 +1298,14 @@ export function BasicInfoPage() {
                       <Label>Phone Number (Optional)</Label>
                       <div className="flex gap-2">
                         {/* Country Code */}
-                        <Select value={personalData.countryCode} onValueChange={(value) => handlePersonalInputChange('countryCode', value)}>
-                          <SelectTrigger className="w-36">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-60">
-                            {countryCodeOptions}
-                          </SelectContent>
-                        </Select>
+                        <Combobox
+                          options={countryCodeComboOptions}
+                          value={personalData.countryCode}
+                          onValueChange={(value) => handlePersonalInputChange('countryCode', value)}
+                          placeholder="Select code"
+                          searchPlaceholder="Search country codes..."
+                          className="w-36"
+                        />
                         
                         {/* Phone Number */}
                         <Input
@@ -1684,14 +1685,14 @@ export function BasicInfoPage() {
                       <Label>Phone Number *</Label>
                       <div className="flex gap-2">
                         {/* Country Code */}
-                        <Select value={businessData.countryCode} onValueChange={(value) => handleBusinessInputChange('countryCode', value)}>
-                          <SelectTrigger className="w-36">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-60">
-                            {countryCodeOptions}
-                          </SelectContent>
-                        </Select>
+                        <Combobox
+                          options={countryCodeComboOptions}
+                          value={businessData.countryCode}
+                          onValueChange={(value) => handleBusinessInputChange('countryCode', value)}
+                          placeholder="Select code"
+                          searchPlaceholder="Search country codes..."
+                          className="w-36"
+                        />
                         
                         {/* Phone Number */}
                         <Input
