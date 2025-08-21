@@ -2,7 +2,16 @@
 
 This is a frontend-only React application built as a Q&A community platform similar to CMOlist. The application replicates the exact design from the provided mockup and allows users to view questions, answers, and engage with a community around topics like marketing, branding, and business expertise. It features a modern, responsive design with a clean interface optimized for both desktop and mobile experiences.
 
-## Recent Changes (August 16, 2025)
+## Recent Changes (August 21, 2025)
+- **Performance Optimization and UX Improvements**: Addressed critical performance bottlenecks and enhanced user experience
+  - Optimized dropdown performance using React.useMemo for all Select component options (country codes, countries, states, cities, job titles)
+  - Expanded country code list from 15 to 195+ countries with proper flags for comprehensive global support
+  - Enhanced radio button switching with loading state to improve perceived performance
+  - Removed irrelevant "Profile Type" title, changed to "Complete Your Information" for better clarity
+  - Fixed Firebase Phone Auth integration with proper state management and verification flow
+  - Added CORS headers and debugging logs to resolve external API connectivity issues (/users/me endpoint)
+  - Implemented smooth form switching between personal and business profiles with proper state reset
+  - Added loading indicators during profile type switching to enhance user feedback
 - **Enhanced Basic Info Form with Professional Features**: Completely redesigned user profile form with comprehensive improvements
   - Updated job titles dropdown with complete construction industry list including "Other (Specify)" option with custom text input
   - Implemented professional profile/cover image upload system with drag-and-drop functionality and file explorer integration

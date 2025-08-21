@@ -79,10 +79,22 @@ class UserApiService {
 
     try {
       const headers = await this.getAuthHeaders();
+      console.log('Making request to:', `${API_BASE_URL}/users/me`);
+      console.log('With headers:', headers);
+      
       const response = await fetch(`${API_BASE_URL}/users/me`, {
         method: 'GET',
-        headers,
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        mode: 'cors',
+        credentials: 'omit',
       });
+      
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
 
       if (response.status === 401) {
         // Token expired or invalid

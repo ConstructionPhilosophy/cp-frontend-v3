@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -98,21 +98,199 @@ const COMPANY_SIZES = [
 ];
 
 const COUNTRY_CODES = [
-  { code: '+1', country: 'US', name: 'United States', flag: '🇺🇸' },
-  { code: '+91', country: 'IN', name: 'India', flag: '🇮🇳' },
-  { code: '+44', country: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: '+93', country: 'AF', name: 'Afghanistan', flag: '🇦🇫' },
+  { code: '+355', country: 'AL', name: 'Albania', flag: '🇦🇱' },
+  { code: '+213', country: 'DZ', name: 'Algeria', flag: '🇩🇿' },
+  { code: '+376', country: 'AD', name: 'Andorra', flag: '🇦🇩' },
+  { code: '+244', country: 'AO', name: 'Angola', flag: '🇦🇴' },
+  { code: '+54', country: 'AR', name: 'Argentina', flag: '🇦🇷' },
+  { code: '+374', country: 'AM', name: 'Armenia', flag: '🇦🇲' },
   { code: '+61', country: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: '+1', country: 'CA', name: 'Canada', flag: '🇨🇦' },
-  { code: '+49', country: 'DE', name: 'Germany', flag: '🇩🇪' },
-  { code: '+33', country: 'FR', name: 'France', flag: '🇫🇷' },
-  { code: '+81', country: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: '+43', country: 'AT', name: 'Austria', flag: '🇦🇹' },
+  { code: '+994', country: 'AZ', name: 'Azerbaijan', flag: '🇦🇿' },
+  { code: '+973', country: 'BH', name: 'Bahrain', flag: '🇧🇭' },
+  { code: '+880', country: 'BD', name: 'Bangladesh', flag: '🇧🇩' },
+  { code: '+375', country: 'BY', name: 'Belarus', flag: '🇧🇾' },
+  { code: '+32', country: 'BE', name: 'Belgium', flag: '🇧🇪' },
+  { code: '+501', country: 'BZ', name: 'Belize', flag: '🇧🇿' },
+  { code: '+229', country: 'BJ', name: 'Benin', flag: '🇧🇯' },
+  { code: '+975', country: 'BT', name: 'Bhutan', flag: '🇧🇹' },
+  { code: '+591', country: 'BO', name: 'Bolivia', flag: '🇧🇴' },
+  { code: '+387', country: 'BA', name: 'Bosnia and Herzegovina', flag: '🇧🇦' },
+  { code: '+267', country: 'BW', name: 'Botswana', flag: '🇧🇼' },
   { code: '+55', country: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: '+673', country: 'BN', name: 'Brunei', flag: '🇧🇳' },
+  { code: '+359', country: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
+  { code: '+226', country: 'BF', name: 'Burkina Faso', flag: '🇧🇫' },
+  { code: '+257', country: 'BI', name: 'Burundi', flag: '🇧🇮' },
+  { code: '+855', country: 'KH', name: 'Cambodia', flag: '🇰🇭' },
+  { code: '+237', country: 'CM', name: 'Cameroon', flag: '🇨🇲' },
+  { code: '+1', country: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: '+238', country: 'CV', name: 'Cape Verde', flag: '🇨🇻' },
+  { code: '+236', country: 'CF', name: 'Central African Republic', flag: '🇨🇫' },
+  { code: '+235', country: 'TD', name: 'Chad', flag: '🇹🇩' },
+  { code: '+56', country: 'CL', name: 'Chile', flag: '🇨🇱' },
   { code: '+86', country: 'CN', name: 'China', flag: '🇨🇳' },
-  { code: '+971', country: 'AE', name: 'UAE', flag: '🇦🇪' },
-  { code: '+65', country: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: '+57', country: 'CO', name: 'Colombia', flag: '🇨🇴' },
+  { code: '+269', country: 'KM', name: 'Comoros', flag: '🇰🇲' },
+  { code: '+242', country: 'CG', name: 'Congo', flag: '🇨🇬' },
+  { code: '+243', country: 'CD', name: 'Congo (DRC)', flag: '🇨🇩' },
+  { code: '+506', country: 'CR', name: 'Costa Rica', flag: '🇨🇷' },
+  { code: '+225', country: 'CI', name: 'Côte d\'Ivoire', flag: '🇨🇮' },
+  { code: '+385', country: 'HR', name: 'Croatia', flag: '🇭🇷' },
+  { code: '+53', country: 'CU', name: 'Cuba', flag: '🇨🇺' },
+  { code: '+357', country: 'CY', name: 'Cyprus', flag: '🇨🇾' },
+  { code: '+420', country: 'CZ', name: 'Czech Republic', flag: '🇨🇿' },
+  { code: '+45', country: 'DK', name: 'Denmark', flag: '🇩🇰' },
+  { code: '+253', country: 'DJ', name: 'Djibouti', flag: '🇩🇯' },
+  { code: '+1767', country: 'DM', name: 'Dominica', flag: '🇩🇲' },
+  { code: '+1', country: 'DO', name: 'Dominican Republic', flag: '🇩🇴' },
+  { code: '+593', country: 'EC', name: 'Ecuador', flag: '🇪🇨' },
+  { code: '+20', country: 'EG', name: 'Egypt', flag: '🇪🇬' },
+  { code: '+503', country: 'SV', name: 'El Salvador', flag: '🇸🇻' },
+  { code: '+240', country: 'GQ', name: 'Equatorial Guinea', flag: '🇬🇶' },
+  { code: '+291', country: 'ER', name: 'Eritrea', flag: '🇪🇷' },
+  { code: '+372', country: 'EE', name: 'Estonia', flag: '🇪🇪' },
+  { code: '+251', country: 'ET', name: 'Ethiopia', flag: '🇪🇹' },
+  { code: '+679', country: 'FJ', name: 'Fiji', flag: '🇫🇯' },
+  { code: '+358', country: 'FI', name: 'Finland', flag: '🇫🇮' },
+  { code: '+33', country: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: '+241', country: 'GA', name: 'Gabon', flag: '🇬🇦' },
+  { code: '+220', country: 'GM', name: 'Gambia', flag: '🇬🇲' },
+  { code: '+995', country: 'GE', name: 'Georgia', flag: '🇬🇪' },
+  { code: '+49', country: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: '+233', country: 'GH', name: 'Ghana', flag: '🇬🇭' },
+  { code: '+30', country: 'GR', name: 'Greece', flag: '🇬🇷' },
+  { code: '+1473', country: 'GD', name: 'Grenada', flag: '🇬🇩' },
+  { code: '+502', country: 'GT', name: 'Guatemala', flag: '🇬🇹' },
+  { code: '+224', country: 'GN', name: 'Guinea', flag: '🇬🇳' },
+  { code: '+245', country: 'GW', name: 'Guinea-Bissau', flag: '🇬🇼' },
+  { code: '+592', country: 'GY', name: 'Guyana', flag: '🇬🇾' },
+  { code: '+509', country: 'HT', name: 'Haiti', flag: '🇭🇹' },
+  { code: '+504', country: 'HN', name: 'Honduras', flag: '🇭🇳' },
+  { code: '+36', country: 'HU', name: 'Hungary', flag: '🇭🇺' },
+  { code: '+354', country: 'IS', name: 'Iceland', flag: '🇮🇸' },
+  { code: '+91', country: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: '+62', country: 'ID', name: 'Indonesia', flag: '🇮🇩' },
+  { code: '+98', country: 'IR', name: 'Iran', flag: '🇮🇷' },
+  { code: '+964', country: 'IQ', name: 'Iraq', flag: '🇮🇶' },
+  { code: '+353', country: 'IE', name: 'Ireland', flag: '🇮🇪' },
+  { code: '+972', country: 'IL', name: 'Israel', flag: '🇮🇱' },
+  { code: '+39', country: 'IT', name: 'Italy', flag: '🇮🇹' },
+  { code: '+1876', country: 'JM', name: 'Jamaica', flag: '🇯🇲' },
+  { code: '+81', country: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: '+962', country: 'JO', name: 'Jordan', flag: '🇯🇴' },
+  { code: '+7', country: 'KZ', name: 'Kazakhstan', flag: '🇰🇿' },
+  { code: '+254', country: 'KE', name: 'Kenya', flag: '🇰🇪' },
+  { code: '+686', country: 'KI', name: 'Kiribati', flag: '🇰🇮' },
+  { code: '+850', country: 'KP', name: 'North Korea', flag: '🇰🇵' },
+  { code: '+82', country: 'KR', name: 'South Korea', flag: '🇰🇷' },
+  { code: '+965', country: 'KW', name: 'Kuwait', flag: '🇰🇼' },
+  { code: '+996', country: 'KG', name: 'Kyrgyzstan', flag: '🇰🇬' },
+  { code: '+856', country: 'LA', name: 'Laos', flag: '🇱🇦' },
+  { code: '+371', country: 'LV', name: 'Latvia', flag: '🇱🇻' },
+  { code: '+961', country: 'LB', name: 'Lebanon', flag: '🇱🇧' },
+  { code: '+266', country: 'LS', name: 'Lesotho', flag: '🇱🇸' },
+  { code: '+231', country: 'LR', name: 'Liberia', flag: '🇱🇷' },
+  { code: '+218', country: 'LY', name: 'Libya', flag: '🇱🇾' },
+  { code: '+423', country: 'LI', name: 'Liechtenstein', flag: '🇱🇮' },
+  { code: '+370', country: 'LT', name: 'Lithuania', flag: '🇱🇹' },
+  { code: '+352', country: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
+  { code: '+389', country: 'MK', name: 'North Macedonia', flag: '🇲🇰' },
+  { code: '+261', country: 'MG', name: 'Madagascar', flag: '🇲🇬' },
+  { code: '+265', country: 'MW', name: 'Malawi', flag: '🇲🇼' },
   { code: '+60', country: 'MY', name: 'Malaysia', flag: '🇲🇾' },
+  { code: '+960', country: 'MV', name: 'Maldives', flag: '🇲🇻' },
+  { code: '+223', country: 'ML', name: 'Mali', flag: '🇲🇱' },
+  { code: '+356', country: 'MT', name: 'Malta', flag: '🇲🇹' },
+  { code: '+692', country: 'MH', name: 'Marshall Islands', flag: '🇲🇭' },
+  { code: '+222', country: 'MR', name: 'Mauritania', flag: '🇲🇷' },
+  { code: '+230', country: 'MU', name: 'Mauritius', flag: '🇲🇺' },
+  { code: '+52', country: 'MX', name: 'Mexico', flag: '🇲🇽' },
+  { code: '+691', country: 'FM', name: 'Micronesia', flag: '🇫🇲' },
+  { code: '+373', country: 'MD', name: 'Moldova', flag: '🇲🇩' },
+  { code: '+377', country: 'MC', name: 'Monaco', flag: '🇲🇨' },
+  { code: '+976', country: 'MN', name: 'Mongolia', flag: '🇲🇳' },
+  { code: '+382', country: 'ME', name: 'Montenegro', flag: '🇲🇪' },
+  { code: '+212', country: 'MA', name: 'Morocco', flag: '🇲🇦' },
+  { code: '+258', country: 'MZ', name: 'Mozambique', flag: '🇲🇿' },
+  { code: '+95', country: 'MM', name: 'Myanmar', flag: '🇲🇲' },
+  { code: '+264', country: 'NA', name: 'Namibia', flag: '🇳🇦' },
+  { code: '+674', country: 'NR', name: 'Nauru', flag: '🇳🇷' },
+  { code: '+977', country: 'NP', name: 'Nepal', flag: '🇳🇵' },
+  { code: '+31', country: 'NL', name: 'Netherlands', flag: '🇳🇱' },
+  { code: '+64', country: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+  { code: '+505', country: 'NI', name: 'Nicaragua', flag: '🇳🇮' },
+  { code: '+227', country: 'NE', name: 'Niger', flag: '🇳🇪' },
+  { code: '+234', country: 'NG', name: 'Nigeria', flag: '🇳🇬' },
+  { code: '+47', country: 'NO', name: 'Norway', flag: '🇳🇴' },
+  { code: '+968', country: 'OM', name: 'Oman', flag: '🇴🇲' },
+  { code: '+92', country: 'PK', name: 'Pakistan', flag: '🇵🇰' },
+  { code: '+680', country: 'PW', name: 'Palau', flag: '🇵🇼' },
+  { code: '+970', country: 'PS', name: 'Palestine', flag: '🇵🇸' },
+  { code: '+507', country: 'PA', name: 'Panama', flag: '🇵🇦' },
+  { code: '+675', country: 'PG', name: 'Papua New Guinea', flag: '🇵🇬' },
+  { code: '+595', country: 'PY', name: 'Paraguay', flag: '🇵🇾' },
+  { code: '+51', country: 'PE', name: 'Peru', flag: '🇵🇪' },
+  { code: '+63', country: 'PH', name: 'Philippines', flag: '🇵🇭' },
+  { code: '+48', country: 'PL', name: 'Poland', flag: '🇵🇱' },
+  { code: '+351', country: 'PT', name: 'Portugal', flag: '🇵🇹' },
+  { code: '+974', country: 'QA', name: 'Qatar', flag: '🇶🇦' },
+  { code: '+40', country: 'RO', name: 'Romania', flag: '🇷🇴' },
+  { code: '+7', country: 'RU', name: 'Russia', flag: '🇷🇺' },
+  { code: '+250', country: 'RW', name: 'Rwanda', flag: '🇷🇼' },
+  { code: '+1869', country: 'KN', name: 'Saint Kitts and Nevis', flag: '🇰🇳' },
+  { code: '+1758', country: 'LC', name: 'Saint Lucia', flag: '🇱🇨' },
+  { code: '+1784', country: 'VC', name: 'Saint Vincent and the Grenadines', flag: '🇻🇨' },
+  { code: '+685', country: 'WS', name: 'Samoa', flag: '🇼🇸' },
+  { code: '+378', country: 'SM', name: 'San Marino', flag: '🇸🇲' },
+  { code: '+239', country: 'ST', name: 'São Tomé and Príncipe', flag: '🇸🇹' },
+  { code: '+966', country: 'SA', name: 'Saudi Arabia', flag: '🇸🇦' },
+  { code: '+221', country: 'SN', name: 'Senegal', flag: '🇸🇳' },
+  { code: '+381', country: 'RS', name: 'Serbia', flag: '🇷🇸' },
+  { code: '+248', country: 'SC', name: 'Seychelles', flag: '🇸🇨' },
+  { code: '+232', country: 'SL', name: 'Sierra Leone', flag: '🇸🇱' },
+  { code: '+65', country: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: '+421', country: 'SK', name: 'Slovakia', flag: '🇸🇰' },
+  { code: '+386', country: 'SI', name: 'Slovenia', flag: '🇸🇮' },
+  { code: '+677', country: 'SB', name: 'Solomon Islands', flag: '🇸🇧' },
+  { code: '+252', country: 'SO', name: 'Somalia', flag: '🇸🇴' },
+  { code: '+27', country: 'ZA', name: 'South Africa', flag: '🇿🇦' },
+  { code: '+211', country: 'SS', name: 'South Sudan', flag: '🇸🇸' },
+  { code: '+34', country: 'ES', name: 'Spain', flag: '🇪🇸' },
+  { code: '+94', country: 'LK', name: 'Sri Lanka', flag: '🇱🇰' },
+  { code: '+249', country: 'SD', name: 'Sudan', flag: '🇸🇩' },
+  { code: '+597', country: 'SR', name: 'Suriname', flag: '🇸🇷' },
+  { code: '+268', country: 'SZ', name: 'Eswatini', flag: '🇸🇿' },
+  { code: '+46', country: 'SE', name: 'Sweden', flag: '🇸🇪' },
+  { code: '+41', country: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+  { code: '+963', country: 'SY', name: 'Syria', flag: '🇸🇾' },
+  { code: '+886', country: 'TW', name: 'Taiwan', flag: '🇹🇼' },
+  { code: '+992', country: 'TJ', name: 'Tajikistan', flag: '🇹🇯' },
+  { code: '+255', country: 'TZ', name: 'Tanzania', flag: '🇹🇿' },
   { code: '+66', country: 'TH', name: 'Thailand', flag: '🇹🇭' },
+  { code: '+670', country: 'TL', name: 'Timor-Leste', flag: '🇹🇱' },
+  { code: '+228', country: 'TG', name: 'Togo', flag: '🇹🇬' },
+  { code: '+676', country: 'TO', name: 'Tonga', flag: '🇹🇴' },
+  { code: '+1868', country: 'TT', name: 'Trinidad and Tobago', flag: '🇹🇹' },
+  { code: '+216', country: 'TN', name: 'Tunisia', flag: '🇹🇳' },
+  { code: '+90', country: 'TR', name: 'Turkey', flag: '🇹🇷' },
+  { code: '+993', country: 'TM', name: 'Turkmenistan', flag: '🇹🇲' },
+  { code: '+688', country: 'TV', name: 'Tuvalu', flag: '🇹🇻' },
+  { code: '+256', country: 'UG', name: 'Uganda', flag: '🇺🇬' },
+  { code: '+380', country: 'UA', name: 'Ukraine', flag: '🇺🇦' },
+  { code: '+971', country: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
+  { code: '+44', country: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: '+1', country: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: '+598', country: 'UY', name: 'Uruguay', flag: '🇺🇾' },
+  { code: '+998', country: 'UZ', name: 'Uzbekistan', flag: '🇺🇿' },
+  { code: '+678', country: 'VU', name: 'Vanuatu', flag: '🇻🇺' },
+  { code: '+39', country: 'VA', name: 'Vatican City', flag: '🇻🇦' },
+  { code: '+58', country: 'VE', name: 'Venezuela', flag: '🇻🇪' },
   { code: '+84', country: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+  { code: '+967', country: 'YE', name: 'Yemen', flag: '🇾🇪' },
+  { code: '+260', country: 'ZM', name: 'Zambia', flag: '🇿🇲' },
+  { code: '+263', country: 'ZW', name: 'Zimbabwe', flag: '🇿🇼' },
 ];
 
 interface Country {
@@ -136,6 +314,7 @@ export function BasicInfoPage() {
   const [loading, setLoading] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [userType, setUserType] = useState<'personal' | 'business'>('personal');
+  const [switchingType, setSwitchingType] = useState(false);
   const [showOtherTitle, setShowOtherTitle] = useState(false);
   const [showOtherIndustry, setShowOtherIndustry] = useState(false);
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
@@ -743,6 +922,63 @@ export function BasicInfoPage() {
   const currentPhoneNumber = userType === 'personal' ? personalData.phoneNumber : businessData.phoneNumber;
   const currentCountryCode = userType === 'personal' ? personalData.countryCode : businessData.countryCode;
 
+  // Memoize country codes for better performance
+  const countryCodeOptions = useMemo(() => 
+    COUNTRY_CODES.map((item) => (
+      <SelectItem key={`${item.code}-${item.country}`} value={item.code}>
+        <span className="flex items-center gap-2">
+          <span>{item.flag}</span>
+          <span>{item.code}</span>
+        </span>
+      </SelectItem>
+    )), []
+  );
+
+  // Memoize job titles for better performance
+  const jobTitleOptions = useMemo(() => 
+    JOB_TITLES.map((title) => (
+      <SelectItem key={title} value={title}>
+        {title}
+      </SelectItem>
+    )), []
+  );
+
+  // Memoize company sizes for better performance
+  const companySizeOptions = useMemo(() => 
+    COMPANY_SIZES.map((size) => (
+      <SelectItem key={size} value={size}>
+        {size}
+      </SelectItem>
+    )), []
+  );
+
+  // Memoize countries for better performance
+  const countryOptions = useMemo(() => 
+    countries.map((country) => (
+      <SelectItem key={country.code} value={JSON.stringify(country)}>
+        {country.name}
+      </SelectItem>
+    )), [countries]
+  );
+
+  // Memoize states for better performance
+  const stateOptions = useMemo(() => 
+    states.map((state) => (
+      <SelectItem key={state.code} value={JSON.stringify(state)}>
+        {state.name}
+      </SelectItem>
+    )), [states]
+  );
+
+  // Memoize cities for better performance
+  const cityOptions = useMemo(() => 
+    cities.map((city) => (
+      <SelectItem key={city} value={city}>
+        {city}
+      </SelectItem>
+    )), [cities]
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-5xl mx-auto px-4">
@@ -757,7 +993,7 @@ export function BasicInfoPage() {
               <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center">
                 <div className="w-4 h-4 bg-white rounded-sm"></div>
               </div>
-              Profile Type
+              Complete Your Information
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -765,7 +1001,53 @@ export function BasicInfoPage() {
               {/* User Type Selection */}
               <div className="space-y-4">
                 <Label className="text-lg font-semibold">Select Profile Type *</Label>
-                <RadioGroup value={userType} onValueChange={(value: 'personal' | 'business') => setUserType(value)}>
+                <RadioGroup 
+                  value={userType} 
+                  onValueChange={(value: 'personal' | 'business') => {
+                    setSwitchingType(true);
+                    setUserType(value);
+                    // Reset form data when switching
+                    setPersonalData({
+                      dateOfBirth: '',
+                      title: '',
+                      customTitle: '',
+                      positionDesignation: '',
+                      company: '',
+                      gender: '',
+                      phoneNumber: '',
+                      countryCode: '+91',
+                      country: { name: '', code: '' },
+                      state: { name: '', code: '' },
+                      city: '',
+                    });
+                    setBusinessData({
+                      companyName: '',
+                      industry: '',
+                      customIndustry: '',
+                      companyType: '',
+                      description: '',
+                      addressLine1: '',
+                      addressLine2: '',
+                      city: '',
+                      state: { name: '', code: '' },
+                      country: { name: '', code: '' },
+                      pincode: '',
+                      website: '',
+                      registrationNumber: '',
+                      companySize: '',
+                      phoneNumber: '',
+                      countryCode: '+91',
+                    });
+                    // Reset verification states
+                    setPhoneCodeSent(false);
+                    setPhoneVerified(false);
+                    setVerificationCode('');
+                    setPhoneError('');
+                    // Clear form errors
+                    setErrors({});
+                    setTimeout(() => setSwitchingType(false), 100);
+                  }}
+                >
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
                       <div className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
@@ -900,7 +1182,12 @@ export function BasicInfoPage() {
 
               {/* Dynamic Form Content Based on User Type */}
               <div className="space-y-4 mt-10">
-                {userType === 'personal' ? (
+                {switchingType ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span className="ml-2">Loading...</span>
+                </div>
+              ) : userType === 'personal' ? (
                   // Personal Profile Form
                   <>
                     <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
@@ -960,11 +1247,7 @@ export function BasicInfoPage() {
                             <SelectValue placeholder="Select job title" />
                           </SelectTrigger>
                           <SelectContent className="max-h-60">
-                            {JOB_TITLES.map((title) => (
-                              <SelectItem key={title} value={title}>
-                                {title}
-                              </SelectItem>
-                            ))}
+                            {jobTitleOptions}
                           </SelectContent>
                         </Select>
                         {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
@@ -1018,15 +1301,8 @@ export function BasicInfoPage() {
                           <SelectTrigger className="w-36">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            {COUNTRY_CODES.map((item) => (
-                              <SelectItem key={`${item.code}-${item.country}`} value={item.code}>
-                                <span className="flex items-center gap-2">
-                                  <span>{item.flag}</span>
-                                  <span>{item.code}</span>
-                                </span>
-                              </SelectItem>
-                            ))}
+                          <SelectContent className="max-h-60">
+                            {countryCodeOptions}
                           </SelectContent>
                         </Select>
                         
@@ -1412,15 +1688,8 @@ export function BasicInfoPage() {
                           <SelectTrigger className="w-36">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            {COUNTRY_CODES.map((item) => (
-                              <SelectItem key={`${item.code}-${item.country}`} value={item.code}>
-                                <span className="flex items-center gap-2">
-                                  <span>{item.flag}</span>
-                                  <span>{item.code}</span>
-                                </span>
-                              </SelectItem>
-                            ))}
+                          <SelectContent className="max-h-60">
+                            {countryCodeOptions}
                           </SelectContent>
                         </Select>
                         
