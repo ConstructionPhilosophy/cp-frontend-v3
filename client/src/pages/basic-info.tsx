@@ -558,8 +558,12 @@ export function BasicInfoPage() {
       setCities([]);
       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
       
-      if (personalData.country.code && stateObj.code) {
-        loadCities(personalData.country.code, stateObj.code);
+      // Use current country code from state since personalData hasn't updated yet
+      const currentCountryCode = personalData.country.code;
+      if (currentCountryCode && stateObj.code) {
+        setTimeout(() => {
+          loadCities(currentCountryCode, stateObj.code);
+        }, 0);
       }
     }
   };
@@ -619,8 +623,12 @@ export function BasicInfoPage() {
       setCities([]);
       if (errors.city) setErrors(prev => ({ ...prev, city: '' }));
       
-      if (businessData.country.code && stateObj.code) {
-        loadCities(businessData.country.code, stateObj.code);
+      // Use current country code from state since businessData hasn't updated yet
+      const currentCountryCode = businessData.country.code;
+      if (currentCountryCode && stateObj.code) {
+        setTimeout(() => {
+          loadCities(currentCountryCode, stateObj.code);
+        }, 0);
       }
     }
   };
@@ -927,7 +935,7 @@ export function BasicInfoPage() {
   const currentPhoneNumber = userType === 'personal' ? personalData.phoneNumber : businessData.phoneNumber;
   const currentCountryCode = userType === 'personal' ? personalData.countryCode : businessData.countryCode;
 
-  // Memoize country codes for better performance
+  // Memoize country codes for better performance - show flag, code and country name
   const countryCodeComboOptions = useMemo(() => 
     COUNTRY_CODES.map((item) => ({
       value: item.code,
@@ -1217,6 +1225,7 @@ export function BasicInfoPage() {
                               fromYear={1940}
                               toYear={new Date().getFullYear() - 13}
                               captionLayout="dropdown-buttons"
+                              showOutsideDays={false}
                               initialFocus
                               disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                             />
