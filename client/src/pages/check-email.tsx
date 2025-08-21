@@ -1,9 +1,57 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'wouter';
 import { Button } from '../components/ui/button';
-import { Mail, ArrowLeft } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2 } from 'lucide-react';
+import { auth } from '../lib/firebase';
+import { sendEmailVerification } from 'firebase/auth';
+import { useToast } from '../hooks/use-toast';
 
 export function CheckEmailPage() {
+  const [resendLoading, setResendLoading] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [timer]);
+
+  const handleResendEmail = async () => {
+    if (timer > 0 || resendLoading) return;
+    
+    const user = auth.currentUser;
+    if (!user) {
+      toast({
+        title: "Authentication Error",
+        description: "Please log in again to resend verification email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setResendLoading(true);
+    try {
+      await sendEmailVerification(user);
+      setTimer(60); // Start 60-second timer
+      toast({
+        title: "Verification Email Sent",
+        description: "Please check your email for the verification link.",
+      });
+    } catch (error: any) {
+      console.error('Error sending verification email:', error);
+      toast({
+        title: "Failed to Send Email",
+        description: "Something went wrong. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setResendLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Left Side - Hero Section */}
@@ -25,10 +73,10 @@ export function CheckEmailPage() {
         <div className="relative z-10 flex items-center justify-center w-full p-12">
           <div className="text-center max-w-md">
             <h1 className="text-4xl font-bold text-gray-800 mb-6">
-              World-class network of CMOs
+              World-class network of Construction Professionals
             </h1>
             <p className="text-lg text-gray-600 leading-relaxed">
-              Only for heads of marketing from hyper-growth companies.
+              Only for construction and civil engineering professionals.
               Every member is carefully vetted.
             </p>
           </div>
@@ -50,7 +98,7 @@ export function CheckEmailPage() {
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <span className="text-xl font-bold text-cmo-text-primary">CMOlist</span>
+            <span className="text-xl font-bold text-cmo-text-primary">CP</span>
           </div>
 
           {/* Email Icon */}
@@ -77,15 +125,24 @@ export function CheckEmailPage() {
             
             <p className="text-sm text-cmo-text-secondary">
               Didn't receive the email? Check your spam folder or{' '}
-              <Button variant="link" className="p-0 h-auto text-sm text-cmo-primary hover:text-cmo-primary/80">
-                resend verification email
+              <Button 
+                variant="link" 
+                className="p-0 h-auto text-sm text-cmo-primary hover:text-cmo-primary/80 disabled:opacity-50"
+                onClick={handleResendEmail}
+                disabled={timer > 0 || resendLoading}
+              >
+                {resendLoading && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
+                {timer > 0 
+                  ? `resend verification email (${timer}s)` 
+                  : 'resend verification email'
+                }
               </Button>
             </p>
           </div>
 
           {/* Footer */}
           <div className="mt-8 text-center">
-            <p className="text-sm text-gray-500 mb-4">© 2024 CMOlist Inc. All rights reserved.</p>
+            <p className="text-sm text-gray-500 mb-4">© 2024 CP Inc. All rights reserved.</p>
             <div className="flex justify-center space-x-6 text-sm text-gray-500">
               <Link href="/privacy-policy">
                 <Button variant="link" className="p-0 h-auto text-sm text-gray-500 hover:text-gray-700">

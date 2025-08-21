@@ -15,6 +15,7 @@ import { BasicInfoPage } from "./pages/basic-info";
 import { SecurityDashboard } from "./pages/security-dashboard-simple";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { PublicRoute } from "./components/PublicRoute";
 import { Toaster } from "./components/ui/toaster";
 
 function App() {
@@ -22,9 +23,17 @@ function App() {
     <AuthProvider>
       <Router>
         <Switch>
-          {/* Public auth routes */}
-          <Route path="/login" component={() => <LoginPage />} />
-          <Route path="/signup" component={() => <SignupPage />} />
+          {/* Public auth routes - redirect to home if logged in */}
+          <Route path="/login" component={() => (
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          )} />
+          <Route path="/signup" component={() => (
+            <PublicRoute>
+              <SignupPage />
+            </PublicRoute>
+          )} />
           <Route path="/check-email" component={() => <CheckEmailPage />} />
           <Route
             path="/verification-success"
@@ -32,7 +41,11 @@ function App() {
           />
           <Route
             path="/forgot-password"
-            component={() => <ForgotPasswordPage />}
+            component={() => (
+              <PublicRoute>
+                <ForgotPasswordPage />
+              </PublicRoute>
+            )}
           />
           <Route
             path="/check-email-reset"
@@ -46,9 +59,15 @@ function App() {
             path="/password-reset-success"
             component={() => <PasswordResetSuccessPage />}
           />
+          
+          {/* Basic info route - only for users without complete profile */}
           <Route
             path="/basic-info"
-            component={() => <BasicInfoPage />}
+            component={() => (
+              <ProtectedRoute requiresIncompleteProfile={true}>
+                <BasicInfoPage />
+              </ProtectedRoute>
+            )}
           />
 
           {/* Protected routes */}

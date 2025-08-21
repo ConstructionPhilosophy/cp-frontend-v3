@@ -6,9 +6,10 @@ import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiresIncompleteProfile?: boolean;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
+export function ProtectedRoute({ children, requiresIncompleteProfile = false }: ProtectedRouteProps) {
   const { user, userProfile, loading } = useAuth();
   const [, setLocation] = useLocation();
 
@@ -21,8 +22,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       }
 
       // Check if user has completed basic info
-      if (!userProfile.hasBasicInfo) {
+      if (!requiresIncompleteProfile && !userProfile.hasBasicInfo) {
         setLocation('/basic-info');
+        return;
+      }
+      
+      // If this route requires incomplete profile but user has complete profile
+      if (requiresIncompleteProfile && userProfile.hasBasicInfo) {
+        setLocation('/');
         return;
       }
     }
@@ -49,8 +56,12 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       return null; // Will redirect to check-email
     }
 
-    if (!userProfile.hasBasicInfo) {
+    if (!requiresIncompleteProfile && !userProfile.hasBasicInfo) {
       return null; // Will redirect to basic-info
+    }
+    
+    if (requiresIncompleteProfile && userProfile.hasBasicInfo) {
+      return null; // Will redirect to home
     }
   }
 

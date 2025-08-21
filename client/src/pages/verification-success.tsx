@@ -31,7 +31,7 @@ export function VerificationSuccessPage() {
             setVerified(true);
             toast({
               title: "Email verified successfully!",
-              description: "You can now access all features of CMOlist.",
+              description: "You can now access all features of CP.",
             });
           } else {
             toast({
@@ -94,7 +94,7 @@ export function VerificationSuccessPage() {
           </CardTitle>
           <CardDescription>
             {verified 
-              ? 'Your email has been successfully verified. Welcome to CMOlist!'
+              ? 'Your email has been successfully verified. Welcome to CP!'
               : 'Your email has not been verified yet. Please check your email and click the verification link.'
             }
           </CardDescription>
@@ -105,7 +105,7 @@ export function VerificationSuccessPage() {
               onClick={handleContinue}
               className="w-full bg-cmo-primary hover:bg-cmo-primary/90"
             >
-              Continue to CMOlist
+              Continue to CP
             </Button>
           ) : (
             <div className="space-y-3">

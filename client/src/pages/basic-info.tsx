@@ -911,7 +911,7 @@ export function BasicInfoPage() {
         description: "Your information has been saved successfully.",
       });
 
-      // Redirect to home page
+      // Redirect to home page after successful profile completion
       setLocation('/');
     } catch (error: any) {
       console.error('Profile update error:', error);

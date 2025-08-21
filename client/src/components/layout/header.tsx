@@ -1,6 +1,6 @@
 import React from "react";
-import { Search, MoreHorizontal, Home, User, Edit, Flag, Share, Settings, FileText, Briefcase, Users, MessageSquare, RefreshCw } from "lucide-react";
-import { Link } from "wouter";
+import { Search, MoreHorizontal, Home, User, Edit, Flag, Share, Settings, FileText, Briefcase, Users, MessageSquare, RefreshCw, LogOut } from "lucide-react";
+import { Link, useLocation } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { 
@@ -10,8 +10,37 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { useAuth } from '../../contexts/AuthContext';
+import { auth } from '../../lib/firebase';
+import { useToast } from '../../hooks/use-toast';
 
 export default function Header() {
+  const { userProfile } = useAuth();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      localStorage.removeItem('rememberMe');
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      });
+      setLocation('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      toast({
+        title: "Logout failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleProfileClick = () => {
+    setLocation('/profile');
+  };
   return (
     <header className="bg-white border-b border-cmo-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,57 +102,25 @@ export default function Header() {
               <RefreshCw className="w-5 h-5" />
               <span className="text-xs mt-1">Updates</span>
             </a>
-            <Link href="/profile">
-              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-                <User className="w-5 h-5" />
-                <span className="text-xs mt-1">My Profile</span>
-              </a>
-            </Link>
+
           </nav>
 
           {/* Right Section */}
           <div className="flex items-center space-x-4">
-            {/* My Profile Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 text-cmo-text-secondary hover:text-cmo-primary">
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&h=32" />
-                    <AvatarFallback>JS</AvatarFallback>
-                  </Avatar>
-                  <span className="hidden md:inline">My Profile</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <Link href="/profile">
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    <span>View Profile</span>
-                  </DropdownMenuItem>
-                </Link>
-                <DropdownMenuItem>
-                  <Edit className="mr-2 h-4 w-4" />
-                  <span>Edit Profile</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" />
-                  <span>My Account</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <FileText className="mr-2 h-4 w-4" />
-                  <span>Privacy Policy</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <FileText className="mr-2 h-4 w-4" />
-                  <span>Terms & Conditions</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {/* My Profile Button - Direct redirect */}
+            <Button 
+              variant="ghost" 
+              className="flex items-center gap-2 text-cmo-text-secondary hover:text-cmo-primary"
+              onClick={handleProfileClick}
+            >
+              <Avatar className="w-8 h-8">
+                <AvatarImage src={userProfile?.profilePic || ""} />
+                <AvatarFallback>
+                  {userProfile?.firstName?.charAt(0) || 'U'}{userProfile?.lastName?.charAt(0) || ''}
+                </AvatarFallback>
+              </Avatar>
+              <span className="hidden md:inline">My Profile</span>
+            </Button>
 
             {/* Three Dots Menu */}
             <DropdownMenu>
@@ -148,6 +145,11 @@ export default function Header() {
                 <DropdownMenuItem>
                   <FileText className="mr-2 h-4 w-4" />
                   <span>Terms & Conditions</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
