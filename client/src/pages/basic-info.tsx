@@ -736,7 +736,26 @@ export function BasicInfoPage() {
         throw new Error('No verification in progress');
       }
       
-      await confirmationResult.confirm(code);
+      // Store the current user before phone verification
+      const currentUser = auth.currentUser;
+      const currentUserToken = currentUser ? await currentUser.getIdToken() : null;
+      
+      // Verify the phone number
+      const result = await confirmationResult.confirm(code);
+      
+      // After phone verification, if it signed in with phone auth, 
+      // we need to ensure we don't lose the original email-based user session
+      if (currentUser && currentUserToken && result.user.uid !== currentUser.uid) {
+        // Phone verification created a new user, we just want to verify the phone
+        // Sign back in with the original email user
+        try {
+          await auth.updateCurrentUser(currentUser);
+        } catch (err) {
+          console.warn('Could not restore original user session:', err);
+          // The phone verification was successful anyway
+        }
+      }
+      
       return true;
     } catch (error: any) {
       console.error('Error verifying OTP:', error);
