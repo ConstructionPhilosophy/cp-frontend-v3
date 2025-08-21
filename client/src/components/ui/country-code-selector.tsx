@@ -253,11 +253,14 @@ export function CountryCodeSelector({
   const filteredCountries = useMemo(() => {
     if (!search) return COUNTRY_CODES;
     
-    const searchLower = search.toLowerCase();
-    return COUNTRY_CODES.filter(country => 
-      country.name.toLowerCase().includes(searchLower) ||
-      country.code.includes(search)
-    );
+    const searchLower = search.toLowerCase().trim();
+    return COUNTRY_CODES.filter(country => {
+      const nameMatches = country.name.toLowerCase().includes(searchLower);
+      const codeMatches = country.code.toLowerCase().includes(searchLower);
+      const codeWithoutPlusMatches = country.code.substring(1).includes(searchLower);
+      
+      return nameMatches || codeMatches || codeWithoutPlusMatches;
+    });
   }, [search]);
 
   const handleSelect = (countryCode: string) => {

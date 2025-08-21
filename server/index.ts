@@ -94,7 +94,7 @@ app.use((req, res, next) => {
 });
 
 // Deployment-ready server configuration
-const PORT = parseInt(process.env.PORT || '8080', 10);
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
 console.log(`Starting server on port ${PORT}...`);
 console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
