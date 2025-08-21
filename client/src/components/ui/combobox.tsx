@@ -64,7 +64,7 @@ export function Combobox({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
         <Command>
-          <CommandInput placeholder={searchPlaceholder} />
+          <CommandInput placeholder={searchPlaceholder} className="border-none focus:ring-0" />
           <CommandEmpty>No option found.</CommandEmpty>
           <CommandGroup className="max-h-60 overflow-auto">
             {options.map((option) => (

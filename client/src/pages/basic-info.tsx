@@ -503,7 +503,7 @@ export function BasicInfoPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handlePersonalInputChange = (field: string, value: string | { name: string; code: string }) => {
+  const handlePersonalInputChange = (field: string, value: string | { name: string; code: string } | boolean) => {
     setPersonalData(prev => ({
       ...prev,
       [field]: value
@@ -564,7 +564,7 @@ export function BasicInfoPage() {
     }
   };
 
-  const handleBusinessInputChange = (field: string, value: string | { name: string; code: string }) => {
+  const handleBusinessInputChange = (field: string, value: string | { name: string; code: string } | boolean) => {
     setBusinessData(prev => ({
       ...prev,
       [field]: value
@@ -931,7 +931,7 @@ export function BasicInfoPage() {
   const countryCodeComboOptions = useMemo(() => 
     COUNTRY_CODES.map((item) => ({
       value: item.code,
-      label: `${item.code} ${item.name}`,
+      label: `${item.flag} ${item.code} ${item.name}`,
       flag: item.flag,
     })), []
   );
@@ -977,9 +977,9 @@ export function BasicInfoPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="mb-6 text-center">
+    <div className="min-h-screen bg-gray-50 py-4 md:py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-4 md:mb-6 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Complete Your Profile</h1>
           <p className="text-gray-600">Provide your information to get started</p>
         </div>
@@ -1016,6 +1016,7 @@ export function BasicInfoPage() {
                       country: { name: '', code: '' },
                       state: { name: '', code: '' },
                       city: '',
+                      hidePhoneNumber: false,
                     });
                     setBusinessData({
                       companyName: '',
@@ -1034,6 +1035,7 @@ export function BasicInfoPage() {
                       companySize: '',
                       phoneNumber: '',
                       countryCode: '+91',
+                      hidePhoneNumber: false,
                     });
                     // Reset verification states
                     setPhoneCodeSent(false);
@@ -1197,17 +1199,18 @@ export function BasicInfoPage() {
                       {/* Gender */}
                       <div className="space-y-2">
                         <Label>Gender (Optional)</Label>
-                        <Select value={personalData.gender} onValueChange={(value) => handlePersonalInputChange('gender', value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select gender" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Male">Male</SelectItem>
-                            <SelectItem value="Female">Female</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                            <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <Combobox
+                          options={[
+                            { value: 'Male', label: 'Male' },
+                            { value: 'Female', label: 'Female' },
+                            { value: 'Other', label: 'Other' },
+                            { value: 'Prefer not to say', label: 'Prefer not to say' }
+                          ]}
+                          value={personalData.gender}
+                          onValueChange={(value) => handlePersonalInputChange('gender', value)}
+                          placeholder="Select gender"
+                          searchPlaceholder="Search gender..."
+                        />
                       </div>
 
                       {/* Date of Birth */}
@@ -1232,6 +1235,10 @@ export function BasicInfoPage() {
                               mode="single"
                               selected={selectedDate}
                               onSelect={handleDateSelect}
+                              defaultMonth={selectedDate || new Date(2000, 0)}
+                              fromYear={1940}
+                              toYear={new Date().getFullYear() - 13}
+                              captionLayout="dropdown-buttons"
                               initialFocus
                               disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
                             />
@@ -1243,18 +1250,14 @@ export function BasicInfoPage() {
                       {/* Job Title */}
                       <div className="space-y-2">
                         <Label>Current Job Title *</Label>
-                        <Select value={personalData.title} onValueChange={(value) => handlePersonalInputChange('title', value)}>
-                          <SelectTrigger className={errors.title ? "border-red-500" : ""}>
-                            <SelectValue placeholder="Select job title" />
-                          </SelectTrigger>
-                          <SelectContent className="max-h-60">
-                            {jobTitleComboOptions.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Combobox
+                          options={jobTitleComboOptions}
+                          value={personalData.title}
+                          onValueChange={(value) => handlePersonalInputChange('title', value)}
+                          placeholder="Select job title"
+                          searchPlaceholder="Search job titles..."
+                          error={!!errors.title}
+                        />
                         {errors.title && <p className="text-sm text-red-500">{errors.title}</p>}
                       </div>
 
@@ -1316,7 +1319,10 @@ export function BasicInfoPage() {
                           type="tel"
                           placeholder="Enter phone number"
                           value={personalData.phoneNumber}
-                          onChange={(e) => handlePersonalInputChange('phoneNumber', e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                            handlePersonalInputChange('phoneNumber', value);
+                          }}
                           className={cn("flex-1", (errors.phoneNumber || phoneError) && "border-red-500")}
                         />
                         
@@ -1690,7 +1696,10 @@ export function BasicInfoPage() {
                           type="tel"
                           placeholder="Enter phone number"
                           value={businessData.phoneNumber}
-                          onChange={(e) => handleBusinessInputChange('phoneNumber', e.target.value)}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                            handleBusinessInputChange('phoneNumber', value);
+                          }}
                           className={cn("flex-1", (errors.phoneNumber || phoneError) && "border-red-500")}
                         />
                         

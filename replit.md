@@ -23,6 +23,10 @@ This is a frontend-only React application built as a Q&A community platform simi
   - Replaced all remaining Select components with searchable Combobox for consistent user experience
   - Fixed country code display to show flag + code + country name format for better identification
   - Ensured all location dropdowns cascade properly (Country → State → City) with proper API integration
+  - Enhanced phone number validation to prevent text entry (digits only)
+  - Improved search input alignment and styling in all Combobox components
+  - Added year/month dropdown navigation to date picker for better user experience
+  - Applied comprehensive mobile responsiveness to all pages (login, signup, basic info, and supporting pages)
 - **Enhanced Basic Info Form with Professional Features**: Completely redesigned user profile form with comprehensive improvements
   - Updated job titles dropdown with complete construction industry list including "Other (Specify)" option with custom text input
   - Implemented professional profile/cover image upload system with drag-and-drop functionality and file explorer integration

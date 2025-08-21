@@ -137,7 +137,7 @@ export function SignupPage() {
       </div>
 
       {/* Right Side - Signup Form */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-white min-h-screen lg:min-h-auto relative">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white min-h-screen lg:min-h-auto relative">
         <div className="w-full max-w-sm">
           {/* Mobile Header - Only visible on mobile */}
           <div className="lg:hidden text-center mb-8">
