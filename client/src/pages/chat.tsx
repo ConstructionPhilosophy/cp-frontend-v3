@@ -7,6 +7,7 @@ import { ChatHeader } from '../components/chat/ChatHeader';
 import { MessageList } from '../components/chat/MessageList';
 import { MessageInput } from '../components/chat/MessageInput';
 import { Conversation } from '../types/chat';
+import { userApiService, UserProfile } from '../lib/userApi';
 import Header from '../components/layout/header';
 import MobileNavigation from '../components/mobile-navigation';
 import { useIsMobile } from '../hooks/use-mobile';
@@ -16,6 +17,7 @@ export const ChatPage: React.FC = () => {
   const conversationId = params?.conversationId;
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [otherUser, setOtherUser] = useState<{ displayName: string; photoURL?: string } | null>(null);
+  const [otherUserProfile, setOtherUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
 
@@ -56,12 +58,22 @@ export const ChatPage: React.FC = () => {
         );
 
         if (otherUserId) {
-          // In a real app, you'd fetch user data from your users collection
-          // For now, we'll use placeholder data
-          setOtherUser({
-            displayName: `User ${otherUserId.slice(0, 8)}`,
-            photoURL: undefined
-          });
+          try {
+            // Fetch real user profile data
+            const userProfile = await userApiService.getUserByUid(otherUserId);
+            setOtherUserProfile(userProfile);
+            setOtherUser({
+              displayName: `${userProfile.firstName} ${userProfile.lastName}`,
+              photoURL: userProfile.photoUrl || userProfile.profilePic
+            });
+          } catch (error) {
+            console.error('Error fetching other user profile:', error);
+            // Fallback to placeholder if API fails
+            setOtherUser({
+              displayName: `User ${otherUserId.slice(0, 8)}`,
+              photoURL: undefined
+            });
+          }
         }
       } catch (error) {
         console.error('Error loading conversation:', error);

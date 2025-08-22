@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import Header from '../components/layout/header';
 import MobileNavigation from '../components/mobile-navigation';
@@ -11,6 +11,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { auth } from '../lib/firebase';
+import { userApiService, UserProfile } from '../lib/userApi';
 
 export const MessagesPage: React.FC = () => {
   const { conversations, loading } = useConversations();
@@ -18,6 +19,39 @@ export const MessagesPage: React.FC = () => {
   const { users: chatUsers } = useChatUsers();
   const [, setLocation] = useLocation();
   const isMobile = useIsMobile();
+  const [userProfiles, setUserProfiles] = useState<{ [uid: string]: UserProfile }>({});
+
+  // Fetch user profiles for all conversation participants
+  useEffect(() => {
+    const fetchUserProfiles = async () => {
+      const userIds = new Set<string>();
+      
+      conversations.forEach(conversation => {
+        conversation.participants.forEach(uid => {
+          if (uid !== auth.currentUser?.uid) {
+            userIds.add(uid);
+          }
+        });
+      });
+
+      const profiles: { [uid: string]: UserProfile } = {};
+      
+      for (const uid of Array.from(userIds)) {
+        try {
+          const profile = await userApiService.getUserByUid(uid);
+          profiles[uid] = profile;
+        } catch (error) {
+          console.error(`Error fetching profile for user ${uid}:`, error);
+        }
+      }
+      
+      setUserProfiles(profiles);
+    };
+
+    if (conversations.length > 0) {
+      fetchUserProfiles();
+    }
+  }, [conversations]);
 
   const handleStartChat = async (otherUserId: string) => {
     try {
@@ -109,20 +143,29 @@ export const MessagesPage: React.FC = () => {
                 uid => uid !== auth.currentUser?.uid
               );
               
+              const otherUserProfile = otherUserId ? userProfiles[otherUserId] : null;
+              const displayName = otherUserProfile 
+                ? `${otherUserProfile.firstName} ${otherUserProfile.lastName}`
+                : `User ${otherUserId?.slice(0, 8)}`;
+              const avatarUrl = otherUserProfile?.photoUrl || otherUserProfile?.profilePic;
+              
               return (
                 <Link key={conversation.id} href={`/chat/${conversation.id}`}>
                   <a className="flex items-center space-x-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     <Avatar className="w-12 h-12">
-                      <AvatarImage src="" />
+                      <AvatarImage src={avatarUrl || ""} />
                       <AvatarFallback>
-                        {otherUserId ? otherUserId.slice(0, 2).toUpperCase() : 'U'}
+                        {otherUserProfile 
+                          ? `${otherUserProfile.firstName?.[0] || ''}${otherUserProfile.lastName?.[0] || ''}`
+                          : (otherUserId ? otherUserId.slice(0, 2).toUpperCase() : 'U')
+                        }
                       </AvatarFallback>
                     </Avatar>
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <h3 className="font-medium text-cmo-text-primary truncate">
-                          User {otherUserId?.slice(0, 8)}
+                          {displayName}
                         </h3>
                         <span className="text-sm text-cmo-text-secondary">
                           {format(conversation.lastMessageTime, 'MMM d')}

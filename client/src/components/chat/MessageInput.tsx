@@ -78,16 +78,27 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
     setSending(true);
     try {
+      console.log('Uploading file:', file.name, 'Type:', mediaType, 'Size:', file.size);
       await onSendMedia(file, mediaType);
       toast({
-        title: "Media sent",
+        title: "Media sent successfully",
         description: "Your file has been shared.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending media:', error);
+      let errorMessage = "Please try again.";
+      
+      if (error.code === 'storage/unauthorized') {
+        errorMessage = "Upload permission denied. Please check Firebase Storage rules.";
+      } else if (error.code === 'storage/canceled') {
+        errorMessage = "Upload was canceled.";
+      } else if (error.code === 'storage/unknown') {
+        errorMessage = "Unknown upload error occurred.";
+      }
+      
       toast({
         title: "Failed to send media",
-        description: "Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
