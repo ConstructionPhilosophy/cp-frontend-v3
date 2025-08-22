@@ -326,19 +326,22 @@ export default function UserProfilePage() {
                           {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
                         <p className="text-lg text-cmo-text-secondary mb-2">
-                          {profileData.title || profileData.positionDesignation || 'Professional'}
+                          {profileData.positionDesignation || 'Professional'} at {profileData.organizationName || 'Company'}
                         </p>
                         {profileData.city && profileData.country && (
-                          <div className="flex items-center gap-1 text-sm text-cmo-text-secondary mb-3">
+                          <div className="flex items-center gap-1 text-sm text-cmo-text-secondary mb-2">
                             <MapPin className="w-4 h-4" />
                             <span>
-                              {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
+                              {profileData.city}, {profileData.state || ''} {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
                             </span>
                           </div>
                         )}
-                        <div className="flex items-center gap-1 text-sm text-cmo-text-secondary">
-                          <Users className="w-4 h-4" />
-                          <span>500+ connections</span>
+                        <div className="flex items-center gap-4 text-sm text-cmo-text-secondary">
+                          <span className="flex items-center gap-1">
+                            <Users className="w-4 h-4" />
+                            142 followers
+                          </span>
+                          <span>80 following</span>
                         </div>
                       </div>
                       
@@ -607,8 +610,50 @@ export default function UserProfilePage() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            {/* Quick Stats */}
+
+            {/* Intro */}
             <Card className="mb-6">
+              <CardContent className="p-6">
+                <h3 className="font-semibold text-cmo-text-primary mb-4">Intro</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-cmo-text-secondary">Position:</span>
+                    <span className="font-medium">{profileData.positionDesignation || 'Professional'}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-cmo-text-secondary">Joined:</span>
+                    <span className="font-medium">2025</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-cmo-text-secondary">Email:</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-auto p-0 font-medium hover:text-cmo-primary"
+                      onClick={() => setShowContactInfo(!showContactInfo)}
+                    >
+                      {showContactInfo ? profileData.email : '••••••••@gmail.com'}
+                    </Button>
+                  </div>
+                  {profileData.phoneNumber && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-cmo-text-secondary">Phone:</span>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="h-auto p-0 font-medium hover:text-cmo-primary"
+                        onClick={() => setShowContactInfo(!showContactInfo)}
+                      >
+                        {showContactInfo ? profileData.phoneNumber : 'Phone number is missing'}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Profile Stats */}
+            <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold text-cmo-text-primary mb-4">Profile Stats</h3>
                 <div className="space-y-3">
@@ -629,51 +674,6 @@ export default function UserProfilePage() {
                     <span className="font-semibold">500+</span>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Contact Info */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-cmo-text-primary">Contact Information</h3>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setShowContactInfo(!showContactInfo)}
-                  >
-                    {showContactInfo ? 'Hide' : 'Show'}
-                  </Button>
-                </div>
-                
-                {showContactInfo && (
-                  <div className="space-y-3 text-sm">
-                    <div className="flex items-center space-x-2">
-                      <Mail className="w-4 h-4 text-cmo-text-secondary" />
-                      <span>{profileData.email}</span>
-                    </div>
-                    {profileData.phoneNumber && (
-                      <div className="flex items-center space-x-2">
-                        <Phone className="w-4 h-4 text-cmo-text-secondary" />
-                        <span>{profileData.phoneNumber}</span>
-                      </div>
-                    )}
-                    {profileData.city && profileData.country && (
-                      <div className="flex items-center space-x-2">
-                        <MapPin className="w-4 h-4 text-cmo-text-secondary" />
-                        <span>
-                          {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {!showContactInfo && (
-                  <p className="text-sm text-cmo-text-secondary">
-                    Click "Show" to view contact details
-                  </p>
-                )}
               </CardContent>
             </Card>
           </div>
