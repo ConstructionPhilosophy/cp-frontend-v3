@@ -1,36 +1,36 @@
-import { useState, useEffect } from 'react';
-import { useRoute } from 'wouter';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Card, CardContent } from '../components/ui/card';
-import { Separator } from '../components/ui/separator';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { Textarea } from '../components/ui/textarea';
-import { 
+import { useState, useEffect } from "react";
+import { useRoute } from "wouter";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Card, CardContent } from "../components/ui/card";
+import { Separator } from "../components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Textarea } from "../components/ui/textarea";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../components/ui/dropdown-menu';
-import Header from '../components/layout/header';
-import MobileNavigation from '../components/mobile-navigation';
-import { useIsMobile } from '../hooks/use-mobile';
-import { useAuth } from '../contexts/AuthContext';
-import { userApiService, UserProfile } from '../lib/userApi';
-import { useCreateConversation } from '../hooks/useChat';
-import { useLocation } from 'wouter';
-import { Loader2 } from 'lucide-react';
-import { 
-  MapPin, 
-  Mail, 
-  Phone, 
-  Globe, 
-  Building, 
-  Users, 
-  MessageSquare, 
-  ThumbsUp, 
-  Star, 
-  Plus, 
+} from "../components/ui/dropdown-menu";
+import Header from "../components/layout/header";
+import MobileNavigation from "../components/mobile-navigation";
+import { useIsMobile } from "../hooks/use-mobile";
+import { useAuth } from "../contexts/AuthContext";
+import { userApiService, UserProfile } from "../lib/userApi";
+import { useCreateConversation } from "../hooks/useChat";
+import { useLocation } from "wouter";
+import { Loader2 } from "lucide-react";
+import {
+  MapPin,
+  Mail,
+  Phone,
+  Globe,
+  Building,
+  Users,
+  MessageSquare,
+  ThumbsUp,
+  Star,
+  Plus,
   MoreHorizontal,
   Filter,
   ChevronDown,
@@ -43,9 +43,9 @@ import {
   GraduationCap,
   Briefcase,
   User,
-  FileText
-} from 'lucide-react';
-import { useToast } from '../hooks/use-toast';
+  FileText,
+} from "lucide-react";
+import { useToast } from "../hooks/use-toast";
 
 const mockEducation = [
   {
@@ -55,7 +55,7 @@ const mockEducation = [
     schoolOrCollege: "Oxford International",
     startDate: "2008-09-01",
     endDate: "2010-06-30",
-    grade: "Distinction"
+    grade: "Distinction",
   },
   {
     id: "edu2",
@@ -64,8 +64,8 @@ const mockEducation = [
     schoolOrCollege: "Stanford University",
     startDate: "2003-09-01",
     endDate: "2007-05-31",
-    grade: "Magna Cum Laude"
-  }
+    grade: "Magna Cum Laude",
+  },
 ];
 
 const mockExperience = [
@@ -76,44 +76,51 @@ const mockExperience = [
     location: "Virginia, NY",
     startDate: "2020-01-01",
     endDate: null,
-    description: "Leading global marketing strategy and brand management for digital transformation initiatives."
+    description:
+      "Leading global marketing strategy and brand management for digital transformation initiatives.",
   },
   {
-    id: "exp2", 
+    id: "exp2",
     company: "Blue Chip CPG",
     role: "Senior Brand Manager",
     location: "New York, NY",
     startDate: "2015-03-01",
     endDate: "2019-12-31",
-    description: "Managed multi-million dollar brand portfolios and launched successful product campaigns."
-  }
+    description:
+      "Managed multi-million dollar brand portfolios and launched successful product campaigns.",
+  },
 ];
 
 const mockActivities = [
   {
     id: "1",
     type: "question",
-    title: "Do you have any experience with deploying @Hubspot for a SaaS business with both a direct and self-serve model?",
-    content: "We have a $2M ARR B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith... See more",
+    title:
+      "Do you have any experience with deploying @Hubspot for a SaaS business with both a direct and self-serve model?",
+    content:
+      "We have a $2M ARR B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith... See more",
     timestamp: "Nov 19",
     category: "Questions & Answers",
-    engagement: { comments: 1, thanks: 5, insightful: 2 }
+    engagement: { comments: 1, thanks: 5, insightful: 2 },
   },
   {
     id: "2",
     type: "article",
     title: "Looking for a new landing page optimization vendor",
-    content: "We are looking for a landing page tool that they are missing a minimal with a custom solution that no... See more",
+    content:
+      "We are looking for a landing page tool that they are missing a minimal with a custom solution that no... See more",
     timestamp: "Nov 12",
     category: "#Inbound #SaaS",
-    engagement: { comments: 1, thanks: 15, insightful: 6 }
-  }
+    engagement: { comments: 1, thanks: 15, insightful: 6 },
+  },
 ];
 
 export default function UserProfilePage() {
-  const [match, params] = useRoute('/u/:username');
-  const [activeFilter, setActiveFilter] = useState('All');
-  const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
+  const [match, params] = useRoute("/u/:username");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [expandedComments, setExpandedComments] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -128,28 +135,28 @@ export default function UserProfilePage() {
   const { toast } = useToast();
 
   const username = params?.username;
-  const filters = ['All', 'News', 'Posts', 'Articles', 'Videos', 'Jobs'];
+  const filters = ["All", "News", "Posts", "Articles", "Videos", "Jobs"];
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!username) return;
-      
+
       setLoading(true);
       setError(null);
-      
+
       try {
         // Try using username directly with /users/{uid} endpoint
         // In case the backend accepts username as uid parameter
         const userData = await userApiService.getUserByUid(username);
         setProfileData(userData);
       } catch (error: any) {
-        console.error('Error fetching user profile:', error);
-        if (error.message === 'USER_NOT_FOUND') {
-          setError('User not found');
-        } else if (error.message === 'AUTH_EXPIRED') {
-          setError('Authentication expired');
+        console.error("Error fetching user profile:", error);
+        if (error.message === "USER_NOT_FOUND") {
+          setError("User not found");
+        } else if (error.message === "AUTH_EXPIRED") {
+          setError("Authentication expired");
         } else {
-          setError('Failed to load user profile');
+          setError("Failed to load user profile");
         }
       } finally {
         setLoading(false);
@@ -161,18 +168,22 @@ export default function UserProfilePage() {
 
   const handleSendMessage = async () => {
     if (!profileData || !user) return;
-    
+
     try {
       const conversationId = await createConversation(profileData.uid);
       setLocation(`/chat/${conversationId}`);
     } catch (error: any) {
-      console.error('Error creating conversation:', error);
-      
+      console.error("Error creating conversation:", error);
+
       // Handle Firebase permission errors more gracefully
-      if (error.message?.includes('permissions') || error.message?.includes('PERMISSION_DENIED')) {
+      if (
+        error.message?.includes("permissions") ||
+        error.message?.includes("PERMISSION_DENIED")
+      ) {
         toast({
           title: "Chat feature not available",
-          description: "Chat functionality is being set up. Please try again later.",
+          description:
+            "Chat functionality is being set up. Please try again later.",
           variant: "destructive",
         });
       } else {
@@ -187,7 +198,7 @@ export default function UserProfilePage() {
 
   const handleFollowToggle = async () => {
     if (!profileData || !user || followLoading) return;
-    
+
     setFollowLoading(true);
     try {
       if (isFollowing) {
@@ -206,7 +217,7 @@ export default function UserProfilePage() {
         });
       }
     } catch (error: any) {
-      console.error('Error toggling follow:', error);
+      console.error("Error toggling follow:", error);
       toast({
         title: "Failed to update follow status",
         description: "Please try again later.",
@@ -218,24 +229,24 @@ export default function UserProfilePage() {
   };
 
   const toggleComments = (postId: string) => {
-    setExpandedComments(prev => ({
+    setExpandedComments((prev) => ({
       ...prev,
-      [postId]: !prev[postId]
+      [postId]: !prev[postId],
     }));
   };
 
   const handleCommentChange = (postId: string, text: string) => {
-    setCommentText(prev => ({
+    setCommentText((prev) => ({
       ...prev,
-      [postId]: text
+      [postId]: text,
     }));
   };
 
   const handleSubmitComment = (postId: string) => {
     console.log(`Comment for post ${postId}:`, commentText[postId]);
-    setCommentText(prev => ({
+    setCommentText((prev) => ({
       ...prev,
-      [postId]: ''
+      [postId]: "",
     }));
   };
 
@@ -273,8 +284,10 @@ export default function UserProfilePage() {
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
-            <p className="text-cmo-text-secondary text-lg mb-2">{error || 'User not found'}</p>
-            <Button variant="outline" onClick={() => setLocation('/')}>
+            <p className="text-cmo-text-secondary text-lg mb-2">
+              {error || "User not found"}
+            </p>
+            <Button variant="outline" onClick={() => setLocation("/")}>
               Go Home
             </Button>
           </div>
@@ -289,50 +302,66 @@ export default function UserProfilePage() {
   return (
     <div className="min-h-screen bg-cmo-bg">
       <Header />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Banner and Profile Section */}
             <Card className="mb-6 overflow-hidden">
-              <div 
+              <div
                 className="h-48 bg-gradient-to-r from-blue-500 to-purple-600"
                 style={{
-                  backgroundImage: profileData.bannerUrl ? `url(${profileData.bannerUrl})` : undefined,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
+                  backgroundImage: profileData.bannerUrl
+                    ? `url(${profileData.bannerUrl})`
+                    : undefined,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
               />
-              
+
               <CardContent className="relative p-6">
                 {/* Profile Info Section */}
                 <div className="flex flex-col sm:flex-row gap-6 pt-4">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
                     <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
-                      <AvatarImage src={profileData.photoUrl || profileData.profilePic || ""} />
+                      <AvatarImage
+                        src={
+                          profileData.photoUrl || profileData.profilePic || ""
+                        }
+                      />
                       <AvatarFallback className="text-2xl">
-                        {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
+                        {profileData.firstName?.charAt(0) || "U"}
+                        {profileData.lastName?.charAt(0) || ""}
                       </AvatarFallback>
                     </Avatar>
                   </div>
-                  
+
                   {/* Profile Details */}
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <h1 className="text-3xl font-bold text-cmo-text-primary truncate">
-                          {profileData.firstName || ''} {profileData.lastName || ''}
+                          {profileData.firstName || ""}{" "}
+                          {profileData.lastName || ""}
                         </h1>
                         <p className="text-lg text-cmo-text-secondary mb-2">
-                          {profileData.positionDesignation || 'Professional'}
+                          {profileData.positionDesignation || "Professional"} at{" "}
+                          {profileData.currentCompany || "Company"}
                         </p>
                         {profileData.city && profileData.country && (
                           <div className="flex items-center gap-1 text-sm text-cmo-text-secondary mb-2">
                             <MapPin className="w-4 h-4" />
                             <span>
-                              {profileData.city}{profileData.state ? `, ${typeof profileData.state === 'string' ? profileData.state : profileData.state.name}` : ''}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
+                              {profileData.city}
+                              {profileData.state
+                                ? `, ${typeof profileData.state === "string" ? profileData.state : profileData.state.name}`
+                                : ""}
+                              ,{" "}
+                              {typeof profileData.country === "string"
+                                ? profileData.country
+                                : profileData.country.name}
                             </span>
                           </div>
                         )}
@@ -344,20 +373,24 @@ export default function UserProfilePage() {
                           <span>80 following</span>
                         </div>
                       </div>
-                      
+
                       {/* Action Buttons */}
                       {!isOwnProfile && (
                         <div className="flex items-center gap-3 flex-shrink-0">
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={handleSendMessage}
                           >
                             <MessageSquare className="w-4 h-4 mr-2" />
                             Message
                           </Button>
-                          <Button 
-                            className={isFollowing ? "bg-gray-500 hover:bg-gray-600" : "bg-cmo-primary hover:bg-cmo-primary/90"}
+                          <Button
+                            className={
+                              isFollowing
+                                ? "bg-gray-500 hover:bg-gray-600"
+                                : "bg-cmo-primary hover:bg-cmo-primary/90"
+                            }
                             onClick={handleFollowToggle}
                             disabled={followLoading}
                           >
@@ -368,9 +401,9 @@ export default function UserProfilePage() {
                             ) : (
                               <Plus className="w-4 h-4 mr-2" />
                             )}
-                            {isFollowing ? 'Following' : 'Follow'}
+                            {isFollowing ? "Following" : "Follow"}
                           </Button>
-                          
+
                           {/* Three Dots Menu */}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -399,7 +432,8 @@ export default function UserProfilePage() {
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold mb-3">About</h3>
                   <p className="text-cmo-text-secondary leading-relaxed">
-                    {profileData.positionDesignation || 'Professional with expertise in the construction and civil engineering industry.'}
+                    {profileData.about ||
+                      "Professional with expertise in the construction and civil engineering industry."}
                   </p>
                 </div>
               </CardContent>
@@ -422,10 +456,15 @@ export default function UserProfilePage() {
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-lg">{edu.degree}</h4>
-                        <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
-                        <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
+                        <p className="text-cmo-primary font-medium">
+                          {edu.fieldOfStudy}
+                        </p>
+                        <p className="text-cmo-text-secondary">
+                          {edu.schoolOrCollege}
+                        </p>
                         <p className="text-sm text-cmo-text-secondary mt-1">
-                          {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
+                          {new Date(edu.startDate).getFullYear()} -{" "}
+                          {new Date(edu.endDate).getFullYear()}
                           {edu.grade && ` • ${edu.grade}`}
                         </p>
                       </div>
@@ -452,15 +491,22 @@ export default function UserProfilePage() {
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-lg">{exp.role}</h4>
-                        <p className="text-cmo-primary font-medium">{exp.company}</p>
+                        <p className="text-cmo-primary font-medium">
+                          {exp.company}
+                        </p>
                         <p className="text-cmo-text-secondary flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
                           {exp.location}
                         </p>
                         <p className="text-sm text-cmo-text-secondary mt-1">
-                          {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
+                          {new Date(exp.startDate).getFullYear()} -{" "}
+                          {exp.endDate
+                            ? new Date(exp.endDate).getFullYear()
+                            : "Present"}
                         </p>
-                        <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
+                        <p className="text-cmo-text-secondary mt-2">
+                          {exp.description}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -489,7 +535,9 @@ export default function UserProfilePage() {
                       variant={activeFilter === filter ? "default" : "outline"}
                       size="sm"
                       onClick={() => setActiveFilter(filter)}
-                      className={activeFilter === filter ? "bg-cmo-primary" : ""}
+                      className={
+                        activeFilter === filter ? "bg-cmo-primary" : ""
+                      }
                     >
                       {filter}
                     </Button>
@@ -499,20 +547,35 @@ export default function UserProfilePage() {
                 {/* Activity Feed */}
                 <div className="space-y-6">
                   {mockActivities.map((activity) => (
-                    <div key={activity.id} className="border-b border-cmo-border pb-6 last:border-b-0">
+                    <div
+                      key={activity.id}
+                      className="border-b border-cmo-border pb-6 last:border-b-0"
+                    >
                       <div className="flex gap-3">
                         <Avatar className="w-12 h-12">
-                          <AvatarImage src={profileData.photoUrl || profileData.profilePic || ""} />
+                          <AvatarImage
+                            src={
+                              profileData.photoUrl ||
+                              profileData.profilePic ||
+                              ""
+                            }
+                          />
                           <AvatarFallback>
-                            {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
+                            {profileData.firstName?.charAt(0) || "U"}
+                            {profileData.lastName?.charAt(0) || ""}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
                             <div>
-                              <h4 className="font-medium text-cmo-text-primary">{activity.title}</h4>
+                              <h4 className="font-medium text-cmo-text-primary">
+                                {activity.title}
+                              </h4>
                               <div className="flex items-center gap-2 text-sm text-cmo-text-secondary mt-1">
-                                <span>{profileData.firstName || ''} {profileData.lastName || ''}</span>
+                                <span>
+                                  {profileData.firstName || ""}{" "}
+                                  {profileData.lastName || ""}
+                                </span>
                                 <span>•</span>
                                 <span>{activity.timestamp}</span>
                                 <Badge variant="secondary" className="text-xs">
@@ -538,28 +601,42 @@ export default function UserProfilePage() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
-                          <p className="text-cmo-text-secondary mt-3">{activity.content}</p>
-                          
+                          <p className="text-cmo-text-secondary mt-3">
+                            {activity.content}
+                          </p>
+
                           {/* Engagement Actions */}
                           <div className="flex items-center gap-6 mt-4">
-                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                            >
                               <ThumbsUp className="w-4 h-4 mr-1" />
                               Thanks {activity.engagement.thanks}
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               className="text-cmo-text-secondary hover:text-cmo-primary"
                               onClick={() => toggleComments(activity.id)}
                             >
                               <MessageSquare className="w-4 h-4 mr-1" />
                               {activity.engagement.comments} comments
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                            >
                               <Star className="w-4 h-4 mr-1" />
                               Insightful {activity.engagement.insightful}
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                            >
                               <Share className="w-4 h-4 mr-1" />
                               Share
                             </Button>
@@ -570,26 +647,44 @@ export default function UserProfilePage() {
                             <div className="mt-4 pt-4 border-t border-cmo-border">
                               <div className="flex gap-3">
                                 <Avatar className="w-8 h-8">
-                                  <AvatarImage src={userProfile?.profilePic || ""} />
+                                  <AvatarImage
+                                    src={userProfile?.profilePic || ""}
+                                  />
                                   <AvatarFallback>
-                                    {userProfile?.firstName?.charAt(0) || 'U'}{userProfile?.lastName?.charAt(0) || ''}
+                                    {userProfile?.firstName?.charAt(0) || "U"}
+                                    {userProfile?.lastName?.charAt(0) || ""}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
                                   <Textarea
                                     placeholder="Write a comment..."
-                                    value={commentText[activity.id] || ''}
-                                    onChange={(e) => handleCommentChange(activity.id, e.target.value)}
+                                    value={commentText[activity.id] || ""}
+                                    onChange={(e) =>
+                                      handleCommentChange(
+                                        activity.id,
+                                        e.target.value,
+                                      )
+                                    }
                                     className="min-h-[80px] resize-none"
                                   />
                                   <div className="flex justify-end gap-2 mt-2">
-                                    <Button variant="outline" size="sm" onClick={() => toggleComments(activity.id)}>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        toggleComments(activity.id)
+                                      }
+                                    >
                                       Cancel
                                     </Button>
-                                    <Button 
-                                      size="sm" 
-                                      onClick={() => handleSubmitComment(activity.id)}
-                                      disabled={!commentText[activity.id]?.trim()}
+                                    <Button
+                                      size="sm"
+                                      onClick={() =>
+                                        handleSubmitComment(activity.id)
+                                      }
+                                      disabled={
+                                        !commentText[activity.id]?.trim()
+                                      }
                                     >
                                       <Send className="w-4 h-4 mr-1" />
                                       Comment
@@ -610,15 +705,18 @@ export default function UserProfilePage() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-
             {/* Intro */}
             <Card className="mb-6">
               <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">Intro</h3>
+                <h3 className="font-semibold text-cmo-text-primary mb-4">
+                  Intro
+                </h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-cmo-text-secondary">Position:</span>
-                    <span className="font-medium">{profileData.positionDesignation || 'Professional'}</span>
+                    <span className="font-medium">
+                      {profileData.positionDesignation || "Professional"}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-cmo-text-secondary">Joined:</span>
@@ -626,25 +724,29 @@ export default function UserProfilePage() {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-cmo-text-secondary">Email:</span>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
+                    <Button
+                      variant="ghost"
+                      size="sm"
                       className="h-auto p-0 font-medium hover:text-cmo-primary"
                       onClick={() => setShowContactInfo(!showContactInfo)}
                     >
-                      {showContactInfo ? profileData.email : '••••••••@gmail.com'}
+                      {showContactInfo
+                        ? profileData.email
+                        : "••••••••@gmail.com"}
                     </Button>
                   </div>
                   {profileData.phoneNumber && (
                     <div className="flex items-center justify-between">
                       <span className="text-cmo-text-secondary">Phone:</span>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         className="h-auto p-0 font-medium hover:text-cmo-primary"
                         onClick={() => setShowContactInfo(!showContactInfo)}
                       >
-                        {showContactInfo ? profileData.phoneNumber : 'Phone number is missing'}
+                        {showContactInfo
+                          ? profileData.phoneNumber
+                          : "Phone number is missing"}
                       </Button>
                     </div>
                   )}
@@ -655,7 +757,9 @@ export default function UserProfilePage() {
             {/* Profile Stats */}
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">Profile Stats</h3>
+                <h3 className="font-semibold text-cmo-text-primary mb-4">
+                  Profile Stats
+                </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-cmo-text-secondary">Posts:</span>
@@ -679,7 +783,7 @@ export default function UserProfilePage() {
           </div>
         </div>
       </div>
-      
+
       {isMobile && <MobileNavigation />}
     </div>
   );

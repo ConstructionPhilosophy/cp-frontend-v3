@@ -1,6 +1,7 @@
-import { auth } from './firebase';
+import { auth } from "./firebase";
 
-const API_BASE_URL = 'https://cp-backend-service-test-972540571952.asia-south1.run.app';
+const API_BASE_URL =
+  "https://cp-backend-service-test-972540571952.asia-south1.run.app";
 
 export interface UserProfile {
   uid: string;
@@ -13,17 +14,23 @@ export interface UserProfile {
   phoneNumber?: string;
   title?: string;
   positionDesignation?: string;
+  currentCompany?: string;
+  about?: string;
   gender?: string;
   dateOfBirth?: string;
   city?: string;
-  state?: string | {
-    code: string;
-    name: string;
-  };
-  country?: string | {
-    code: string;
-    name: string;
-  };
+  state?:
+    | string
+    | {
+        code: string;
+        name: string;
+      };
+  country?:
+    | string
+    | {
+        code: string;
+        name: string;
+      };
   photoUrl?: string;
   bannerUrl?: string;
   userType?: string;
@@ -36,10 +43,11 @@ export interface UserProfile {
   bannerPic?: string;
   createdAt?: string;
   updatedAt?: string;
+  followingCount?: number;
 }
 
 export interface UpdateUserData {
-  userType?: 'personal' | 'business';
+  userType?: "personal" | "business";
   phoneNumber?: string;
   title?: string;
   positionDesignation?: string;
@@ -71,19 +79,21 @@ class UserApiService {
   private async getAuthHeaders(): Promise<{ Authorization: string }> {
     const user = auth.currentUser;
     if (!user) {
-      throw new Error('User not authenticated');
+      throw new Error("User not authenticated");
     }
-    
+
     const token = await user.getIdToken(true); // Force refresh
     return {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${token}`,
     };
   }
 
   private isCacheValid(): boolean {
-    return this.userCache !== null && 
-           this.cacheTimestamp !== null && 
-           Date.now() - this.cacheTimestamp < this.CACHE_DURATION;
+    return (
+      this.userCache !== null &&
+      this.cacheTimestamp !== null &&
+      Date.now() - this.cacheTimestamp < this.CACHE_DURATION
+    );
   }
 
   async getCurrentUser(forceRefresh: boolean = false): Promise<UserProfile> {
@@ -94,58 +104,63 @@ class UserApiService {
 
     try {
       const headers = await this.getAuthHeaders();
-      console.log('Making request to:', `${API_BASE_URL}/users/me`);
-      console.log('With headers:', headers);
-      
+      console.log("Making request to:", `${API_BASE_URL}/users/me`);
+      console.log("With headers:", headers);
+
       const response = await fetch(`${API_BASE_URL}/users/me`, {
-        method: 'GET',
+        method: "GET",
         headers: {
           ...headers,
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
-        mode: 'cors',
-        credentials: 'omit',
+        mode: "cors",
+        credentials: "omit",
       });
-      
-      console.log('Response status:', response.status);
-      console.log('Response headers:', response.headers);
+
+      console.log("Response status:", response.status);
+      console.log("Response headers:", response.headers);
 
       if (response.status === 401) {
         // Token expired or invalid
-        throw new Error('AUTH_EXPIRED');
+        throw new Error("AUTH_EXPIRED");
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch user data: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch user data: ${response.status} ${response.statusText}`,
+        );
       }
 
       const userData: UserProfile = await response.json();
-      
+
       // Update cache
       this.userCache = userData;
       this.cacheTimestamp = Date.now();
-      
+
       return userData;
     } catch (error: any) {
-      if (error.message === 'AUTH_EXPIRED') {
+      if (error.message === "AUTH_EXPIRED") {
         throw error;
       }
-      console.error('Error fetching user data:', error);
-      throw new Error('Failed to fetch user profile');
+      console.error("Error fetching user data:", error);
+      throw new Error("Failed to fetch user profile");
     }
   }
 
-  async updateUser(uid: string, userData: UpdateUserData): Promise<UserProfile> {
+  async updateUser(
+    uid: string,
+    userData: UpdateUserData,
+  ): Promise<UserProfile> {
     try {
       const headers = await this.getAuthHeaders();
-      
+
       // Create FormData for multipart request
       const formData = new FormData();
-      
+
       // Add all fields to FormData
       Object.entries(userData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
+        if (value !== undefined && value !== null && value !== "") {
           if (value instanceof File) {
             formData.append(key, value);
           } else {
@@ -155,33 +170,35 @@ class UserApiService {
       });
 
       const response = await fetch(`${API_BASE_URL}/users/${uid}`, {
-        method: 'PUT',
+        method: "PUT",
         headers, // Don't set Content-Type header - browser will set it with boundary
         body: formData,
       });
 
       if (response.status === 401) {
-        throw new Error('AUTH_EXPIRED');
+        throw new Error("AUTH_EXPIRED");
       }
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(`Failed to update user: ${response.status} ${response.statusText} - ${errorText}`);
+        throw new Error(
+          `Failed to update user: ${response.status} ${response.statusText} - ${errorText}`,
+        );
       }
 
       const updatedUser: UserProfile = await response.json();
-      
+
       // Update cache with new data
       this.userCache = updatedUser;
       this.cacheTimestamp = Date.now();
-      
+
       return updatedUser;
     } catch (error: any) {
-      if (error.message === 'AUTH_EXPIRED') {
+      if (error.message === "AUTH_EXPIRED") {
         throw error;
       }
-      console.error('Error updating user:', error);
-      throw new Error('Failed to update user profile');
+      console.error("Error updating user:", error);
+      throw new Error("Failed to update user profile");
     }
   }
 
@@ -193,126 +210,146 @@ class UserApiService {
   async getUserByUid(uid: string): Promise<UserProfile> {
     try {
       const headers = await this.getAuthHeaders();
-      
+
       const response = await fetch(`${API_BASE_URL}/users/${uid}`, {
-        method: 'GET',
+        method: "GET",
         headers: {
           ...headers,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        mode: 'cors',
-        credentials: 'omit',
+        mode: "cors",
+        credentials: "omit",
       });
 
       if (response.status === 401) {
-        throw new Error('AUTH_EXPIRED');
+        throw new Error("AUTH_EXPIRED");
       }
 
       if (response.status === 404) {
-        throw new Error('USER_NOT_FOUND');
+        throw new Error("USER_NOT_FOUND");
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch user: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch user: ${response.status} ${response.statusText}`,
+        );
       }
 
       const userData: UserProfile = await response.json();
       return userData;
     } catch (error: any) {
-      if (error.message === 'AUTH_EXPIRED' || error.message === 'USER_NOT_FOUND') {
+      if (
+        error.message === "AUTH_EXPIRED" ||
+        error.message === "USER_NOT_FOUND"
+      ) {
         throw error;
       }
-      console.error('Error fetching user by uid:', error);
-      throw new Error('Failed to fetch user profile');
+      console.error("Error fetching user by uid:", error);
+      throw new Error("Failed to fetch user profile");
     }
   }
 
   async searchUsersByUsername(username: string): Promise<UserProfile[]> {
     try {
       const headers = await this.getAuthHeaders();
-      
-      const response = await fetch(`${API_BASE_URL}/users/search?username=${encodeURIComponent(username)}`, {
-        method: 'GET',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
+
+      const response = await fetch(
+        `${API_BASE_URL}/users/search?username=${encodeURIComponent(username)}`,
+        {
+          method: "GET",
+          headers: {
+            ...headers,
+            "Content-Type": "application/json",
+          },
+          mode: "cors",
+          credentials: "omit",
         },
-        mode: 'cors',
-        credentials: 'omit',
-      });
+      );
 
       if (response.status === 401) {
-        throw new Error('AUTH_EXPIRED');
+        throw new Error("AUTH_EXPIRED");
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to search users: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to search users: ${response.status} ${response.statusText}`,
+        );
       }
 
       const users: UserProfile[] = await response.json();
       return users;
     } catch (error: any) {
-      if (error.message === 'AUTH_EXPIRED') {
+      if (error.message === "AUTH_EXPIRED") {
         throw error;
       }
-      console.error('Error searching users:', error);
-      throw new Error('Failed to search users');
+      console.error("Error searching users:", error);
+      throw new Error("Failed to search users");
     }
   }
 
   async followUser(targetUid: string): Promise<void> {
     try {
       const headers = await this.getAuthHeaders();
-      
-      const response = await fetch(`${API_BASE_URL}/users/follow?targetUid=${targetUid}`, {
-        method: 'POST',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
+
+      const response = await fetch(
+        `${API_BASE_URL}/users/follow?targetUid=${targetUid}`,
+        {
+          method: "POST",
+          headers: {
+            ...headers,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (response.status === 401) {
-        throw new Error('AUTH_EXPIRED');
+        throw new Error("AUTH_EXPIRED");
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to follow user: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to follow user: ${response.status} ${response.statusText}`,
+        );
       }
     } catch (error: any) {
-      if (error.message === 'AUTH_EXPIRED') {
+      if (error.message === "AUTH_EXPIRED") {
         throw error;
       }
-      console.error('Error following user:', error);
-      throw new Error('Failed to follow user');
+      console.error("Error following user:", error);
+      throw new Error("Failed to follow user");
     }
   }
 
   async unfollowUser(targetUid: string): Promise<void> {
     try {
       const headers = await this.getAuthHeaders();
-      
-      const response = await fetch(`${API_BASE_URL}/users/unfollow?targetUid=${targetUid}`, {
-        method: 'POST',
-        headers: {
-          ...headers,
-          'Content-Type': 'application/json',
+
+      const response = await fetch(
+        `${API_BASE_URL}/users/unfollow?targetUid=${targetUid}`,
+        {
+          method: "POST",
+          headers: {
+            ...headers,
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
 
       if (response.status === 401) {
-        throw new Error('AUTH_EXPIRED');
+        throw new Error("AUTH_EXPIRED");
       }
 
       if (!response.ok) {
-        throw new Error(`Failed to unfollow user: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Failed to unfollow user: ${response.status} ${response.statusText}`,
+        );
       }
     } catch (error: any) {
-      if (error.message === 'AUTH_EXPIRED') {
+      if (error.message === "AUTH_EXPIRED") {
         throw error;
       }
-      console.error('Error unfollowing user:', error);
-      throw new Error('Failed to unfollow user');
+      console.error("Error unfollowing user:", error);
+      throw new Error("Failed to unfollow user");
     }
   }
 }
