@@ -326,13 +326,13 @@ export default function UserProfilePage() {
                           {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
                         <p className="text-lg text-cmo-text-secondary mb-2">
-                          {profileData.positionDesignation || 'Professional'} at {profileData.organizationName || 'Company'}
+                          {profileData.positionDesignation || 'Professional'}
                         </p>
                         {profileData.city && profileData.country && (
                           <div className="flex items-center gap-1 text-sm text-cmo-text-secondary mb-2">
                             <MapPin className="w-4 h-4" />
                             <span>
-                              {profileData.city}, {profileData.state || ''} {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
+                              {profileData.city}{profileData.state ? `, ${typeof profileData.state === 'string' ? profileData.state : profileData.state.name}` : ''}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
                             </span>
                           </div>
                         )}

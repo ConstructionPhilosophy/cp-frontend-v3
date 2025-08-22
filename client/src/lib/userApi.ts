@@ -16,17 +16,18 @@ export interface UserProfile {
   gender?: string;
   dateOfBirth?: string;
   city?: string;
-  state?: {
+  state?: string | {
     code: string;
     name: string;
   };
-  country?: {
+  country?: string | {
     code: string;
     name: string;
   };
   photoUrl?: string;
   bannerUrl?: string;
   userType?: string;
+  organizationName?: string;
   isActive?: boolean;
   createdTime?: string;
   updatedTime?: string;
