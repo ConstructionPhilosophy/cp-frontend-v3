@@ -9,15 +9,28 @@ export interface UserProfile {
   lastName: string;
   username?: string;
   hasBasicInfo: boolean;
-  verified: boolean;
+  verified?: boolean;
   phoneNumber?: string;
   title?: string;
   positionDesignation?: string;
   gender?: string;
   dateOfBirth?: string;
   city?: string;
-  state?: string;
-  country?: string;
+  state?: {
+    code: string;
+    name: string;
+  };
+  country?: {
+    code: string;
+    name: string;
+  };
+  photoUrl?: string;
+  bannerUrl?: string;
+  userType?: string;
+  isActive?: boolean;
+  createdTime?: string;
+  updatedTime?: string;
+  // Legacy fields for backward compatibility
   profilePic?: string;
   bannerPic?: string;
   createdAt?: string;

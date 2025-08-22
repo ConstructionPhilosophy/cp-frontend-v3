@@ -199,9 +199,9 @@ export default function UserProfilePage() {
               <CardContent className="p-0">
                 {/* Banner */}
                 <div className="h-32 sm:h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg relative">
-                  {profileData.bannerPic && (
+                  {(profileData.bannerUrl || profileData.bannerPic) && (
                     <img 
-                      src={profileData.bannerPic} 
+                      src={profileData.bannerUrl || profileData.bannerPic} 
                       alt="Banner" 
                       className="w-full h-full object-cover rounded-t-lg"
                     />
@@ -213,7 +213,7 @@ export default function UserProfilePage() {
                   <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between -mt-16 sm:-mt-20">
                     <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-4">
                       <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-white shadow-lg">
-                        <AvatarImage src={profileData.profilePic || ""} />
+                        <AvatarImage src={profileData.photoUrl || profileData.profilePic || ""} />
                         <AvatarFallback className="text-2xl">
                           {profileData.firstName?.[0]}{profileData.lastName?.[0]}
                         </AvatarFallback>
@@ -233,7 +233,9 @@ export default function UserProfilePage() {
                           {profileData.city && profileData.country && (
                             <div className="flex items-center gap-1">
                               <MapPin className="w-4 h-4" />
-                              <span>{profileData.city}, {profileData.country}</span>
+                              <span>
+                                {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
+                              </span>
                             </div>
                           )}
                           <div className="flex items-center gap-1">
@@ -391,7 +393,9 @@ export default function UserProfilePage() {
                   {profileData.city && profileData.country && (
                     <div className="flex items-center space-x-2">
                       <MapPin className="w-4 h-4 text-cmo-text-secondary" />
-                      <span>{profileData.city}, {profileData.country}</span>
+                      <span>
+                        {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
+                      </span>
                     </div>
                   )}
                 </div>
