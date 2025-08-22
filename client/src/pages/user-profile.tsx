@@ -105,12 +105,16 @@ export default function UserProfilePage() {
       setError(null);
       
       try {
-        const userData = await userApiService.getUserByUsername(username);
+        // Try using username directly with /users/{uid} endpoint
+        // In case the backend accepts username as uid parameter
+        const userData = await userApiService.getUserByUid(username);
         setProfileData(userData);
       } catch (error: any) {
         console.error('Error fetching user profile:', error);
         if (error.message === 'USER_NOT_FOUND') {
           setError('User not found');
+        } else if (error.message === 'AUTH_EXPIRED') {
+          setError('Authentication expired');
         } else {
           setError('Failed to load user profile');
         }
