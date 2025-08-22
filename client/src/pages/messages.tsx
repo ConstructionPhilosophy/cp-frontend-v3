@@ -1,5 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'wouter';
+import Header from '../components/layout/header';
+import MobileNavigation from '../components/mobile-navigation';
+import { useIsMobile } from '../hooks/use-mobile';
 import { MessageSquare, Plus, Search } from 'lucide-react';
 import { format } from 'date-fns';
 import { useConversations, useCreateConversation, useChatUsers } from '../hooks/useChat';
@@ -14,6 +17,7 @@ export const MessagesPage: React.FC = () => {
   const { createConversation } = useCreateConversation();
   const { users: chatUsers } = useChatUsers();
   const [, setLocation] = useLocation();
+  const isMobile = useIsMobile();
 
   const handleStartChat = async (otherUserId: string) => {
     try {
@@ -25,7 +29,10 @@ export const MessagesPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4">
+    <div className="min-h-screen bg-cmo-bg-main">
+      <Header />
+      
+      <div className="max-w-4xl mx-auto p-4">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-2">
           <MessageSquare className="w-6 h-6 text-cmo-primary" />
@@ -133,6 +140,9 @@ export const MessagesPage: React.FC = () => {
           </div>
         )}
       </div>
+      
+      {isMobile && <MobileNavigation />}
+    </div>
     </div>
   );
 };

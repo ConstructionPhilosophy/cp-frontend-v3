@@ -7,6 +7,9 @@ import { ChatHeader } from '../components/chat/ChatHeader';
 import { MessageList } from '../components/chat/MessageList';
 import { MessageInput } from '../components/chat/MessageInput';
 import { Conversation } from '../types/chat';
+import Header from '../components/layout/header';
+import MobileNavigation from '../components/mobile-navigation';
+import { useIsMobile } from '../hooks/use-mobile';
 
 export const ChatPage: React.FC = () => {
   const [match, params] = useRoute('/chat/:conversationId');
@@ -14,6 +17,7 @@ export const ChatPage: React.FC = () => {
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [otherUser, setOtherUser] = useState<{ displayName: string; photoURL?: string } | null>(null);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   const {
     messages,
@@ -71,36 +75,52 @@ export const ChatPage: React.FC = () => {
 
   if (!match || !conversationId) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-cmo-text-secondary">Conversation not found</p>
+      <div className="min-h-screen bg-cmo-bg-main">
+        <Header />
+        <div className="flex items-center justify-center h-96">
+          <p className="text-cmo-text-secondary">Conversation not found</p>
+        </div>
+        {isMobile && <MobileNavigation />}
       </div>
     );
   }
 
   if (loading || !otherUser) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-cmo-text-secondary">Loading conversation...</p>
+      <div className="min-h-screen bg-cmo-bg-main">
+        <Header />
+        <div className="flex items-center justify-center h-96">
+          <p className="text-cmo-text-secondary">Loading conversation...</p>
+        </div>
+        {isMobile && <MobileNavigation />}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <ChatHeader otherUser={otherUser} />
+    <div className="min-h-screen bg-cmo-bg-main">
+      <Header />
       
-      <MessageList
-        messages={messages}
-        loading={messagesLoading}
-        hasMore={hasMore}
-        otherUser={otherUser}
-        onLoadMore={loadMoreMessages}
-      />
+      <div className="max-w-4xl mx-auto">
+        <div className="flex flex-col h-[calc(100vh-4rem)] bg-white dark:bg-gray-900 border border-cmo-border rounded-lg m-4">
+          <ChatHeader otherUser={otherUser} />
+          
+          <MessageList
+            messages={messages}
+            loading={messagesLoading}
+            hasMore={hasMore}
+            otherUser={otherUser}
+            onLoadMore={loadMoreMessages}
+          />
+          
+          <MessageInput
+            onSendMessage={sendMessage}
+            onSendMedia={sendMediaMessage}
+          />
+        </div>
+      </div>
       
-      <MessageInput
-        onSendMessage={sendMessage}
-        onSendMedia={sendMediaMessage}
-      />
+      {isMobile && <MobileNavigation />}
     </div>
   );
 };

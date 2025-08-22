@@ -7,6 +7,7 @@ export interface UserProfile {
   email: string;
   firstName: string;
   lastName: string;
+  username?: string;
   hasBasicInfo: boolean;
   verified: boolean;
   phoneNumber?: string;
@@ -173,6 +174,43 @@ class UserApiService {
   clearCache(): void {
     this.userCache = null;
     this.cacheTimestamp = null;
+  }
+
+  async getUserByUsername(username: string): Promise<UserProfile> {
+    try {
+      const headers = await this.getAuthHeaders();
+      
+      const response = await fetch(`${API_BASE_URL}/users/username/${username}`, {
+        method: 'GET',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+        mode: 'cors',
+        credentials: 'omit',
+      });
+
+      if (response.status === 401) {
+        throw new Error('AUTH_EXPIRED');
+      }
+
+      if (response.status === 404) {
+        throw new Error('USER_NOT_FOUND');
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user: ${response.status} ${response.statusText}`);
+      }
+
+      const userData: UserProfile = await response.json();
+      return userData;
+    } catch (error: any) {
+      if (error.message === 'AUTH_EXPIRED' || error.message === 'USER_NOT_FOUND') {
+        throw error;
+      }
+      console.error('Error fetching user by username:', error);
+      throw new Error('Failed to fetch user profile');
+    }
   }
 }
 

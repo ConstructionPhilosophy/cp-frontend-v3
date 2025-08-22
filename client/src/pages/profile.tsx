@@ -14,6 +14,9 @@ import {
 import Header from '../components/layout/header';
 import { useAuth } from '../contexts/AuthContext';
 import { userApiService, UserProfile } from '../lib/userApi';
+import { useCreateConversation } from '../hooks/useChat';
+import { useLocation } from 'wouter';
+import { useToast } from '../hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { 
   MapPin, 
@@ -113,8 +116,37 @@ export default function ProfilePage() {
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { user, userProfile } = useAuth();
+  const { createConversation } = useCreateConversation();
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
 
   const filters = ['All', 'News', 'Posts', 'Articles', 'Videos', 'Jobs'];
+
+  const handleSendMessage = async () => {
+    if (!profileData || !user) return;
+    
+    // Don't allow messaging yourself
+    if (user.uid === profileData.uid) {
+      toast({
+        title: "Cannot message yourself",
+        description: "You cannot send a message to yourself.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    try {
+      const conversationId = await createConversation(profileData.uid);
+      setLocation(`/chat/${conversationId}`);
+    } catch (error) {
+      console.error('Error creating conversation:', error);
+      toast({
+        title: "Failed to start conversation",
+        description: "Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -264,7 +296,12 @@ export default function ProfilePage() {
                       
                       {/* Action Buttons */}
                       <div className="flex items-center gap-3 flex-shrink-0">
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={handleSendMessage}
+                          disabled={!profileData || user?.uid === profileData?.uid}
+                        >
                           <MessageSquare className="w-4 h-4 mr-2" />
                           Message
                         </Button>

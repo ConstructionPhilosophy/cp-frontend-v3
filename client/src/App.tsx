@@ -15,6 +15,7 @@ import { BasicInfoPage } from "./pages/basic-info";
 import { SecurityDashboard } from "./pages/security-dashboard-simple";
 import { MessagesPage } from "./pages/messages";
 import { ChatPage } from "./pages/chat";
+import UserProfilePage from "./pages/user-profile";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
@@ -110,6 +111,14 @@ function App() {
             component={() => (
               <ProtectedRoute>
                 <ChatPage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/u/:username"
+            component={() => (
+              <ProtectedRoute>
+                <UserProfilePage />
               </ProtectedRoute>
             )}
           />
