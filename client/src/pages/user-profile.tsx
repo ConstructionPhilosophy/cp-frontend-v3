@@ -5,6 +5,7 @@ import { Badge } from '../components/ui/badge';
 import { Card, CardContent } from '../components/ui/card';
 import { Separator } from '../components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
+import { Textarea } from '../components/ui/textarea';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -50,11 +51,20 @@ const mockEducation = [
   {
     id: "edu1",
     degree: "MBA",
-    fieldOfStudy: "Marketing & Business Strategy", 
+    fieldOfStudy: "Marketing & Business Strategy",
     schoolOrCollege: "Oxford International",
     startDate: "2008-09-01",
     endDate: "2010-06-30",
     grade: "Distinction"
+  },
+  {
+    id: "edu2",
+    degree: "B.A.",
+    fieldOfStudy: "Business Administration",
+    schoolOrCollege: "Stanford University",
+    startDate: "2003-09-01",
+    endDate: "2007-05-31",
+    grade: "Magna Cum Laude"
   }
 ];
 
@@ -67,6 +77,15 @@ const mockExperience = [
     startDate: "2020-01-01",
     endDate: null,
     description: "Leading global marketing strategy and brand management for digital transformation initiatives."
+  },
+  {
+    id: "exp2", 
+    company: "Blue Chip CPG",
+    role: "Senior Brand Manager",
+    location: "New York, NY",
+    startDate: "2015-03-01",
+    endDate: "2019-12-31",
+    description: "Managed multi-million dollar brand portfolios and launched successful product campaigns."
   }
 ];
 
@@ -74,17 +93,28 @@ const mockActivities = [
   {
     id: "1",
     type: "question",
-    title: "Looking for advice on digital marketing strategies for SaaS companies",
-    content: "We have a $2M ARR B2B startup and looking to scale our marketing efforts. Any recommendations?",
+    title: "Do you have any experience with deploying @Hubspot for a SaaS business with both a direct and self-serve model?",
+    content: "We have a $2M ARR B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith... See more",
     timestamp: "Nov 19",
     category: "Questions & Answers",
     engagement: { comments: 1, thanks: 5, insightful: 2 }
+  },
+  {
+    id: "2",
+    type: "article",
+    title: "Looking for a new landing page optimization vendor",
+    content: "We are looking for a landing page tool that they are missing a minimal with a custom solution that no... See more",
+    timestamp: "Nov 12",
+    category: "#Inbound #SaaS",
+    engagement: { comments: 1, thanks: 15, insightful: 6 }
   }
 ];
 
 export default function UserProfilePage() {
   const [match, params] = useRoute('/u/:username');
   const [activeFilter, setActiveFilter] = useState('All');
+  const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
+  const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -132,22 +162,56 @@ export default function UserProfilePage() {
     try {
       const conversationId = await createConversation(profileData.uid);
       setLocation(`/chat/${conversationId}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating conversation:', error);
-      toast({
-        title: "Failed to start conversation",
-        description: "Please try again.",
-        variant: "destructive",
-      });
+      
+      // Handle Firebase permission errors more gracefully
+      if (error.message?.includes('permissions') || error.message?.includes('PERMISSION_DENIED')) {
+        toast({
+          title: "Chat feature not available",
+          description: "Chat functionality is being set up. Please try again later.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Failed to start conversation",
+          description: "Please try again later.",
+          variant: "destructive",
+        });
+      }
     }
+  };
+
+  const toggleComments = (postId: string) => {
+    setExpandedComments(prev => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
+  };
+
+  const handleCommentChange = (postId: string, text: string) => {
+    setCommentText(prev => ({
+      ...prev,
+      [postId]: text
+    }));
+  };
+
+  const handleSubmitComment = (postId: string) => {
+    console.log(`Comment for post ${postId}:`, commentText[postId]);
+    setCommentText(prev => ({
+      ...prev,
+      [postId]: ''
+    }));
   };
 
   if (!match || !username) {
     return (
-      <div className="min-h-screen bg-cmo-bg-main">
+      <div className="min-h-screen bg-cmo-bg">
         <Header />
-        <div className="flex items-center justify-center h-96">
-          <p className="text-cmo-text-secondary">Invalid profile URL</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">
+            <p className="text-cmo-text-secondary">Invalid profile URL</p>
+          </div>
         </div>
         {isMobile && <MobileNavigation />}
       </div>
@@ -156,10 +220,12 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-cmo-bg-main">
+      <div className="min-h-screen bg-cmo-bg">
         <Header />
-        <div className="flex items-center justify-center h-96">
-          <Loader2 className="w-8 h-8 animate-spin text-cmo-primary" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex items-center justify-center h-64">
+            <Loader2 className="w-8 h-8 animate-spin text-cmo-primary" />
+          </div>
         </div>
         {isMobile && <MobileNavigation />}
       </div>
@@ -168,9 +234,9 @@ export default function UserProfilePage() {
 
   if (error || !profileData) {
     return (
-      <div className="min-h-screen bg-cmo-bg-main">
+      <div className="min-h-screen bg-cmo-bg">
         <Header />
-        <div className="flex items-center justify-center h-96">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <p className="text-cmo-text-secondary text-lg mb-2">{error || 'User not found'}</p>
             <Button variant="outline" onClick={() => setLocation('/')}>
@@ -186,204 +252,358 @@ export default function UserProfilePage() {
   const isOwnProfile = user?.uid === profileData.uid;
 
   return (
-    <div className="min-h-screen bg-cmo-bg-main">
+    <div className="min-h-screen bg-cmo-bg">
       <Header />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-6">
-          
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-8">
-            {/* Profile Header */}
-            <Card className="mb-6">
-              <CardContent className="p-0">
-                {/* Banner */}
-                <div className="h-32 sm:h-48 bg-gradient-to-r from-blue-500 to-purple-600 rounded-t-lg relative">
-                  {(profileData.bannerUrl || profileData.bannerPic) && (
-                    <img 
-                      src={profileData.bannerUrl || profileData.bannerPic} 
-                      alt="Banner" 
-                      className="w-full h-full object-cover rounded-t-lg"
-                    />
-                  )}
-                </div>
-                
-                {/* Profile Info */}
-                <div className="p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between -mt-16 sm:-mt-20">
-                    <div className="flex flex-col sm:flex-row sm:items-end space-y-4 sm:space-y-0 sm:space-x-4">
-                      <Avatar className="w-24 h-24 sm:w-32 sm:h-32 border-4 border-white shadow-lg">
-                        <AvatarImage src={profileData.photoUrl || profileData.profilePic || ""} />
-                        <AvatarFallback className="text-2xl">
-                          {profileData.firstName?.[0]}{profileData.lastName?.[0]}
-                        </AvatarFallback>
-                      </Avatar>
-                      
-                      <div className="flex-1">
-                        <h1 className="text-2xl sm:text-3xl font-bold text-cmo-text-primary">
-                          {profileData.firstName} {profileData.lastName}
-                        </h1>
-                        {profileData.username && (
-                          <p className="text-cmo-text-secondary">@{profileData.username}</p>
-                        )}
-                        {profileData.title && (
-                          <p className="text-lg text-cmo-text-secondary mt-1">{profileData.title}</p>
-                        )}
-                        <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-cmo-text-secondary">
-                          {profileData.city && profileData.country && (
-                            <div className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
-                              <span>
-                                {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            <span>500+ connections</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {!isOwnProfile && (
-                      <div className="flex items-center gap-3 flex-shrink-0 mt-4 sm:mt-0">
-                        <Button variant="outline" size="sm" onClick={handleSendMessage}>
-                          <MessageSquare className="w-4 h-4 mr-2" />
-                          Message
-                        </Button>
-                        <Button className="bg-cmo-primary hover:bg-cmo-primary/90">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Follow
-                        </Button>
-                      </div>
-                    )}
+          <div className="lg:col-span-3">
+            {/* Banner and Profile Section */}
+            <Card className="mb-6 overflow-hidden">
+              <div 
+                className="h-48 bg-gradient-to-r from-blue-500 to-purple-600"
+                style={{
+                  backgroundImage: profileData.bannerUrl ? `url(${profileData.bannerUrl})` : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center'
+                }}
+              />
+              
+              <CardContent className="relative p-6">
+                {/* Profile Info Section */}
+                <div className="flex flex-col sm:flex-row gap-6 pt-4">
+                  {/* Avatar */}
+                  <div className="flex-shrink-0">
+                    <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
+                      <AvatarImage src={profileData.photoUrl || profileData.profilePic || ""} />
+                      <AvatarFallback className="text-2xl">
+                        {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
+                      </AvatarFallback>
+                    </Avatar>
                   </div>
                   
-                  {/* Bio */}
-                  <div className="mt-6">
-                    <p className="text-cmo-text-primary">
-                      {profileData.positionDesignation || "Passionate professional in the construction and civil engineering industry."}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Activity Feed */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-cmo-text-primary">Activity</h2>
-                  <div className="flex items-center space-x-2">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm">
-                          <Filter className="w-4 h-4 mr-2" />
-                          {activeFilter}
-                          <ChevronDown className="w-4 h-4 ml-2" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        {filters.map((filter) => (
-                          <DropdownMenuItem 
-                            key={filter}
-                            onClick={() => setActiveFilter(filter)}
+                  {/* Profile Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h1 className="text-3xl font-bold text-cmo-text-primary truncate">
+                          {profileData.firstName || ''} {profileData.lastName || ''}
+                        </h1>
+                        <p className="text-lg text-cmo-text-secondary mb-3">
+                          {profileData.title || profileData.positionDesignation || 'Professional'}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-cmo-text-secondary">
+                          <span className="flex items-center gap-1">
+                            <Mail className="w-4 h-4" />
+                            {profileData.email}
+                          </span>
+                          {profileData.phoneNumber && (
+                            <span className="flex items-center gap-1">
+                              <Phone className="w-4 h-4" />
+                              {profileData.phoneNumber}
+                            </span>
+                          )}
+                          {profileData.city && profileData.country && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-4 h-4" />
+                              {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* Action Buttons */}
+                      {!isOwnProfile && (
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={handleSendMessage}
                           >
-                            {filter}
-                          </DropdownMenuItem>
-                        ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-
-                <div className="space-y-6">
-                  {mockActivities.length === 0 ? (
-                    <div className="text-center py-12">
-                      <FileText className="w-12 h-12 text-cmo-text-secondary mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-cmo-text-primary mb-2">No activity yet</h3>
-                      <p className="text-cmo-text-secondary">
-                        {profileData.firstName} hasn't shared any posts or activities recently.
-                      </p>
-                    </div>
-                  ) : (
-                    mockActivities.map((activity) => (
-                      <div key={activity.id} className="border-b border-cmo-border pb-6 last:border-b-0">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex items-center space-x-2">
-                            <Badge variant="secondary" className="text-xs">
-                              {activity.category}
-                            </Badge>
-                            <span className="text-sm text-cmo-text-secondary">{activity.timestamp}</span>
-                          </div>
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Message
+                          </Button>
+                          <Button className="bg-cmo-primary hover:bg-cmo-primary/90">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Follow
+                          </Button>
                           
+                          {/* Three Dots Menu */}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm">
+                              <Button variant="outline" size="icon">
                                 <MoreHorizontal className="w-4 h-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent>
+                            <DropdownMenuContent align="end">
                               <DropdownMenuItem>
-                                <Bookmark className="w-4 h-4 mr-2" />
-                                Save post
+                                <Flag className="mr-2 h-4 w-4" />
+                                <span>Report</span>
                               </DropdownMenuItem>
                               <DropdownMenuItem>
-                                <Share className="w-4 h-4 mr-2" />
-                                Share
-                              </DropdownMenuItem>
-                              <DropdownMenuItem>
-                                <Flag className="w-4 h-4 mr-2" />
-                                Report
+                                <Share className="mr-2 h-4 w-4" />
+                                <span>Share</span>
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                        
-                        <h3 className="font-semibold text-cmo-text-primary mb-2">
-                          {activity.title}
-                        </h3>
-                        
-                        <p className="text-cmo-text-secondary mb-4">
-                          {activity.content}
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* About Section */}
+                {profileData.positionDesignation && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold mb-3">About</h3>
+                    <p className="text-cmo-text-secondary leading-relaxed">
+                      {profileData.positionDesignation}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Education Section */}
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                    Education
+                  </h3>
+                </div>
+                <div className="space-y-6">
+                  {mockEducation.map((edu) => (
+                    <div key={edu.id} className="flex gap-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-lg">{edu.degree}</h4>
+                        <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
+                        <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
+                        <p className="text-sm text-cmo-text-secondary mt-1">
+                          {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
+                          {edu.grade && ` • ${edu.grade}`}
                         </p>
-                        
-                        <div className="flex items-center space-x-4 text-sm text-cmo-text-secondary">
-                          <Button variant="ghost" size="sm">
-                            <ThumbsUp className="w-4 h-4 mr-1" />
-                            Thanks {activity.engagement.thanks}
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <MessageSquare className="w-4 h-4 mr-1" />
-                            {activity.engagement.comments} comments
-                          </Button>
-                          <Button variant="ghost" size="sm">
-                            <Star className="w-4 h-4 mr-1" />
-                            Insightful {activity.engagement.insightful}
-                          </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Experience Section */}
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <Briefcase className="w-6 h-6 text-cmo-primary" />
+                    Experience
+                  </h3>
+                </div>
+                <div className="space-y-6">
+                  {mockExperience.map((exp) => (
+                    <div key={exp.id} className="flex gap-4">
+                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Briefcase className="w-6 h-6 text-cmo-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-lg">{exp.role}</h4>
+                        <p className="text-cmo-primary font-medium">{exp.company}</p>
+                        <p className="text-cmo-text-secondary flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          {exp.location}
+                        </p>
+                        <p className="text-sm text-cmo-text-secondary mt-1">
+                          {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
+                        </p>
+                        <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* User Activities */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold">Activities</h3>
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm">
+                      <Filter className="w-4 h-4 mr-2" />
+                      Filter
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Activity Filters */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {filters.map((filter) => (
+                    <Button
+                      key={filter}
+                      variant={activeFilter === filter ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setActiveFilter(filter)}
+                      className={activeFilter === filter ? "bg-cmo-primary" : ""}
+                    >
+                      {filter}
+                    </Button>
+                  ))}
+                </div>
+
+                {/* Activity Feed */}
+                <div className="space-y-6">
+                  {mockActivities.map((activity) => (
+                    <div key={activity.id} className="border-b border-cmo-border pb-6 last:border-b-0">
+                      <div className="flex gap-3">
+                        <Avatar className="w-12 h-12">
+                          <AvatarImage src={profileData.photoUrl || profileData.profilePic || ""} />
+                          <AvatarFallback>
+                            {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h4 className="font-medium text-cmo-text-primary">{activity.title}</h4>
+                              <div className="flex items-center gap-2 text-sm text-cmo-text-secondary mt-1">
+                                <span>{profileData.firstName || ''} {profileData.lastName || ''}</span>
+                                <span>•</span>
+                                <span>{activity.timestamp}</span>
+                                <Badge variant="secondary" className="text-xs">
+                                  {activity.category}
+                                </Badge>
+                              </div>
+                            </div>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Flag className="mr-2 h-4 w-4" />
+                                  <span>Report</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  <Share className="mr-2 h-4 w-4" />
+                                  <span>Share</span>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                          <p className="text-cmo-text-secondary mt-3">{activity.content}</p>
+                          
+                          {/* Engagement Actions */}
+                          <div className="flex items-center gap-6 mt-4">
+                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                              <ThumbsUp className="w-4 h-4 mr-1" />
+                              Thanks {activity.engagement.thanks}
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                              onClick={() => toggleComments(activity.id)}
+                            >
+                              <MessageSquare className="w-4 h-4 mr-1" />
+                              {activity.engagement.comments} comments
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                              <Star className="w-4 h-4 mr-1" />
+                              Insightful {activity.engagement.insightful}
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                              <Share className="w-4 h-4 mr-1" />
+                              Share
+                            </Button>
+                          </div>
+
+                          {/* Comments Section */}
+                          {expandedComments[activity.id] && (
+                            <div className="mt-4 pt-4 border-t border-cmo-border">
+                              <div className="flex gap-3">
+                                <Avatar className="w-8 h-8">
+                                  <AvatarImage src={userProfile?.profilePic || ""} />
+                                  <AvatarFallback>
+                                    {userProfile?.firstName?.charAt(0) || 'U'}{userProfile?.lastName?.charAt(0) || ''}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="flex-1">
+                                  <Textarea
+                                    placeholder="Write a comment..."
+                                    value={commentText[activity.id] || ''}
+                                    onChange={(e) => handleCommentChange(activity.id, e.target.value)}
+                                    className="min-h-[80px] resize-none"
+                                  />
+                                  <div className="flex justify-end gap-2 mt-2">
+                                    <Button variant="outline" size="sm" onClick={() => toggleComments(activity.id)}>
+                                      Cancel
+                                    </Button>
+                                    <Button 
+                                      size="sm" 
+                                      onClick={() => handleSubmitComment(activity.id)}
+                                      disabled={!commentText[activity.id]?.trim()}
+                                    >
+                                      <Send className="w-4 h-4 mr-1" />
+                                      Comment
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    ))
-                  )}
+                    </div>
+                  ))}
                 </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-4 mt-6 lg:mt-0">
-            {/* About Section */}
+          <div className="lg:col-span-1">
+            {/* Quick Stats */}
             <Card className="mb-6">
               <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">About</h3>
+                <h3 className="font-semibold text-cmo-text-primary mb-4">Profile Stats</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span className="text-cmo-text-secondary">Posts:</span>
+                    <span className="font-semibold">24</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-cmo-text-secondary">Views:</span>
+                    <span className="font-semibold">1.2k</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-cmo-text-secondary">Thanks:</span>
+                    <span className="font-semibold">156</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-cmo-text-secondary">Followers:</span>
+                    <span className="font-semibold">500+</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Contact Info */}
+            <Card>
+              <CardContent className="p-6">
+                <h3 className="font-semibold text-cmo-text-primary mb-4">Contact Information</h3>
                 <div className="space-y-3 text-sm">
-                  {profileData.email && (
-                    <div className="flex items-center space-x-2">
-                      <Mail className="w-4 h-4 text-cmo-text-secondary" />
-                      <span>{profileData.email}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center space-x-2">
+                    <Mail className="w-4 h-4 text-cmo-text-secondary" />
+                    <span>{profileData.email}</span>
+                  </div>
                   {profileData.phoneNumber && (
                     <div className="flex items-center space-x-2">
                       <Phone className="w-4 h-4 text-cmo-text-secondary" />
@@ -398,48 +618,6 @@ export default function UserProfilePage() {
                       </span>
                     </div>
                   )}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Experience Section */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">Experience</h3>
-                <div className="space-y-4">
-                  {mockExperience.map((exp) => (
-                    <div key={exp.id} className="flex items-start space-x-3">
-                      <div className="w-10 h-10 bg-cmo-primary/10 rounded-lg flex items-center justify-center">
-                        <Briefcase className="w-5 h-5 text-cmo-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-cmo-text-primary">{exp.role}</h4>
-                        <p className="text-sm text-cmo-text-secondary">{exp.company}</p>
-                        <p className="text-xs text-cmo-text-secondary mt-1">{exp.location}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Education Section */}
-            <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">Education</h3>
-                <div className="space-y-4">
-                  {mockEducation.map((edu) => (
-                    <div key={edu.id} className="flex items-start space-x-3">
-                      <div className="w-10 h-10 bg-cmo-primary/10 rounded-lg flex items-center justify-center">
-                        <GraduationCap className="w-5 h-5 text-cmo-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-cmo-text-primary">{edu.degree}</h4>
-                        <p className="text-sm text-cmo-text-secondary">{edu.fieldOfStudy}</p>
-                        <p className="text-sm text-cmo-text-secondary">{edu.schoolOrCollege}</p>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </CardContent>
             </Card>
