@@ -123,7 +123,7 @@ export const MessagesPage: React.FC = () => {
         </Dialog>
       </div>
 
-      <div className="bg-white dark:bg-gray-900 rounded-lg border border-cmo-border">
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-cmo-border min-h-[400px]">
         {loading ? (
           <div className="p-8 text-center">
             <p className="text-cmo-text-secondary">Loading conversations...</p>

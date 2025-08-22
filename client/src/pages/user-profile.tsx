@@ -118,6 +118,9 @@ export default function UserProfilePage() {
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [followLoading, setFollowLoading] = useState<boolean>(false);
+  const [showContactInfo, setShowContactInfo] = useState<boolean>(false);
   const { user, userProfile } = useAuth();
   const { createConversation } = useCreateConversation();
   const [, setLocation] = useLocation();
@@ -179,6 +182,38 @@ export default function UserProfilePage() {
           variant: "destructive",
         });
       }
+    }
+  };
+
+  const handleFollowToggle = async () => {
+    if (!profileData || !user || followLoading) return;
+    
+    setFollowLoading(true);
+    try {
+      if (isFollowing) {
+        await userApiService.unfollowUser(profileData.uid);
+        setIsFollowing(false);
+        toast({
+          title: "Unfollowed",
+          description: `You are no longer following ${profileData.firstName} ${profileData.lastName}`,
+        });
+      } else {
+        await userApiService.followUser(profileData.uid);
+        setIsFollowing(true);
+        toast({
+          title: "Following",
+          description: `You are now following ${profileData.firstName} ${profileData.lastName}`,
+        });
+      }
+    } catch (error: any) {
+      console.error('Error toggling follow:', error);
+      toast({
+        title: "Failed to update follow status",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setFollowLoading(false);
     }
   };
 
@@ -290,26 +325,20 @@ export default function UserProfilePage() {
                         <h1 className="text-3xl font-bold text-cmo-text-primary truncate">
                           {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
-                        <p className="text-lg text-cmo-text-secondary mb-3">
+                        <p className="text-lg text-cmo-text-secondary mb-2">
                           {profileData.title || profileData.positionDesignation || 'Professional'}
                         </p>
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-cmo-text-secondary">
-                          <span className="flex items-center gap-1">
-                            <Mail className="w-4 h-4" />
-                            {profileData.email}
-                          </span>
-                          {profileData.phoneNumber && (
-                            <span className="flex items-center gap-1">
-                              <Phone className="w-4 h-4" />
-                              {profileData.phoneNumber}
-                            </span>
-                          )}
-                          {profileData.city && profileData.country && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
+                        {profileData.city && profileData.country && (
+                          <div className="flex items-center gap-1 text-sm text-cmo-text-secondary mb-3">
+                            <MapPin className="w-4 h-4" />
+                            <span>
                               {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
                             </span>
-                          )}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1 text-sm text-cmo-text-secondary">
+                          <Users className="w-4 h-4" />
+                          <span>500+ connections</span>
                         </div>
                       </div>
                       
@@ -324,9 +353,19 @@ export default function UserProfilePage() {
                             <MessageSquare className="w-4 h-4 mr-2" />
                             Message
                           </Button>
-                          <Button className="bg-cmo-primary hover:bg-cmo-primary/90">
-                            <Plus className="w-4 h-4 mr-2" />
-                            Follow
+                          <Button 
+                            className={isFollowing ? "bg-gray-500 hover:bg-gray-600" : "bg-cmo-primary hover:bg-cmo-primary/90"}
+                            onClick={handleFollowToggle}
+                            disabled={followLoading}
+                          >
+                            {followLoading ? (
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            ) : isFollowing ? (
+                              <User className="w-4 h-4 mr-2" />
+                            ) : (
+                              <Plus className="w-4 h-4 mr-2" />
+                            )}
+                            {isFollowing ? 'Following' : 'Follow'}
                           </Button>
                           
                           {/* Three Dots Menu */}
@@ -354,14 +393,12 @@ export default function UserProfilePage() {
                 </div>
 
                 {/* About Section */}
-                {profileData.positionDesignation && (
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-3">About</h3>
-                    <p className="text-cmo-text-secondary leading-relaxed">
-                      {profileData.positionDesignation}
-                    </p>
-                  </div>
-                )}
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-3">About</h3>
+                  <p className="text-cmo-text-secondary leading-relaxed">
+                    {profileData.positionDesignation || 'Professional with expertise in the construction and civil engineering industry.'}
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
@@ -598,27 +635,45 @@ export default function UserProfilePage() {
             {/* Contact Info */}
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">Contact Information</h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center space-x-2">
-                    <Mail className="w-4 h-4 text-cmo-text-secondary" />
-                    <span>{profileData.email}</span>
-                  </div>
-                  {profileData.phoneNumber && (
-                    <div className="flex items-center space-x-2">
-                      <Phone className="w-4 h-4 text-cmo-text-secondary" />
-                      <span>{profileData.phoneNumber}</span>
-                    </div>
-                  )}
-                  {profileData.city && profileData.country && (
-                    <div className="flex items-center space-x-2">
-                      <MapPin className="w-4 h-4 text-cmo-text-secondary" />
-                      <span>
-                        {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
-                      </span>
-                    </div>
-                  )}
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="font-semibold text-cmo-text-primary">Contact Information</h3>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => setShowContactInfo(!showContactInfo)}
+                  >
+                    {showContactInfo ? 'Hide' : 'Show'}
+                  </Button>
                 </div>
+                
+                {showContactInfo && (
+                  <div className="space-y-3 text-sm">
+                    <div className="flex items-center space-x-2">
+                      <Mail className="w-4 h-4 text-cmo-text-secondary" />
+                      <span>{profileData.email}</span>
+                    </div>
+                    {profileData.phoneNumber && (
+                      <div className="flex items-center space-x-2">
+                        <Phone className="w-4 h-4 text-cmo-text-secondary" />
+                        <span>{profileData.phoneNumber}</span>
+                      </div>
+                    )}
+                    {profileData.city && profileData.country && (
+                      <div className="flex items-center space-x-2">
+                        <MapPin className="w-4 h-4 text-cmo-text-secondary" />
+                        <span>
+                          {profileData.city}, {typeof profileData.country === 'string' ? profileData.country : profileData.country.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {!showContactInfo && (
+                  <p className="text-sm text-cmo-text-secondary">
+                    Click "Show" to view contact details
+                  </p>
+                )}
               </CardContent>
             </Card>
           </div>

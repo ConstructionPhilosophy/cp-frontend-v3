@@ -258,6 +258,62 @@ class UserApiService {
       throw new Error('Failed to search users');
     }
   }
+
+  async followUser(targetUid: string): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+      
+      const response = await fetch(`${API_BASE_URL}/users/follow?targetUid=${targetUid}`, {
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 401) {
+        throw new Error('AUTH_EXPIRED');
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to follow user: ${response.status} ${response.statusText}`);
+      }
+    } catch (error: any) {
+      if (error.message === 'AUTH_EXPIRED') {
+        throw error;
+      }
+      console.error('Error following user:', error);
+      throw new Error('Failed to follow user');
+    }
+  }
+
+  async unfollowUser(targetUid: string): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+      
+      const response = await fetch(`${API_BASE_URL}/users/unfollow?targetUid=${targetUid}`, {
+        method: 'POST',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 401) {
+        throw new Error('AUTH_EXPIRED');
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to unfollow user: ${response.status} ${response.statusText}`);
+      }
+    } catch (error: any) {
+      if (error.message === 'AUTH_EXPIRED') {
+        throw error;
+      }
+      console.error('Error unfollowing user:', error);
+      throw new Error('Failed to unfollow user');
+    }
+  }
 }
 
 export const userApiService = new UserApiService();
