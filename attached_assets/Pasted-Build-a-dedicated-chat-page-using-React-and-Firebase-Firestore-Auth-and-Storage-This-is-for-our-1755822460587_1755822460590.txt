@@ -1,0 +1,55 @@
+Build a dedicated chat page using React and Firebase (Firestore, Auth, and Storage). This is for our current project where chat is an optional feature. Avoid floating chat windows or heavy chat UI. Link the page with the messages menu.
+
+✅ Requirements:
+- Only authenticated users (via Firebase Auth) can use the chat.
+- Each chat is between two users (1-to-1 messaging).
+- Any user can message any other user.
+- Use Firebase Firestore for chat data, and Firebase Storage for media uploads.
+- Display only the last 20–30 messages initially.
+- As the user scrolls up, load older messages (pagination).
+- Display real-time incoming messages using Firestore `onSnapshot`.
+
+✅ Firestore Structure:
+- `conversations` (collection)
+  - `{conversationId}` (document)
+    - `participants`: [uid1, uid2]
+    - `lastMessage`: string
+    - `lastMessageTime`: timestamp
+    - `updatedBy`: uid
+
+- `messages` (subcollection under each conversation)
+  - `{messageId}` (document)
+    - `senderId`: uid
+    - `text`: string (optional)
+    - `mediaUrl`: string (optional)
+    - `type`: "text" | "image" | "video"
+    - `timestamp`: timestamp
+    - `status`: "sent" | "seen"
+
+✅ Components to build:
+1. `ChatPage`: Dedicated route like `/chat/:conversationId`
+2. `ChatHeader`: Show the name and profile picture of the other user
+3. `MessageList`: Paginated message list, newest at bottom, lazy loads older messages
+4. `MessageBubble`: Shows a single message (text/media)
+5. `MessageInput`: Text input + media upload, sends message on Enter or send button
+
+✅ Features:
+- Use Firestore `onSnapshot` for real-time updates.
+- Use `startAfter()` and `limit()` for lazy loading older messages.
+- Scroll to bottom on new message.
+- Use `firebase.auth().currentUser.uid` to get current user.
+- Show media (image/video) if present in the message.
+- Allow file upload and store in Firebase Storage.
+- Display timestamps and sender alignment (left/right bubble).
+- Use modular Firebase SDK (v9+) and hooks.
+
+✅ Firestore Security Rules:
+```js
+match /conversations/{conversationId} {
+  allow read, write: if request.auth != null &&
+    request.auth.uid in resource.data.participants;
+}
+match /conversations/{conversationId}/messages/{messageId} {
+  allow read, write: if request.auth != null &&
+    request.auth.uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+}
