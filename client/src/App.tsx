@@ -13,6 +13,8 @@ import { ResetPasswordPage } from "./pages/reset-password";
 import { PasswordResetSuccessPage } from "./pages/password-reset-success";
 import { BasicInfoPage } from "./pages/basic-info";
 import { SecurityDashboard } from "./pages/security-dashboard-simple";
+import { MessagesPage } from "./pages/messages";
+import { ChatPage } from "./pages/chat";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
@@ -92,6 +94,22 @@ function App() {
             component={() => (
               <ProtectedRoute>
                 <SecurityDashboard />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/messages"
+            component={() => (
+              <ProtectedRoute>
+                <MessagesPage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/chat/:conversationId"
+            component={() => (
+              <ProtectedRoute>
+                <ChatPage />
               </ProtectedRoute>
             )}
           />

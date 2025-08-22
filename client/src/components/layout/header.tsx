@@ -114,7 +114,7 @@ export default function Header() {
               onClick={handleProfileClick}
             >
               <Avatar className="w-8 h-8">
-                <AvatarImage src={userProfile?.photoUrl || userProfile?.profilePic || ""} />
+                <AvatarImage src={userProfile?.profilePic || ""} />
                 <AvatarFallback>
                   {userProfile?.firstName?.charAt(0) || 'U'}{userProfile?.lastName?.charAt(0) || ''}
                 </AvatarFallback>
