@@ -36,7 +36,9 @@ import {
   Send,
   Calendar,
   GraduationCap,
-  Briefcase
+  Briefcase,
+  User,
+  FileText
 } from 'lucide-react';
 
 
