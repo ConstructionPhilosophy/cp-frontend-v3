@@ -8,12 +8,16 @@ interface MessageInputProps {
   onSendMessage: (text: string) => Promise<void>;
   onSendMedia: (file: File, type: 'image' | 'video') => Promise<void>;
   disabled?: boolean;
+  isBlocked?: boolean;
+  blockMessage?: string;
 }
 
 export const MessageInput: React.FC<MessageInputProps> = ({
   onSendMessage,
   onSendMedia,
-  disabled = false
+  disabled = false,
+  isBlocked = false,
+  blockMessage = "Messaging is disabled"
 }) => {
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
@@ -22,7 +26,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!text.trim() || sending || disabled) return;
+    if (!text.trim() || sending || disabled || isBlocked) return;
 
     setSending(true);
     try {
@@ -120,7 +124,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
               onChange={(e) => setText(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="Type a message..."
-              disabled={disabled || sending}
+              disabled={disabled || sending || isBlocked}
               className="pr-20 min-h-[40px] max-h-32 resize-none"
               rows={1}
             />
@@ -139,7 +143,7 @@ export const MessageInput: React.FC<MessageInputProps> = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
-                disabled={disabled || sending}
+                disabled={disabled || sending || isBlocked}
                 className="h-8 w-8 p-0 text-cmo-text-secondary hover:text-cmo-primary"
               >
                 <Paperclip className="w-4 h-4" />
@@ -150,12 +154,18 @@ export const MessageInput: React.FC<MessageInputProps> = ({
         
         <Button 
           type="submit" 
-          disabled={!text.trim() || disabled || sending}
+          disabled={!text.trim() || disabled || sending || isBlocked}
           className="h-10 w-10 p-0"
         >
           <Send className="w-4 h-4" />
         </Button>
       </form>
+      
+      {isBlocked && (
+        <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-600 text-center">{blockMessage}</p>
+        </div>
+      )}
     </div>
   );
 };

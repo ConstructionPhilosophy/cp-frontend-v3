@@ -5,7 +5,7 @@ import MobileNavigation from '../components/mobile-navigation';
 import { useIsMobile } from '../hooks/use-mobile';
 import { MessageSquare, Plus, Search, ArrowLeft } from 'lucide-react';
 import { format } from 'date-fns';
-import { useConversations, useCreateConversation, useChatUsers, useChat } from '../hooks/useChat';
+import { useConversations, useCreateConversation, useChatUsers, useChat, useBlockingStatus } from '../hooks/useChat';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -26,6 +26,7 @@ export const MessagesPage: React.FC = () => {
   const [userProfiles, setUserProfiles] = useState<{ [uid: string]: UserProfile }>({});
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [selectedUser, setSelectedUser] = useState<{ displayName: string; photoURL?: string; isOnline?: boolean } | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showChat, setShowChat] = useState(false); // For mobile view
 
   // Chat hook for the selected conversation
@@ -37,6 +38,9 @@ export const MessagesPage: React.FC = () => {
     sendMediaMessage,
     loadMoreMessages
   } = useChat(selectedConversation?.id);
+
+  // Blocking status for selected user
+  const { isBlockedByMe, isBlockedByThem } = useBlockingStatus(selectedUserId || undefined);
 
 
   // Fetch user profiles for all conversation participants
@@ -103,6 +107,7 @@ export const MessagesPage: React.FC = () => {
     );
     
     if (otherUserId) {
+      setSelectedUserId(otherUserId);
       try {
         const chatUserInfo = await userApiService.getChatUserInfo(otherUserId);
         setSelectedUser({
@@ -173,6 +178,14 @@ export const MessagesPage: React.FC = () => {
             <MessageInput
               onSendMessage={sendMessage}
               onSendMedia={sendMediaMessage}
+              isBlocked={isBlockedByMe || isBlockedByThem}
+              blockMessage={
+                isBlockedByMe 
+                  ? "You blocked this user" 
+                  : isBlockedByThem 
+                  ? "You are blocked by this user" 
+                  : undefined
+              }
             />
           </div>
         </div>
@@ -323,7 +336,7 @@ export const MessagesPage: React.FC = () => {
           <div className="flex-1 flex flex-col">
             {selectedConversation && selectedUser ? (
               <>
-                <ChatHeader otherUser={selectedUser} />
+                <ChatHeader otherUser={selectedUser} otherUserId={selectedUserId || undefined} />
                 
                 <MessageList
                   messages={messages}
@@ -336,6 +349,14 @@ export const MessagesPage: React.FC = () => {
                 <MessageInput
                   onSendMessage={sendMessage}
                   onSendMedia={sendMediaMessage}
+                  isBlocked={isBlockedByMe || isBlockedByThem}
+                  blockMessage={
+                    isBlockedByMe 
+                      ? "You blocked this user" 
+                      : isBlockedByThem 
+                      ? "You are blocked by this user" 
+                      : undefined
+                  }
                 />
               </>
             ) : (

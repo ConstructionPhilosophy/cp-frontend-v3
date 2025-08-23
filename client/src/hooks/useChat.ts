@@ -17,6 +17,7 @@ import {
   getDoc,
   setDoc
 } from 'firebase/firestore';
+import { deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { firestore, storage, auth } from '../lib/firebase';
@@ -261,4 +262,59 @@ export const useChatUsers = () => {
   }, []);
 
   return { users, loading };
+};
+
+// Block/Unblock functionality
+export const useBlockUser = () => {
+  const blockUser = useCallback(async (targetUid: string): Promise<void> => {
+    if (!auth.currentUser) throw new Error('Not authenticated');
+    
+    await setDoc(doc(firestore, 'users', auth.currentUser.uid, 'blockedUsers', targetUid), {
+      blockedAt: serverTimestamp()
+    });
+  }, []);
+
+  const unblockUser = useCallback(async (targetUid: string): Promise<void> => {
+    if (!auth.currentUser) throw new Error('Not authenticated');
+    
+    await deleteDoc(doc(firestore, 'users', auth.currentUser.uid, 'blockedUsers', targetUid));
+  }, []);
+
+  return { blockUser, unblockUser };
+};
+
+// Check blocking status
+export const useBlockingStatus = (otherUserId?: string) => {
+  const [isBlockedByMe, setIsBlockedByMe] = useState(false);
+  const [isBlockedByThem, setIsBlockedByThem] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!auth.currentUser || !otherUserId) {
+      setLoading(false);
+      return;
+    }
+
+    const checkBlockingStatus = async () => {
+      try {
+        // Check if I blocked them
+        const blockedByMeRef = doc(firestore, 'users', auth.currentUser!.uid, 'blockedUsers', otherUserId);
+        const blockedByMeSnap = await getDoc(blockedByMeRef);
+        setIsBlockedByMe(blockedByMeSnap.exists());
+
+        // Check if they blocked me
+        const blockedByThemRef = doc(firestore, 'users', otherUserId, 'blockedUsers', auth.currentUser!.uid);
+        const blockedByThemSnap = await getDoc(blockedByThemRef);
+        setIsBlockedByThem(blockedByThemSnap.exists());
+      } catch (error) {
+        console.error('Error checking blocking status:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkBlockingStatus();
+  }, [otherUserId]);
+
+  return { isBlockedByMe, isBlockedByThem, loading };
 };

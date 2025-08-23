@@ -1,0 +1,51 @@
+Enhance an existing React + Firebase chat application by adding a "block user" feature. The app uses Firebase Authentication and Firestore, and users can already message each other in real time via Firestore collections.
+
+✅ Requirements:
+
+1. **Firestore Structure:**
+- Each user can block other users using a subcollection:
+  users/{uid}/blockedUsers/{targetUid}
+- Each document should contain:
+  {
+    blockedAt: serverTimestamp()
+  }
+
+2. **Block a User:**
+- Implement a `blockUser(targetUid)` function in React
+- It should call:
+  setDoc(doc(db, "users", currentUid, "blockedUsers", targetUid), {
+    blockedAt: serverTimestamp()
+  });
+
+3. **Unblock a User:**
+- Implement `unblockUser(targetUid)` function
+- It should call:
+  deleteDoc(doc(db, "users", currentUid, "blockedUsers", targetUid));
+
+4. **Frontend Checks:**
+- When displaying a chat window, check:
+  - If the **current user has blocked** the other user
+  - If the **other user has blocked** the current user
+- Use these conditions to:
+  - Disable the message input
+  - Show notice: “You blocked this user” or “You are blocked by this user”
+
+5. **Optional Firestore Rules:**
+Update Firestore security rules to prevent users from writing messages if they are blocked by the recipient:
+
+```js
+match /conversations/{conversationId}/messages/{messageId} {
+  allow create: if request.auth != null &&
+    isParticipant(request.auth.uid, conversationId) &&
+    !isBlocked(request.auth.uid, conversationId);
+}
+
+function isParticipant(uid, conversationId) {
+  return uid in get(/databases/$(database)/documents/conversations/$(conversationId)).data.participants;
+}
+
+function isBlocked(senderUid, conversationId) {
+  let convo = get(/databases/$(database)/documents/conversations/$(conversationId)).data;
+  let otherUid = convo.participants[0] == senderUid ? convo.participants[1] : convo.participants[0];
+  return exists(/databases/$(database)/documents/users/$(otherUid)/blockedUsers/$(senderUid));
+}
