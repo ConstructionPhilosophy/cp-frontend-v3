@@ -137,6 +137,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User endpoints for chat fallback
+  app.get("/api/users/:uid", async (req, res) => {
+    try {
+      const { uid } = req.params;
+      
+      // Create a mock user for any Firebase UID  
+      const mockUser = {
+        id: uid,
+        uid: uid,
+        email: `user${uid.slice(0, 8)}@example.com`,
+        firstName: `User`,
+        lastName: uid.slice(0, 8),
+        username: `user_${uid.slice(0, 8)}`,
+        photoUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(`User ${uid.slice(0, 8)}`)}&background=0D8ABC&color=fff`,
+        profilePic: `https://ui-avatars.com/api/?name=${encodeURIComponent(`User ${uid.slice(0, 8)}`)}&background=0D8ABC&color=fff`,
+        isActive: Math.random() > 0.5, // Random online status
+        hasBasicInfo: true,
+        verified: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      res.json(mockUser);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      res.status(500).json({ error: "Failed to fetch user" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

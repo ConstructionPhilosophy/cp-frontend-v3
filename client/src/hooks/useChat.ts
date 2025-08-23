@@ -158,21 +158,23 @@ export const useConversations = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Wait for authentication to be ready
-    const setupListener = () => {
-      if (!auth.currentUser) {
+    let conversationUnsubscribe: (() => void) | null = null;
+
+    const setupConversationListener = (user: any) => {
+      if (!user) {
+        setConversations([]);
         setLoading(false);
-        return null;
+        return;
       }
 
       const conversationsRef = collection(firestore, 'conversations');
       const q = query(
         conversationsRef,
-        where('participants', 'array-contains', auth.currentUser.uid),
+        where('participants', 'array-contains', user.uid),
         orderBy('lastMessageTime', 'desc')
       );
 
-      const unsubscribe = onSnapshot(q, (snapshot) => {
+      conversationUnsubscribe = onSnapshot(q, (snapshot) => {
         const newConversations: Conversation[] = [];
         snapshot.forEach((doc) => {
           const data = doc.data();
@@ -189,27 +191,22 @@ export const useConversations = () => {
         console.error('Error in conversation listener:', error);
         setLoading(false);
       });
-
-      return unsubscribe;
     };
 
-    // Initial setup
-    const unsubscribe = setupListener();
-
-    // Also listen for auth state changes
+    // Set up auth state listener - this handles both initial load and auth changes
     const authUnsubscribe = onAuthStateChanged(auth, (user: any) => {
-      if (user && !unsubscribe) {
-        // User just signed in, set up listener
-        setupListener();
-      } else if (!user) {
-        // User signed out, clear conversations
-        setConversations([]);
-        setLoading(false);
+      // Clean up previous listener
+      if (conversationUnsubscribe) {
+        conversationUnsubscribe();
+        conversationUnsubscribe = null;
       }
+
+      // Set up new listener for this user (or clear if no user)
+      setupConversationListener(user);
     });
 
     return () => {
-      if (unsubscribe) unsubscribe();
+      if (conversationUnsubscribe) conversationUnsubscribe();
       authUnsubscribe();
     };
   }, []);

@@ -63,20 +63,42 @@ export const ChatPage: React.FC = () => {
             console.log('Fetching user profile for:', otherUserId);
             const userProfile = await userApiService.getUserByUid(otherUserId);
             console.log('Fetched user profile:', userProfile);
-            setOtherUserProfile(userProfile);
-            setOtherUser({
-              displayName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || `User ${otherUserId.slice(0, 8)}`,
-              photoURL: userProfile.photoUrl || userProfile.profilePic,
-              isOnline: userProfile.isActive || false
-            });
+            
+            if (userProfile && (userProfile.firstName || userProfile.lastName)) {
+              setOtherUserProfile(userProfile);
+              setOtherUser({
+                displayName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
+                photoURL: userProfile.photoUrl || userProfile.profilePic,
+                isOnline: userProfile.isActive || false
+              });
+            } else {
+              throw new Error('Invalid user profile data');
+            }
           } catch (error) {
             console.error('Error fetching other user profile:', error);
-            // Fallback to placeholder if API fails
-            setOtherUser({
-              displayName: `User ${otherUserId.slice(0, 8)}`,
-              photoURL: undefined,
-              isOnline: false
-            });
+            
+            // Try to get user data from local sample data as fallback
+            try {
+              const fallbackResponse = await fetch(`/api/users/${otherUserId}`);
+              if (fallbackResponse.ok) {
+                const fallbackUser = await fallbackResponse.json();
+                setOtherUser({
+                  displayName: `${fallbackUser.firstName || ''} ${fallbackUser.lastName || ''}`.trim() || `User ${otherUserId.slice(0, 8)}`,
+                  photoURL: fallbackUser.profilePic || fallbackUser.photoUrl,
+                  isOnline: false
+                });
+              } else {
+                throw new Error('Local fallback failed');
+              }
+            } catch (fallbackError) {
+              console.error('Fallback user fetch failed:', fallbackError);
+              // Final fallback to placeholder
+              setOtherUser({
+                displayName: `User ${otherUserId.slice(0, 8)}`,
+                photoURL: undefined,
+                isOnline: false
+              });
+            }
           }
         }
       } catch (error) {
