@@ -8,6 +8,7 @@ interface ChatHeaderProps {
   otherUser: {
     displayName: string;
     photoURL?: string;
+    isOnline?: boolean;
   };
 }
 
@@ -35,7 +36,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ otherUser }) => {
         
         <div>
           <h3 className="font-medium text-cmo-text-primary">{otherUser.displayName}</h3>
-          <p className="text-sm text-cmo-text-secondary">Online</p>
+          {otherUser.isOnline && (
+            <p className="text-sm text-green-500">Online</p>
+          )}
+          {!otherUser.isOnline && (
+            <p className="text-sm text-cmo-text-secondary">Last seen recently</p>
+          )}
         </div>
       </div>
       

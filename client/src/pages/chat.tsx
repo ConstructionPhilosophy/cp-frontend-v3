@@ -16,7 +16,7 @@ export const ChatPage: React.FC = () => {
   const [match, params] = useRoute('/chat/:conversationId');
   const conversationId = params?.conversationId;
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [otherUser, setOtherUser] = useState<{ displayName: string; photoURL?: string } | null>(null);
+  const [otherUser, setOtherUser] = useState<{ displayName: string; photoURL?: string; isOnline?: boolean } | null>(null);
   const [otherUserProfile, setOtherUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const isMobile = useIsMobile();
@@ -60,18 +60,22 @@ export const ChatPage: React.FC = () => {
         if (otherUserId) {
           try {
             // Fetch real user profile data
+            console.log('Fetching user profile for:', otherUserId);
             const userProfile = await userApiService.getUserByUid(otherUserId);
+            console.log('Fetched user profile:', userProfile);
             setOtherUserProfile(userProfile);
             setOtherUser({
-              displayName: `${userProfile.firstName} ${userProfile.lastName}`,
-              photoURL: userProfile.photoUrl || userProfile.profilePic
+              displayName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || `User ${otherUserId.slice(0, 8)}`,
+              photoURL: userProfile.photoUrl || userProfile.profilePic,
+              isOnline: userProfile.isActive || false
             });
           } catch (error) {
             console.error('Error fetching other user profile:', error);
             // Fallback to placeholder if API fails
             setOtherUser({
               displayName: `User ${otherUserId.slice(0, 8)}`,
-              photoURL: undefined
+              photoURL: undefined,
+              isOnline: false
             });
           }
         }
