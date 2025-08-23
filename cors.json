@@ -1,0 +1,12 @@
+[
+  {
+    "origin": [
+      "https://pixel-connect-jamescruser3.replit.app",
+      "https://v3.constructionphilosophy.com",
+      "https://constructionphilosophy.com"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "x-goog-meta-*"]
+  }
+]
