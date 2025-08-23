@@ -17,6 +17,7 @@ import {
   getDoc,
   setDoc
 } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { firestore, storage, auth } from '../lib/firebase';
 import { Message, Conversation, ChatUser } from '../types/chat';
@@ -157,31 +158,60 @@ export const useConversations = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth.currentUser) return;
+    // Wait for authentication to be ready
+    const setupListener = () => {
+      if (!auth.currentUser) {
+        setLoading(false);
+        return null;
+      }
 
-    const conversationsRef = collection(firestore, 'conversations');
-    const q = query(
-      conversationsRef,
-      where('participants', 'array-contains', auth.currentUser.uid),
-      orderBy('lastMessageTime', 'desc')
-    );
+      const conversationsRef = collection(firestore, 'conversations');
+      const q = query(
+        conversationsRef,
+        where('participants', 'array-contains', auth.currentUser.uid),
+        orderBy('lastMessageTime', 'desc')
+      );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newConversations: Conversation[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        newConversations.push({
-          id: doc.id,
-          ...data,
-          lastMessageTime: data.lastMessageTime?.toDate() || new Date(),
-        } as Conversation);
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const newConversations: Conversation[] = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          newConversations.push({
+            id: doc.id,
+            ...data,
+            lastMessageTime: data.lastMessageTime?.toDate() || new Date(),
+          } as Conversation);
+        });
+        
+        setConversations(newConversations);
+        setLoading(false);
+      }, (error) => {
+        console.error('Error in conversation listener:', error);
+        setLoading(false);
       });
-      
-      setConversations(newConversations);
-      setLoading(false);
+
+      return unsubscribe;
+    };
+
+    // Initial setup
+    const unsubscribe = setupListener();
+
+    // Also listen for auth state changes
+    const authUnsubscribe = onAuthStateChanged(auth, (user: any) => {
+      if (user && !unsubscribe) {
+        // User just signed in, set up listener
+        setupListener();
+      } else if (!user) {
+        // User signed out, clear conversations
+        setConversations([]);
+        setLoading(false);
+      }
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribe) unsubscribe();
+      authUnsubscribe();
+    };
   }, []);
 
   return { conversations, loading };

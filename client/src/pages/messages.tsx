@@ -21,6 +21,7 @@ export const MessagesPage: React.FC = () => {
   const isMobile = useIsMobile();
   const [userProfiles, setUserProfiles] = useState<{ [uid: string]: UserProfile }>({});
 
+
   // Fetch user profiles for all conversation participants
   useEffect(() => {
     const fetchUserProfiles = async () => {
