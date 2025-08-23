@@ -136,7 +136,7 @@ export const MessagesPage: React.FC = () => {
         <Header />
         
         <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col h-[calc(100vh-4rem)] bg-white dark:bg-gray-900 border border-cmo-border rounded-lg m-4">
+          <div className="flex flex-col h-[calc(100vh-8rem)] bg-white dark:bg-gray-900 border border-cmo-border rounded-lg m-4">
             {/* Mobile chat header with back button */}
             <div className="flex items-center justify-between p-4 border-b border-cmo-border bg-white dark:bg-gray-900">
               <div className="flex items-center space-x-3">
@@ -257,7 +257,7 @@ export const MessagesPage: React.FC = () => {
         </div>
 
         {/* Split screen layout */}
-        <div className="flex bg-white dark:bg-gray-900 rounded-lg border border-cmo-border h-[calc(100vh-8rem)]">
+        <div className="flex bg-white dark:bg-gray-900 rounded-lg border border-cmo-border h-[calc(100vh-12rem)]">
           {/* Left side - Conversations list */}
           <div className="w-1/3 border-r border-cmo-border flex flex-col">
             <div className="p-4 border-b border-cmo-border">
