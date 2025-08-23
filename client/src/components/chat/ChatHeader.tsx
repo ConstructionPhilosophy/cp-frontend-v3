@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Phone, Video, MoreVertical, UserX, UserCheck } from 'lucide-react';
+import { ArrowLeft, MoreVertical, UserX, UserCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../ui/dropdown-menu';
@@ -59,15 +59,19 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ otherUser, otherUserId }
           <ArrowLeft className="w-4 h-4" />
         </Button>
         
-        <Avatar className="w-10 h-10">
-          <AvatarImage src={otherUser.photoURL} />
-          <AvatarFallback>
-            {otherUser.displayName.split(' ').map(n => n[0]).join('')}
-          </AvatarFallback>
-        </Avatar>
-        
-        <div>
-          <h3 className="font-medium text-cmo-text-primary">{otherUser.displayName}</h3>
+        <div 
+          className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg p-2 -m-2"
+          onClick={() => otherUserId && setLocation(`/u/${otherUserId}`)}
+        >
+          <Avatar className="w-10 h-10">
+            <AvatarImage src={otherUser.photoURL} />
+            <AvatarFallback>
+              {otherUser.displayName.split(' ').map(n => n[0]).join('')}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div>
+            <h3 className="font-medium text-cmo-text-primary hover:text-cmo-primary">{otherUser.displayName}</h3>
           {isBlockedByMe && (
             <p className="text-sm text-red-500">Blocked</p>
           )}
@@ -80,16 +84,11 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ otherUser, otherUserId }
           {!isBlockedByMe && !isBlockedByThem && !otherUser.isOnline && (
             <p className="text-sm text-cmo-text-secondary">Last seen recently</p>
           )}
+          </div>
         </div>
       </div>
       
       <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="sm" className="hidden sm:flex">
-          <Phone className="w-4 h-4" />
-        </Button>
-        <Button variant="ghost" size="sm" className="hidden sm:flex">
-          <Video className="w-4 h-4" />
-        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm">
