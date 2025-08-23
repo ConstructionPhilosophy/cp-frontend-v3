@@ -44,6 +44,7 @@ export interface UserProfile {
   createdAt?: string;
   updatedAt?: string;
   followingCount?: number;
+  followersCount?: number;
 }
 
 export interface UpdateUserData {
@@ -400,6 +401,76 @@ class UserApiService {
       }
       console.error("Error unfollowing user:", error);
       throw new Error("Failed to unfollow user");
+    }
+  }
+
+  async getUserFollowers(uid: string): Promise<UserProfile[]> {
+    try {
+      const headers = await this.getAuthHeaders();
+
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/followers`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch followers: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const followers: UserProfile[] = await response.json();
+      return followers;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error fetching followers:", error);
+      throw new Error("Failed to fetch followers");
+    }
+  }
+
+  async getUserFollowing(uid: string): Promise<UserProfile[]> {
+    try {
+      const headers = await this.getAuthHeaders();
+
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/following`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch following: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const following: UserProfile[] = await response.json();
+      return following;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error fetching following:", error);
+      throw new Error("Failed to fetch following");
     }
   }
 }

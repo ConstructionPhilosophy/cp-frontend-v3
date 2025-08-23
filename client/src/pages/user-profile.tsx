@@ -368,9 +368,9 @@ export default function UserProfilePage() {
                         <div className="flex items-center gap-4 text-sm text-cmo-text-secondary">
                           <span className="flex items-center gap-1">
                             <Users className="w-4 h-4" />
-                            142 followers
+                            {profileData.followersCount || 0} followers
                           </span>
-                          <span>80 following</span>
+                          <span>{profileData.followingCount || 0} following</span>
                         </div>
                       </div>
 
