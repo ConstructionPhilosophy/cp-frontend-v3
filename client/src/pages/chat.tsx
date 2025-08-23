@@ -59,46 +59,25 @@ export const ChatPage: React.FC = () => {
 
         if (otherUserId) {
           try {
-            // Fetch real user profile data
-            console.log('Fetching user profile for:', otherUserId);
-            const userProfile = await userApiService.getUserByUid(otherUserId);
-            console.log('Fetched user profile:', userProfile);
+            // Fetch real user chat info
+            console.log('Fetching chat user info for:', otherUserId);
+            const chatUserInfo = await userApiService.getChatUserInfo(otherUserId);
+            console.log('Fetched chat user info:', chatUserInfo);
             
-            if (userProfile && (userProfile.firstName || userProfile.lastName)) {
-              setOtherUserProfile(userProfile);
-              setOtherUser({
-                displayName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim(),
-                photoURL: userProfile.photoUrl || userProfile.profilePic,
-                isOnline: userProfile.isActive || false
-              });
-            } else {
-              throw new Error('Invalid user profile data');
-            }
+            setOtherUser({
+              displayName: `${chatUserInfo.firstName} ${chatUserInfo.lastName}`.trim(),
+              photoURL: chatUserInfo.photoUrl,
+              isOnline: false // We'll set this based on actual activity later
+            });
           } catch (error) {
-            console.error('Error fetching other user profile:', error);
+            console.error('Error fetching chat user info:', error);
             
-            // Try to get user data from local sample data as fallback
-            try {
-              const fallbackResponse = await fetch(`/api/users/${otherUserId}`);
-              if (fallbackResponse.ok) {
-                const fallbackUser = await fallbackResponse.json();
-                setOtherUser({
-                  displayName: `${fallbackUser.firstName || ''} ${fallbackUser.lastName || ''}`.trim() || `User ${otherUserId.slice(0, 8)}`,
-                  photoURL: fallbackUser.profilePic || fallbackUser.photoUrl,
-                  isOnline: false
-                });
-              } else {
-                throw new Error('Local fallback failed');
-              }
-            } catch (fallbackError) {
-              console.error('Fallback user fetch failed:', fallbackError);
-              // Final fallback to placeholder
-              setOtherUser({
-                displayName: `User ${otherUserId.slice(0, 8)}`,
-                photoURL: undefined,
-                isOnline: false
-              });
-            }
+            // Fallback to placeholder only if API completely fails
+            setOtherUser({
+              displayName: `User ${otherUserId.slice(0, 8)}`,
+              photoURL: undefined,
+              isOnline: false
+            });
           }
         }
       } catch (error) {

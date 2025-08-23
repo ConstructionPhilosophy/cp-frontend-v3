@@ -39,10 +39,20 @@ export const MessagesPage: React.FC = () => {
       
       for (const uid of Array.from(userIds)) {
         try {
-          const profile = await userApiService.getUserByUid(uid);
-          profiles[uid] = profile;
+          const chatInfo = await userApiService.getChatUserInfo(uid);
+          // Convert chat info to UserProfile format for compatibility
+          profiles[uid] = {
+            uid: chatInfo.uid,
+            firstName: chatInfo.firstName,
+            lastName: chatInfo.lastName,
+            photoUrl: chatInfo.photoUrl,
+            username: chatInfo.username,
+            email: '', // Not needed for chat display
+            hasBasicInfo: true,
+            isActive: false
+          } as UserProfile;
         } catch (error) {
-          console.error(`Error fetching profile for user ${uid}:`, error);
+          console.error(`Error fetching chat info for user ${uid}:`, error);
         }
       }
       

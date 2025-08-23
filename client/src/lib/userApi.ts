@@ -249,6 +249,56 @@ class UserApiService {
     }
   }
 
+  async getChatUserInfo(uid: string): Promise<{
+    uid: string;
+    firstName: string;
+    lastName: string;
+    title?: string;
+    positionDesignation?: string;
+    photoUrl?: string;
+    username?: string;
+  }> {
+    try {
+      const headers = await this.getAuthHeaders();
+
+      const response = await fetch(`${API_BASE_URL}/users/chatinfo/${uid}`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (response.status === 404) {
+        throw new Error("USER_NOT_FOUND");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch chat user info: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const userData = await response.json();
+      return userData;
+    } catch (error: any) {
+      if (
+        error.message === "AUTH_EXPIRED" ||
+        error.message === "USER_NOT_FOUND"
+      ) {
+        throw error;
+      }
+      console.error("Error fetching chat user info:", error);
+      throw new Error("Failed to fetch chat user info");
+    }
+  }
+
   async searchUsersByUsername(username: string): Promise<UserProfile[]> {
     try {
       const headers = await this.getAuthHeaders();
