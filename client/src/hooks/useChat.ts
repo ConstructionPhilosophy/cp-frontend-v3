@@ -283,7 +283,7 @@ export const useBlockUser = () => {
   return { blockUser, unblockUser };
 };
 
-// Check blocking status
+// Check blocking status with real-time updates
 export const useBlockingStatus = (otherUserId?: string) => {
   const [isBlockedByMe, setIsBlockedByMe] = useState(false);
   const [isBlockedByThem, setIsBlockedByThem] = useState(false);
@@ -295,25 +295,32 @@ export const useBlockingStatus = (otherUserId?: string) => {
       return;
     }
 
-    const checkBlockingStatus = async () => {
-      try {
-        // Check if I blocked them
-        const blockedByMeRef = doc(firestore, 'users', auth.currentUser!.uid, 'blockedUsers', otherUserId);
-        const blockedByMeSnap = await getDoc(blockedByMeRef);
-        setIsBlockedByMe(blockedByMeSnap.exists());
+    let unsubscribeMyBlock: () => void;
+    let unsubscribeTheirBlock: () => void;
 
-        // Check if they blocked me
-        const blockedByThemRef = doc(firestore, 'users', otherUserId, 'blockedUsers', auth.currentUser!.uid);
-        const blockedByThemSnap = await getDoc(blockedByThemRef);
-        setIsBlockedByThem(blockedByThemSnap.exists());
-      } catch (error) {
-        console.error('Error checking blocking status:', error);
-      } finally {
-        setLoading(false);
-      }
+    // Real-time listener for if I blocked them
+    const blockedByMeRef = doc(firestore, 'users', auth.currentUser.uid, 'blockedUsers', otherUserId);
+    unsubscribeMyBlock = onSnapshot(blockedByMeRef, (doc) => {
+      setIsBlockedByMe(doc.exists());
+      setLoading(false);
+    }, (error) => {
+      console.error('Error listening to my block status:', error);
+      setLoading(false);
+    });
+
+    // Real-time listener for if they blocked me
+    const blockedByThemRef = doc(firestore, 'users', otherUserId, 'blockedUsers', auth.currentUser.uid);
+    unsubscribeTheirBlock = onSnapshot(blockedByThemRef, (doc) => {
+      setIsBlockedByThem(doc.exists());
+    }, (error) => {
+      console.error('Error listening to their block status:', error);
+    });
+
+    // Cleanup listeners on unmount
+    return () => {
+      if (unsubscribeMyBlock) unsubscribeMyBlock();
+      if (unsubscribeTheirBlock) unsubscribeTheirBlock();
     };
-
-    checkBlockingStatus();
   }, [otherUserId]);
 
   return { isBlockedByMe, isBlockedByThem, loading };
