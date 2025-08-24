@@ -452,6 +452,13 @@ export default function UserProfilePage() {
   }
 
   const isOwnProfile = user?.uid === profileData.uid;
+  
+  console.log("Debug info:", {
+    userUid: user?.uid,
+    profileDataUid: profileData.uid,
+    isOwnProfile,
+    showEditProfileModal
+  });
 
   return (
     <div className="min-h-screen bg-cmo-bg">
@@ -546,7 +553,10 @@ export default function UserProfilePage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => setShowEditProfileModal(true)}>
+                              <DropdownMenuItem onClick={() => {
+                                console.log("Edit Profile clicked");
+                                setShowEditProfileModal(true);
+                              }}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 <span>Edit Profile</span>
                               </DropdownMenuItem>
