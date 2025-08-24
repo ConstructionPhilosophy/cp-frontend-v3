@@ -18,6 +18,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../components/ui/dialog";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import Header from "../components/layout/header";
 import MobileNavigation from "../components/mobile-navigation";
 import { useIsMobile } from "../hooks/use-mobile";
@@ -140,6 +143,23 @@ export default function UserProfilePage() {
   const [following, setFollowing] = useState<UserProfile[]>([]);
   const [followersLoading, setFollowersLoading] = useState<boolean>(false);
   const [followingLoading, setFollowingLoading] = useState<boolean>(false);
+  const [showEditProfileModal, setShowEditProfileModal] = useState<boolean>(false);
+  const [editFormLoading, setEditFormLoading] = useState<boolean>(false);
+  const [editFormData, setEditFormData] = useState({
+    firstName: "",
+    lastName: "",
+    title: "",
+    positionDesignation: "",
+    currentCompany: "",
+    about: "",
+    gender: "",
+    dateOfBirth: "",
+    city: "",
+    state: "",
+    country: "",
+    userType: "",
+    organizationName: "",
+  });
   const { user, userProfile } = useAuth();
   const { createConversation } = useCreateConversation();
   const [, setLocation] = useLocation();
@@ -166,6 +186,23 @@ export default function UserProfilePage() {
         if (userData.followerlist && user?.uid) {
           setIsFollowing(userData.followerlist.includes(user.uid));
         }
+        
+        // Initialize edit form data
+        setEditFormData({
+          firstName: userData.firstName || "",
+          lastName: userData.lastName || "",
+          title: userData.title || "",
+          positionDesignation: userData.positionDesignation || "",
+          currentCompany: userData.currentCompany || "",
+          about: userData.about || "",
+          gender: userData.gender || "",
+          dateOfBirth: userData.dateOfBirth || "",
+          city: userData.city || "",
+          state: typeof userData.state === 'string' ? userData.state : userData.state?.name || "",
+          country: typeof userData.country === 'string' ? userData.country : userData.country?.name || "",
+          userType: userData.userType || "",
+          organizationName: userData.organizationName || "",
+        });
       } catch (error: any) {
         console.error("Error fetching user profile:", error);
         if (error.message === "USER_NOT_FOUND") {
@@ -295,6 +332,54 @@ export default function UserProfilePage() {
     } finally {
       setFollowingLoading(false);
     }
+  };
+
+  const handleEditFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!profileData || !user) return;
+    
+    setEditFormLoading(true);
+    
+    try {
+      const updateData: any = {
+        ...editFormData,
+        company: editFormData.currentCompany,
+        description: editFormData.about,
+      };
+      
+      // Remove empty fields
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key] === "") {
+          delete updateData[key];
+        }
+      });
+      
+      const updatedUser = await userApiService.updateUser(profileData.uid, updateData);
+      setProfileData(updatedUser);
+      setShowEditProfileModal(false);
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Failed to update profile",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setEditFormLoading(false);
+    }
+  };
+
+  const handleEditFormChange = (field: string, value: string) => {
+    setEditFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const toggleComments = (postId: string) => {
@@ -452,6 +537,24 @@ export default function UserProfilePage() {
                       </div>
 
                       {/* Action Buttons */}
+                      {isOwnProfile && (
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="icon">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => setShowEditProfileModal(true)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                <span>Edit Profile</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+
                       {!isOwnProfile && (
                         <div className="flex items-center gap-3 flex-shrink-0">
                           <Button
@@ -964,6 +1067,182 @@ export default function UserProfilePage() {
               </div>
             )}
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Profile Modal */}
+      <Dialog open={showEditProfileModal} onOpenChange={setShowEditProfileModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditFormSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={editFormData.firstName}
+                  onChange={(e) => handleEditFormChange("firstName", e.target.value)}
+                  placeholder="Enter first name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={editFormData.lastName}
+                  onChange={(e) => handleEditFormChange("lastName", e.target.value)}
+                  placeholder="Enter last name"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={editFormData.title}
+                onChange={(e) => handleEditFormChange("title", e.target.value)}
+                placeholder="Enter your title"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="positionDesignation">Position/Designation</Label>
+              <Input
+                id="positionDesignation"
+                value={editFormData.positionDesignation}
+                onChange={(e) => handleEditFormChange("positionDesignation", e.target.value)}
+                placeholder="Enter your position or designation"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="currentCompany">Current Company</Label>
+              <Input
+                id="currentCompany"
+                value={editFormData.currentCompany}
+                onChange={(e) => handleEditFormChange("currentCompany", e.target.value)}
+                placeholder="Enter your current company"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="about">About</Label>
+              <Textarea
+                id="about"
+                value={editFormData.about}
+                onChange={(e) => handleEditFormChange("about", e.target.value)}
+                placeholder="Tell us about yourself"
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="gender">Gender</Label>
+                <Select value={editFormData.gender} onValueChange={(value) => handleEditFormChange("gender", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                <Input
+                  id="dateOfBirth"
+                  type="date"
+                  value={editFormData.dateOfBirth}
+                  onChange={(e) => handleEditFormChange("dateOfBirth", e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={editFormData.city}
+                  onChange={(e) => handleEditFormChange("city", e.target.value)}
+                  placeholder="Enter your city"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="state">State</Label>
+                <Input
+                  id="state"
+                  value={editFormData.state}
+                  onChange={(e) => handleEditFormChange("state", e.target.value)}
+                  placeholder="Enter your state"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  value={editFormData.country}
+                  onChange={(e) => handleEditFormChange("country", e.target.value)}
+                  placeholder="Enter your country"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="userType">User Type</Label>
+                <Select value={editFormData.userType} onValueChange={(value) => handleEditFormChange("userType", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select user type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="personal">Personal</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="organizationName">Organization Name</Label>
+                <Input
+                  id="organizationName"
+                  value={editFormData.organizationName}
+                  onChange={(e) => handleEditFormChange("organizationName", e.target.value)}
+                  placeholder="Enter organization name"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowEditProfileModal(false)}
+                disabled={editFormLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={editFormLoading}
+              >
+                {editFormLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  "Update Profile"
+                )}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
