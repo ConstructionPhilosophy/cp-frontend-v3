@@ -12,6 +12,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../components/ui/dialog";
 import Header from "../components/layout/header";
 import MobileNavigation from "../components/mobile-navigation";
 import { useIsMobile } from "../hooks/use-mobile";
@@ -128,6 +134,12 @@ export default function UserProfilePage() {
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [followLoading, setFollowLoading] = useState<boolean>(false);
   const [showContactInfo, setShowContactInfo] = useState<boolean>(false);
+  const [showFollowersModal, setShowFollowersModal] = useState<boolean>(false);
+  const [showFollowingModal, setShowFollowingModal] = useState<boolean>(false);
+  const [followers, setFollowers] = useState<UserProfile[]>([]);
+  const [following, setFollowing] = useState<UserProfile[]>([]);
+  const [followersLoading, setFollowersLoading] = useState<boolean>(false);
+  const [followingLoading, setFollowingLoading] = useState<boolean>(false);
   const { user, userProfile } = useAuth();
   const { createConversation } = useCreateConversation();
   const [, setLocation] = useLocation();
@@ -240,6 +252,48 @@ export default function UserProfilePage() {
       });
     } finally {
       setFollowLoading(false);
+    }
+  };
+
+  const handleShowFollowers = async () => {
+    if (!profileData) return;
+    
+    setShowFollowersModal(true);
+    setFollowersLoading(true);
+    
+    try {
+      const followersList = await userApiService.getUserFollowers(profileData.uid);
+      setFollowers(followersList);
+    } catch (error) {
+      console.error('Error fetching followers:', error);
+      toast({
+        title: "Failed to load followers",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setFollowersLoading(false);
+    }
+  };
+
+  const handleShowFollowing = async () => {
+    if (!profileData) return;
+    
+    setShowFollowingModal(true);
+    setFollowingLoading(true);
+    
+    try {
+      const followingList = await userApiService.getUserFollowing(profileData.uid);
+      setFollowing(followingList);
+    } catch (error) {
+      console.error('Error fetching following:', error);
+      toast({
+        title: "Failed to load following",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setFollowingLoading(false);
     }
   };
 
@@ -383,20 +437,14 @@ export default function UserProfilePage() {
                         <div className="flex items-center gap-4 text-sm text-cmo-text-secondary">
                           <button 
                             className="flex items-center gap-1 hover:text-cmo-primary transition-colors"
-                            onClick={() => {
-                              // TODO: Show followers list modal
-                              console.log('Show followers list');
-                            }}
+                            onClick={handleShowFollowers}
                           >
                             <Users className="w-4 h-4" />
                             {profileData.followersCount || 0} followers
                           </button>
                           <button 
                             className="hover:text-cmo-primary transition-colors"
-                            onClick={() => {
-                              // TODO: Show following list modal
-                              console.log('Show following list');
-                            }}
+                            onClick={handleShowFollowing}
                           >
                             {profileData.followingCount || 0} following
                           </button>
@@ -814,6 +862,110 @@ export default function UserProfilePage() {
       </div>
 
       {isMobile && <MobileNavigation />}
+
+      {/* Followers Modal */}
+      <Dialog open={showFollowersModal} onOpenChange={setShowFollowersModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Followers ({profileData?.followersCount || 0})</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-96 overflow-y-auto">
+            {followersLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-cmo-primary" />
+              </div>
+            ) : followers.length === 0 ? (
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 text-cmo-text-secondary mx-auto mb-2" />
+                <p className="text-cmo-text-secondary">No followers yet</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {followers.map((follower) => (
+                  <div
+                    key={follower.uid}
+                    className="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
+                    onClick={() => {
+                      setShowFollowersModal(false);
+                      setLocation(`/u/${follower.username || follower.uid}`);
+                    }}
+                  >
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={follower.photoUrl || follower.profilePic} />
+                      <AvatarFallback>
+                        {follower.firstName?.charAt(0) || "U"}
+                        {follower.lastName?.charAt(0) || ""}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-cmo-text-primary truncate">
+                        {follower.firstName} {follower.lastName}
+                      </p>
+                      {follower.title && (
+                        <p className="text-sm text-cmo-text-secondary truncate">
+                          {follower.title}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Following Modal */}
+      <Dialog open={showFollowingModal} onOpenChange={setShowFollowingModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Following ({profileData?.followingCount || 0})</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-96 overflow-y-auto">
+            {followingLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-cmo-primary" />
+              </div>
+            ) : following.length === 0 ? (
+              <div className="text-center py-8">
+                <Users className="w-12 h-12 text-cmo-text-secondary mx-auto mb-2" />
+                <p className="text-cmo-text-secondary">Not following anyone yet</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {following.map((followedUser) => (
+                  <div
+                    key={followedUser.uid}
+                    className="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
+                    onClick={() => {
+                      setShowFollowingModal(false);
+                      setLocation(`/u/${followedUser.username || followedUser.uid}`);
+                    }}
+                  >
+                    <Avatar className="w-10 h-10">
+                      <AvatarImage src={followedUser.photoUrl || followedUser.profilePic} />
+                      <AvatarFallback>
+                        {followedUser.firstName?.charAt(0) || "U"}
+                        {followedUser.lastName?.charAt(0) || ""}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-cmo-text-primary truncate">
+                        {followedUser.firstName} {followedUser.lastName}
+                      </p>
+                      {followedUser.title && (
+                        <p className="text-sm text-cmo-text-secondary truncate">
+                          {followedUser.title}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
