@@ -453,25 +453,19 @@ export default function UserProfilePage() {
 
   const isOwnProfile = user?.uid === profileData.uid;
   
-  console.log("Debug info:", {
-    userUid: user?.uid,
-    profileDataUid: profileData.uid,
-    isOwnProfile,
-    showEditProfileModal
-  });
 
   return (
     <div className="min-h-screen bg-cmo-bg">
       <Header />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Banner and Profile Section */}
-            <Card className="mb-6 overflow-hidden">
+            <Card className="mb-4 overflow-hidden">
               <div
-                className="h-48 bg-gradient-to-r from-blue-500 to-purple-600"
+                className="h-32 sm:h-40 bg-gradient-to-r from-blue-500 to-purple-600"
                 style={{
                   backgroundImage: profileData.bannerUrl
                     ? `url(${profileData.bannerUrl})`
@@ -481,18 +475,18 @@ export default function UserProfilePage() {
                 }}
               />
 
-              <CardContent className="relative p-6">
+              <CardContent className="relative p-4 sm:p-6">
                 {/* Profile Info Section */}
-                <div className="flex flex-col sm:flex-row gap-6 pt-4">
+                <div className="flex flex-col sm:flex-row gap-4 pt-2">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
-                    <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
+                    <Avatar className="w-24 h-24 sm:w-28 sm:h-28 -mt-14 sm:-mt-16 border-4 border-white shadow-lg">
                       <AvatarImage
                         src={
                           profileData.photoUrl || profileData.profilePic || ""
                         }
                       />
-                      <AvatarFallback className="text-2xl">
+                      <AvatarFallback className="text-lg sm:text-xl">
                         {profileData.firstName?.charAt(0) || "U"}
                         {profileData.lastName?.charAt(0) || ""}
                       </AvatarFallback>
@@ -501,18 +495,18 @@ export default function UserProfilePage() {
 
                   {/* Profile Details */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h1 className="text-3xl font-bold text-cmo-text-primary truncate">
+                        <h1 className="text-xl sm:text-2xl font-semibold text-cmo-text-primary truncate">
                           {profileData.firstName || ""}{" "}
                           {profileData.lastName || ""}
                         </h1>
-                        <p className="text-lg text-cmo-text-secondary mb-2">
+                        <p className="text-sm sm:text-base text-cmo-text-secondary mb-1">
                           {profileData.positionDesignation || "Professional"} at{" "}
                           {profileData.currentCompany || "Company"}
                         </p>
                         {profileData.city && profileData.country && (
-                          <div className="flex items-center gap-1 text-sm text-cmo-text-secondary mb-2">
+                          <div className="flex items-center gap-1 text-xs sm:text-sm text-cmo-text-secondary mb-1">
                             <MapPin className="w-4 h-4" />
                             <span>
                               {profileData.city}
@@ -526,7 +520,7 @@ export default function UserProfilePage() {
                             </span>
                           </div>
                         )}
-                        <div className="flex items-center gap-4 text-sm text-cmo-text-secondary">
+                        <div className="flex items-center gap-3 text-xs sm:text-sm text-cmo-text-secondary">
                           <button 
                             className="flex items-center gap-1 hover:text-cmo-primary transition-colors"
                             onClick={handleShowFollowers}
@@ -545,7 +539,7 @@ export default function UserProfilePage() {
 
                       {/* Action Buttons */}
                       {isOwnProfile && (
-                        <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="outline" size="icon">
@@ -553,10 +547,7 @@ export default function UserProfilePage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => {
-                                console.log("Edit Profile clicked");
-                                setShowEditProfileModal(true);
-                              }}>
+                              <DropdownMenuItem onClick={() => setShowEditProfileModal(true)}>
                                 <Edit className="mr-2 h-4 w-4" />
                                 <span>Edit Profile</span>
                               </DropdownMenuItem>
@@ -566,7 +557,7 @@ export default function UserProfilePage() {
                       )}
 
                       {!isOwnProfile && (
-                        <div className="flex items-center gap-3 flex-shrink-0">
+                        <div className="flex items-center gap-2 flex-shrink-0">
                           <Button
                             variant="outline"
                             size="sm"
@@ -619,9 +610,9 @@ export default function UserProfilePage() {
                 </div>
 
                 {/* About Section */}
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold mb-3">About</h3>
-                  <p className="text-cmo-text-secondary leading-relaxed">
+                <div className="mt-4">
+                  <h3 className="text-base font-semibold mb-2">About</h3>
+                  <p className="text-sm text-cmo-text-secondary leading-relaxed">
                     {profileData.about ||
                       "Professional with expertise in the construction and civil engineering industry."}
                   </p>
@@ -630,29 +621,29 @@ export default function UserProfilePage() {
             </Card>
 
             {/* Education Section */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
                     <GraduationCap className="w-6 h-6 text-cmo-primary" />
                     Education
                   </h3>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {mockEducation.map((edu) => (
-                    <div key={edu.id} className="flex gap-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                    <div key={edu.id} className="flex gap-3">
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <GraduationCap className="w-5 h-5 text-cmo-primary" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-lg">{edu.degree}</h4>
-                        <p className="text-cmo-primary font-medium">
+                        <h4 className="font-semibold text-base">{edu.degree}</h4>
+                        <p className="text-sm text-cmo-primary font-medium">
                           {edu.fieldOfStudy}
                         </p>
-                        <p className="text-cmo-text-secondary">
+                        <p className="text-sm text-cmo-text-secondary">
                           {edu.schoolOrCollege}
                         </p>
-                        <p className="text-sm text-cmo-text-secondary mt-1">
+                        <p className="text-xs text-cmo-text-secondary mt-1">
                           {new Date(edu.startDate).getFullYear()} -{" "}
                           {new Date(edu.endDate).getFullYear()}
                           {edu.grade && ` • ${edu.grade}`}
@@ -665,36 +656,36 @@ export default function UserProfilePage() {
             </Card>
 
             {/* Experience Section */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <Briefcase className="w-6 h-6 text-cmo-primary" />
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Briefcase className="w-5 h-5 text-cmo-primary" />
                     Experience
                   </h3>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {mockExperience.map((exp) => (
-                    <div key={exp.id} className="flex gap-4">
-                      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Briefcase className="w-6 h-6 text-cmo-primary" />
+                    <div key={exp.id} className="flex gap-3">
+                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Briefcase className="w-5 h-5 text-cmo-primary" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-lg">{exp.role}</h4>
-                        <p className="text-cmo-primary font-medium">
+                        <h4 className="font-semibold text-base">{exp.role}</h4>
+                        <p className="text-sm text-cmo-primary font-medium">
                           {exp.company}
                         </p>
-                        <p className="text-cmo-text-secondary flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
+                        <p className="text-xs text-cmo-text-secondary flex items-center gap-1">
+                          <MapPin className="w-3 h-3" />
                           {exp.location}
                         </p>
-                        <p className="text-sm text-cmo-text-secondary mt-1">
+                        <p className="text-xs text-cmo-text-secondary mt-1">
                           {new Date(exp.startDate).getFullYear()} -{" "}
                           {exp.endDate
                             ? new Date(exp.endDate).getFullYear()
                             : "Present"}
                         </p>
-                        <p className="text-cmo-text-secondary mt-2">
+                        <p className="text-xs text-cmo-text-secondary mt-2">
                           {exp.description}
                         </p>
                       </div>
@@ -706,9 +697,9 @@ export default function UserProfilePage() {
 
             {/* User Activities */}
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold">Activities</h3>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Activities</h3>
                   <div className="flex items-center gap-2">
                     <Button variant="outline" size="sm">
                       <Filter className="w-4 h-4 mr-2" />
@@ -718,7 +709,7 @@ export default function UserProfilePage() {
                 </div>
 
                 {/* Activity Filters */}
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {filters.map((filter) => (
                     <Button
                       key={filter}
@@ -735,11 +726,11 @@ export default function UserProfilePage() {
                 </div>
 
                 {/* Activity Feed */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {mockActivities.map((activity) => (
                     <div
                       key={activity.id}
-                      className="border-b border-cmo-border pb-6 last:border-b-0"
+                      className="border-b border-cmo-border pb-4 last:border-b-0"
                     >
                       <div className="flex gap-3">
                         <Avatar className="w-12 h-12">
@@ -896,12 +887,12 @@ export default function UserProfilePage() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Intro */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-cmo-text-primary mb-3">
                   Intro
                 </h3>
-                <div className="space-y-3 text-sm">
+                <div className="space-y-2 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-cmo-text-secondary">Position:</span>
                     <span className="font-medium">
@@ -946,24 +937,24 @@ export default function UserProfilePage() {
 
             {/* Profile Stats */}
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold text-cmo-text-primary mb-4">
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-cmo-text-primary mb-3">
                   Profile Stats
                 </h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
                     <span className="text-cmo-text-secondary">Posts:</span>
                     <span className="font-semibold">24</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-cmo-text-secondary">Views:</span>
                     <span className="font-semibold">1.2k</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-cmo-text-secondary">Thanks:</span>
                     <span className="font-semibold">156</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between text-sm">
                     <span className="text-cmo-text-secondary">Followers:</span>
                     <span className="font-semibold">500+</span>
                   </div>
