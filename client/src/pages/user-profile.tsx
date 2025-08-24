@@ -149,6 +149,11 @@ export default function UserProfilePage() {
         // In case the backend accepts username as uid parameter
         const userData = await userApiService.getUserByUid(username);
         setProfileData(userData);
+        
+        // Check if current user is in the followerlist
+        if (userData.followerlist && user?.uid) {
+          setIsFollowing(userData.followerlist.includes(user.uid));
+        }
       } catch (error: any) {
         console.error("Error fetching user profile:", error);
         if (error.message === "USER_NOT_FOUND") {
@@ -204,6 +209,10 @@ export default function UserProfilePage() {
       if (isFollowing) {
         await userApiService.unfollowUser(profileData.uid);
         setIsFollowing(false);
+        // Update followerlist locally
+        if (profileData.followerlist && user?.uid) {
+          profileData.followerlist = profileData.followerlist.filter(uid => uid !== user.uid);
+        }
         toast({
           title: "Unfollowed",
           description: `You are no longer following ${profileData.firstName} ${profileData.lastName}`,
@@ -211,6 +220,12 @@ export default function UserProfilePage() {
       } else {
         await userApiService.followUser(profileData.uid);
         setIsFollowing(true);
+        // Update followerlist locally
+        if (profileData.followerlist && user?.uid) {
+          profileData.followerlist.push(user.uid);
+        } else if (user?.uid) {
+          profileData.followerlist = [user.uid];
+        }
         toast({
           title: "Following",
           description: `You are now following ${profileData.firstName} ${profileData.lastName}`,
@@ -366,11 +381,25 @@ export default function UserProfilePage() {
                           </div>
                         )}
                         <div className="flex items-center gap-4 text-sm text-cmo-text-secondary">
-                          <span className="flex items-center gap-1">
+                          <button 
+                            className="flex items-center gap-1 hover:text-cmo-primary transition-colors"
+                            onClick={() => {
+                              // TODO: Show followers list modal
+                              console.log('Show followers list');
+                            }}
+                          >
                             <Users className="w-4 h-4" />
                             {profileData.followersCount || 0} followers
-                          </span>
-                          <span>{profileData.followingCount || 0} following</span>
+                          </button>
+                          <button 
+                            className="hover:text-cmo-primary transition-colors"
+                            onClick={() => {
+                              // TODO: Show following list modal
+                              console.log('Show following list');
+                            }}
+                          >
+                            {profileData.followingCount || 0} following
+                          </button>
                         </div>
                       </div>
 

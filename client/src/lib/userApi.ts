@@ -45,6 +45,7 @@ export interface UserProfile {
   updatedAt?: string;
   followingCount?: number;
   followersCount?: number;
+  followerlist?: string[];
 }
 
 export interface UpdateUserData {

@@ -16,7 +16,7 @@ export const ChatPage: React.FC = () => {
   const [match, params] = useRoute('/chat/:conversationId');
   const conversationId = params?.conversationId;
   const [conversation, setConversation] = useState<Conversation | null>(null);
-  const [otherUser, setOtherUser] = useState<{ displayName: string; photoURL?: string; isOnline?: boolean } | null>(null);
+  const [otherUser, setOtherUser] = useState<{ displayName: string; photoURL?: string; username?: string; isOnline?: boolean } | null>(null);
   const [otherUserProfile, setOtherUserProfile] = useState<UserProfile | null>(null);
   const [otherUserId, setOtherUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,6 +70,7 @@ export const ChatPage: React.FC = () => {
             setOtherUser({
               displayName: `${chatUserInfo.firstName} ${chatUserInfo.lastName}`.trim(),
               photoURL: chatUserInfo.photoUrl,
+              username: chatUserInfo.username,
               isOnline: false // We'll set this based on actual activity later
             });
           } catch (error) {
@@ -79,6 +80,7 @@ export const ChatPage: React.FC = () => {
             setOtherUser({
               displayName: `User ${foundOtherUserId.slice(0, 8)}`,
               photoURL: undefined,
+              username: undefined,
               isOnline: false
             });
           }

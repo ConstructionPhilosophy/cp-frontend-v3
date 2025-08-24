@@ -25,7 +25,7 @@ export const MessagesPage: React.FC = () => {
   const isMobile = useIsMobile();
   const [userProfiles, setUserProfiles] = useState<{ [uid: string]: UserProfile }>({});
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
-  const [selectedUser, setSelectedUser] = useState<{ displayName: string; photoURL?: string; isOnline?: boolean } | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{ displayName: string; photoURL?: string; username?: string; isOnline?: boolean } | null>(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showChat, setShowChat] = useState(false); // For mobile view
 
@@ -113,6 +113,7 @@ export const MessagesPage: React.FC = () => {
         setSelectedUser({
           displayName: `${chatUserInfo.firstName} ${chatUserInfo.lastName}`.trim(),
           photoURL: chatUserInfo.photoUrl,
+          username: chatUserInfo.username,
           isOnline: false
         });
       } catch (error) {
@@ -120,6 +121,7 @@ export const MessagesPage: React.FC = () => {
         setSelectedUser({
           displayName: `User ${otherUserId.slice(0, 8)}`,
           photoURL: undefined,
+          username: undefined,
           isOnline: false
         });
       }
@@ -256,8 +258,8 @@ export const MessagesPage: React.FC = () => {
           </Dialog>
         </div>
 
-        {/* Split screen layout */}
-        <div className="flex bg-white dark:bg-gray-900 rounded-lg border border-cmo-border h-[calc(100vh-12rem)]">
+        {/* Split screen layout - Desktop and Tablet only */}
+        <div className="hidden md:flex bg-white dark:bg-gray-900 rounded-lg border border-cmo-border h-[calc(100vh-12rem)]">
           {/* Left side - Conversations list */}
           <div className="w-1/3 border-r border-cmo-border flex flex-col">
             <div className="p-4 border-b border-cmo-border">
@@ -374,6 +376,81 @@ export const MessagesPage: React.FC = () => {
         </div>
       </div>
       
+        {/* Mobile single screen design */}
+        <div className="md:hidden">
+          {!showChat ? (
+            /* Mobile conversations list */
+            <div className="bg-white dark:bg-gray-900 rounded-lg border border-cmo-border mx-4 mb-4">
+              <div className="p-4 border-b border-cmo-border">
+                <h2 className="font-semibold text-cmo-text-primary">Conversations</h2>
+              </div>
+              
+              <div className="max-h-96 overflow-y-auto">
+                {loading ? (
+                  <div className="p-8 text-center">
+                    <p className="text-cmo-text-secondary">Loading conversations...</p>
+                  </div>
+                ) : conversations.length === 0 ? (
+                  <div className="p-8 text-center">
+                    <MessageSquare className="w-12 h-12 text-cmo-text-secondary mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-cmo-text-primary mb-2">No conversations yet</h3>
+                    <p className="text-cmo-text-secondary mb-4">
+                      Start your first conversation by clicking "New Chat"
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-cmo-border">
+                    {conversations.map((conversation) => {
+                      const otherUserId = conversation.participants.find(
+                        uid => uid !== auth.currentUser?.uid
+                      );
+                      
+                      const otherUserProfile = otherUserId ? userProfiles[otherUserId] : null;
+                      const displayName = otherUserProfile 
+                        ? `${otherUserProfile.firstName} ${otherUserProfile.lastName}`
+                        : `User ${otherUserId?.slice(0, 8)}`;
+                      const avatarUrl = otherUserProfile?.photoUrl || otherUserProfile?.profilePic;
+                      
+                      return (
+                        <div
+                          key={conversation.id}
+                          className="flex items-center space-x-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                          onClick={() => handleSelectConversation(conversation)}
+                        >
+                          <Avatar className="w-12 h-12">
+                            <AvatarImage src={avatarUrl || ""} />
+                            <AvatarFallback>
+                              {otherUserProfile 
+                                ? `${otherUserProfile.firstName?.[0] || ''}${otherUserProfile.lastName?.[0] || ''}`
+                                : (otherUserId ? otherUserId.slice(0, 2).toUpperCase() : 'U')
+                              }
+                            </AvatarFallback>
+                          </Avatar>
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-medium text-cmo-text-primary truncate">
+                                {displayName}
+                              </h3>
+                              <span className="text-sm text-cmo-text-secondary">
+                                {format(conversation.lastMessageTime, 'MMM d')}
+                              </span>
+                            </div>
+                            
+                            <p className="text-sm text-cmo-text-secondary truncate">
+                              {conversation.lastMessage || 'No messages yet'}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </div>
+
       {isMobile && <MobileNavigation />}
     </div>
   );

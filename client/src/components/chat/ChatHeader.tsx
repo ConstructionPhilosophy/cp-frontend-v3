@@ -11,6 +11,7 @@ interface ChatHeaderProps {
     displayName: string;
     photoURL?: string;
     isOnline?: boolean;
+    username?: string;
   };
   otherUserId?: string;
 }
@@ -61,7 +62,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({ otherUser, otherUserId }
         
         <div 
           className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg p-2 -m-2"
-          onClick={() => otherUserId && setLocation(`/u/${otherUserId}`)}
+          onClick={() => {
+            const navigateToUsername = otherUser.username || otherUserId;
+            if (navigateToUsername) {
+              setLocation(`/u/${navigateToUsername}`);
+            }
+          }}
         >
           <Avatar className="w-10 h-10">
             <AvatarImage src={otherUser.photoURL} />
