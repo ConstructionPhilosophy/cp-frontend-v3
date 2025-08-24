@@ -116,12 +116,12 @@ export function SignupPage() {
           </svg>
         </div>
 
-        <div className="relative z-10 flex items-center justify-center w-full p-12">
+        <div className="relative z-10 flex items-center justify-center w-full p-8">
           <div className="text-center max-w-md">
-            <h1 className="text-4xl font-bold text-gray-800 mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
               Professional network for construction industry
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
               Connect with construction professionals, engineers, and project managers.
               Build your professional network in the construction sector.
             </p>
@@ -137,11 +137,11 @@ export function SignupPage() {
       </div>
 
       {/* Right Side - Signup Form */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white min-h-screen lg:min-h-auto relative">
+      <div className="flex-1 flex items-center justify-center p-3 sm:p-6 bg-white min-h-screen lg:min-h-auto relative">
         <div className="w-full max-w-sm">
           {/* Mobile Header - Only visible on mobile */}
-          <div className="lg:hidden text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-800 mb-2">
+          <div className="lg:hidden text-center mb-6">
+            <h1 className="text-xl font-bold text-gray-800 mb-2">
               Join CP
             </h1>
             <p className="text-sm text-gray-600">
@@ -150,7 +150,7 @@ export function SignupPage() {
           </div>
 
           {/* Logo */}
-          <div className="flex items-center mb-8">
+          <div className="flex items-center mb-6">
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>

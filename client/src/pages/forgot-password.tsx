@@ -77,12 +77,12 @@ export function ForgotPasswordPage() {
           </svg>
         </div>
 
-        <div className="relative z-10 flex items-center justify-center w-full p-12">
+        <div className="relative z-10 flex items-center justify-center w-full p-8">
           <div className="text-center max-w-md">
-            <h1 className="text-4xl font-bold text-gray-800 mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
               Professional network for construction industry
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
               Connect with construction professionals, engineers, and project managers.
               Build your professional network in the construction sector.
             </p>
@@ -98,10 +98,10 @@ export function ForgotPasswordPage() {
       </div>
 
       {/* Right Side - Forgot Password Form */}
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-white min-h-screen lg:min-h-auto">
+      <div className="flex-1 flex items-center justify-center p-3 sm:p-6 bg-white min-h-screen lg:min-h-auto">
         <div className="w-full max-w-sm">
           {/* Logo */}
-          <div className="flex items-center mb-8">
+          <div className="flex items-center mb-6">
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
@@ -109,7 +109,7 @@ export function ForgotPasswordPage() {
           </div>
 
           {/* Key Icon */}
-          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+          <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mb-4">
             <Key className="w-6 h-6 text-gray-600" />
           </div>
 

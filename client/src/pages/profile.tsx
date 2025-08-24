@@ -196,8 +196,8 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-cmo-bg">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-center justify-center h-64">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-center h-32">
             <Loader2 className="w-8 h-8 animate-spin text-cmo-primary" />
           </div>
         </div>
@@ -209,7 +209,7 @@ export default function ProfilePage() {
     return (
       <div className="min-h-screen bg-cmo-bg">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="text-center">
             <p className="text-cmo-text-secondary">Unable to load profile data.</p>
           </div>
@@ -222,14 +222,14 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-cmo-bg">
       <Header />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Banner and Profile Section */}
-            <Card className="mb-6 overflow-hidden">
+            <Card className="mb-4 overflow-hidden">
               <div 
-                className="h-48 bg-gradient-to-r from-blue-500 to-purple-600"
+                className="h-32 sm:h-40 bg-gradient-to-r from-blue-500 to-purple-600"
                 style={{
                   backgroundImage: (profileData as any).bannerUrl ? `url(${(profileData as any).bannerUrl})` : undefined,
                   backgroundSize: 'cover',
@@ -237,14 +237,14 @@ export default function ProfilePage() {
                 }}
               />
               
-              <CardContent className="relative p-6">
+              <CardContent className="relative p-4 sm:p-6">
                 {/* Profile Info Section - Fixed Overlap */}
-                <div className="flex flex-col sm:flex-row gap-6 pt-4">
+                <div className="flex flex-col sm:flex-row gap-4 pt-2">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
-                    <Avatar className="w-32 h-32 -mt-20 border-4 border-white shadow-lg">
+                    <Avatar className="w-24 h-24 sm:w-28 sm:h-28 -mt-14 sm:-mt-16 border-4 border-white shadow-lg">
                       <AvatarImage src={(profileData as any).photoUrl || (profileData as any).profilePic || ""} />
-                      <AvatarFallback className="text-2xl">
+                      <AvatarFallback className="text-lg sm:text-xl">
                         {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
                       </AvatarFallback>
                     </Avatar>
@@ -252,18 +252,18 @@ export default function ProfilePage() {
                   
                   {/* Profile Details */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h1 className="text-3xl font-bold text-cmo-text-primary truncate">
+                        <h1 className="text-xl sm:text-2xl font-semibold text-cmo-text-primary truncate">
                           {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
-                        <p className="text-lg text-cmo-text-secondary mb-3">
+                        <p className="text-sm sm:text-base text-cmo-text-secondary mb-2">
                           {(profileData as any).userType === 'business' 
                             ? (profileData as any).businessProfile?.companyName 
                             : ((profileData as any).title || (profileData as any).positionDesignation || 'Professional')
                           }
                         </p>
-                        <div className="flex flex-wrap items-center gap-4 text-sm text-cmo-text-secondary">
+                        <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-cmo-text-secondary">
                           <span className="flex items-center gap-1">
                             <Mail className="w-4 h-4" />
                             {profileData.email}
@@ -295,7 +295,7 @@ export default function ProfilePage() {
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex items-center gap-3 flex-shrink-0">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <Button 
                           variant="outline" 
                           size="sm"

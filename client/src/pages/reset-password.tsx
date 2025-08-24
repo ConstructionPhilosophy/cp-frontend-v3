@@ -139,12 +139,12 @@ export function ResetPasswordPage() {
           </svg>
         </div>
 
-        <div className="relative z-10 flex items-center justify-center w-full p-12">
+        <div className="relative z-10 flex items-center justify-center w-full p-8">
           <div className="text-center max-w-md">
-            <h1 className="text-4xl font-bold text-gray-800 mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
               Professional network for construction industry
             </h1>
-            <p className="text-lg text-gray-600 leading-relaxed">
+            <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
               Connect with construction professionals, engineers, and project managers.
               Build your professional network in the construction sector.
             </p>
