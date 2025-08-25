@@ -989,7 +989,7 @@ export default function UserProfilePage() {
                         <p className="text-xs text-cmo-text-secondary truncate">{person.title}</p>
                         <p className="text-xs text-cmo-text-secondary truncate">{person.location}</p>
                       </div>
-                      <Button variant="outline" size="sm" className="text-xs px-2 py-1 h-6">
+                      <Button size="sm" className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white">
                         Follow
                       </Button>
                     </div>
@@ -1047,17 +1047,17 @@ export default function UserProfilePage() {
                 <p className="text-cmo-text-secondary">No followers yet</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {followers.map((follower) => (
                   <div
                     key={follower.uid}
-                    className="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
+                    className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
                     onClick={() => {
                       setShowFollowersModal(false);
-                      setLocation(`/u/${follower.username || follower.uid}`);
+                      setLocation(`/u/${follower.username}`);
                     }}
                   >
-                    <Avatar className="w-10 h-10">
+                    <Avatar className="w-8 h-8 flex-shrink-0">
                       <AvatarImage src={follower.photoUrl || follower.profilePic} />
                       <AvatarFallback>
                         {follower.firstName?.charAt(0) || "U"}
@@ -1065,11 +1065,11 @@ export default function UserProfilePage() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-cmo-text-primary truncate">
+                      <p className="font-medium text-sm text-cmo-text-primary truncate">
                         {follower.firstName} {follower.lastName}
                       </p>
                       {follower.title && (
-                        <p className="text-sm text-cmo-text-secondary truncate">
+                        <p className="text-xs text-cmo-text-secondary truncate">
                           {follower.title}
                         </p>
                       )}
@@ -1099,17 +1099,17 @@ export default function UserProfilePage() {
                 <p className="text-cmo-text-secondary">Not following anyone yet</p>
               </div>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-1">
                 {following.map((followedUser) => (
                   <div
                     key={followedUser.uid}
-                    className="flex items-center space-x-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
+                    className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
                     onClick={() => {
                       setShowFollowingModal(false);
-                      setLocation(`/u/${followedUser.username || followedUser.uid}`);
+                      setLocation(`/u/${followedUser.username}`);
                     }}
                   >
-                    <Avatar className="w-10 h-10">
+                    <Avatar className="w-8 h-8 flex-shrink-0">
                       <AvatarImage src={followedUser.photoUrl || followedUser.profilePic} />
                       <AvatarFallback>
                         {followedUser.firstName?.charAt(0) || "U"}
@@ -1117,11 +1117,11 @@ export default function UserProfilePage() {
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-cmo-text-primary truncate">
+                      <p className="font-medium text-sm text-cmo-text-primary truncate">
                         {followedUser.firstName} {followedUser.lastName}
                       </p>
                       {followedUser.title && (
-                        <p className="text-sm text-cmo-text-secondary truncate">
+                        <p className="text-xs text-cmo-text-secondary truncate">
                           {followedUser.title}
                         </p>
                       )}

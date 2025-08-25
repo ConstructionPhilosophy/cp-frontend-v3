@@ -133,6 +133,7 @@ export default function ProfilePage() {
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [editFormLoading, setEditFormLoading] = useState(false);
   const [editFormData, setEditFormData] = useState({
+    // Personal fields
     firstName: '',
     lastName: '',
     title: '',
@@ -144,6 +145,17 @@ export default function ProfilePage() {
     city: '',
     stateName: '',
     country: '',
+    // Business fields
+    companyName: '',
+    industry: '',
+    companyType: '',
+    description: '',
+    addressLine1: '',
+    addressLine2: '',
+    pincode: '',
+    website: '',
+    registrationNumber: '',
+    companySize: '',
   });
 
   const filters = ['All', 'News', 'Posts', 'Articles', 'Videos', 'Jobs'];
@@ -182,8 +194,10 @@ export default function ProfilePage() {
       try {
         const data = await userApiService.getCurrentUser(true);
         setProfileData(data);
-        // Populate edit form data
+        // Populate edit form data based on user type
+        const isBusinessUser = (data as any).userType === 'business';
         setEditFormData({
+          // Personal fields
           firstName: data.firstName || '',
           lastName: data.lastName || '',
           title: (data as any).title || '',
@@ -195,13 +209,26 @@ export default function ProfilePage() {
           city: (data as any).city || '',
           stateName: (data as any).stateName || '',
           country: (data as any).country || '',
+          // Business fields
+          companyName: isBusinessUser ? (data as any).businessProfile?.companyName || '' : '',
+          industry: isBusinessUser ? (data as any).businessProfile?.industry || '' : '',
+          companyType: isBusinessUser ? (data as any).businessProfile?.companyType || '' : '',
+          description: isBusinessUser ? (data as any).businessProfile?.description || '' : '',
+          addressLine1: isBusinessUser ? (data as any).businessProfile?.addressLine1 || '' : '',
+          addressLine2: isBusinessUser ? (data as any).businessProfile?.addressLine2 || '' : '',
+          pincode: isBusinessUser ? (data as any).businessProfile?.pincode || '' : '',
+          website: isBusinessUser ? (data as any).businessProfile?.website || '' : '',
+          registrationNumber: isBusinessUser ? (data as any).businessProfile?.registrationNumber || '' : '',
+          companySize: isBusinessUser ? (data as any).businessProfile?.companySize || '' : '',
         });
       } catch (error) {
         console.error('Error fetching profile data:', error);
         // Fallback to context data if API fails
         if (userProfile) {
           setProfileData(userProfile);
+          const isBusinessUser = (userProfile as any).userType === 'business';
           setEditFormData({
+            // Personal fields
             firstName: userProfile.firstName || '',
             lastName: userProfile.lastName || '',
             title: (userProfile as any).title || '',
@@ -213,6 +240,17 @@ export default function ProfilePage() {
             city: (userProfile as any).city || '',
             stateName: (userProfile as any).stateName || '',
             country: (userProfile as any).country || '',
+            // Business fields
+            companyName: isBusinessUser ? (userProfile as any).businessProfile?.companyName || '' : '',
+            industry: isBusinessUser ? (userProfile as any).businessProfile?.industry || '' : '',
+            companyType: isBusinessUser ? (userProfile as any).businessProfile?.companyType || '' : '',
+            description: isBusinessUser ? (userProfile as any).businessProfile?.description || '' : '',
+            addressLine1: isBusinessUser ? (userProfile as any).businessProfile?.addressLine1 || '' : '',
+            addressLine2: isBusinessUser ? (userProfile as any).businessProfile?.addressLine2 || '' : '',
+            pincode: isBusinessUser ? (userProfile as any).businessProfile?.pincode || '' : '',
+            website: isBusinessUser ? (userProfile as any).businessProfile?.website || '' : '',
+            registrationNumber: isBusinessUser ? (userProfile as any).businessProfile?.registrationNumber || '' : '',
+            companySize: isBusinessUser ? (userProfile as any).businessProfile?.companySize || '' : '',
           });
         }
       } finally {
@@ -254,18 +292,70 @@ export default function ProfilePage() {
     setEditFormLoading(true);
     
     try {
-      const updateData: any = {
-        ...editFormData,
-        company: editFormData.currentCompany,
-        description: editFormData.about,
-      };
+      const isBusinessUser = (profileData as any).userType === 'business';
+      let updateData: any = {};
+      
+      if (isBusinessUser) {
+        // Business profile update
+        updateData = {
+          businessProfile: {
+            companyName: editFormData.companyName,
+            industry: editFormData.industry,
+            companyType: editFormData.companyType,
+            description: editFormData.description,
+            addressLine1: editFormData.addressLine1,
+            addressLine2: editFormData.addressLine2,
+            pincode: editFormData.pincode,
+            website: editFormData.website,
+            registrationNumber: editFormData.registrationNumber,
+            companySize: editFormData.companySize,
+            location: {
+              city: editFormData.city,
+              state: { name: editFormData.stateName },
+              country: editFormData.country
+            }
+          }
+        };
+      } else {
+        // Personal profile update
+        updateData = {
+          firstName: editFormData.firstName,
+          lastName: editFormData.lastName,
+          title: editFormData.title,
+          positionDesignation: editFormData.positionDesignation,
+          company: editFormData.currentCompany,
+          description: editFormData.about,
+          gender: editFormData.gender,
+          dateOfBirth: editFormData.dateOfBirth,
+          city: editFormData.city,
+          stateName: editFormData.stateName,
+          country: editFormData.country,
+        };
+      }
       
       // Remove empty fields
-      Object.keys(updateData).forEach(key => {
-        if (updateData[key] === "") {
-          delete updateData[key];
-        }
-      });
+      const removeEmptyFields = (obj: any): any => {
+        if (obj === null || typeof obj !== 'object') return obj;
+        
+        if (Array.isArray(obj)) return obj.map(removeEmptyFields).filter(v => v !== null && v !== undefined && v !== '');
+        
+        return Object.keys(obj).reduce((acc, key) => {
+          const value = obj[key];
+          if (value !== null && value !== undefined && value !== '') {
+            if (typeof value === 'object') {
+              const cleaned = removeEmptyFields(value);
+              if (Object.keys(cleaned).length > 0) {
+                acc[key] = cleaned;
+              }
+            } else {
+              acc[key] = value;
+            }
+          }
+          return acc;
+        }, {} as any);
+      };
+      
+      updateData = removeEmptyFields(updateData);
       
       const updatedUser = await userApiService.updateUser(profileData.uid, updateData);
       setProfileData(updatedUser);
@@ -904,7 +994,7 @@ export default function ProfilePage() {
                         <p className="text-xs text-cmo-text-secondary truncate">{person.title}</p>
                         <p className="text-xs text-cmo-text-secondary truncate">{person.location}</p>
                       </div>
-                      <Button variant="outline" size="sm" className="text-xs px-2 py-1 h-6">
+                      <Button size="sm" className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white">
                         Follow
                       </Button>
                     </div>
@@ -944,123 +1034,285 @@ export default function ProfilePage() {
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditFormSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
-                <Input
-                  id="firstName"
-                  value={editFormData.firstName}
-                  onChange={(e) => handleEditFormChange("firstName", e.target.value)}
-                  placeholder="Enter first name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName">Last Name</Label>
-                <Input
-                  id="lastName"
-                  value={editFormData.lastName}
-                  onChange={(e) => handleEditFormChange("lastName", e.target.value)}
-                  placeholder="Enter last name"
-                />
-              </div>
-            </div>
+            {(profileData as any)?.userType === 'business' ? (
+              // Business Profile Fields
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="companyName">Company Name</Label>
+                  <Input
+                    id="companyName"
+                    value={editFormData.companyName}
+                    onChange={(e) => handleEditFormChange("companyName", e.target.value)}
+                    placeholder="Enter company name"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={editFormData.title}
-                onChange={(e) => handleEditFormChange("title", e.target.value)}
-                placeholder="Enter your title"
-              />
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="industry">Industry</Label>
+                    <Select value={editFormData.industry} onValueChange={(value) => handleEditFormChange("industry", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select industry" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Construction">Construction</SelectItem>
+                        <SelectItem value="Engineering">Engineering</SelectItem>
+                        <SelectItem value="Architecture">Architecture</SelectItem>
+                        <SelectItem value="Real Estate">Real Estate</SelectItem>
+                        <SelectItem value="Manufacturing">Manufacturing</SelectItem>
+                        <SelectItem value="Technology">Technology</SelectItem>
+                        <SelectItem value="Others">Others</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="companyType">Company Type</Label>
+                    <Select value={editFormData.companyType} onValueChange={(value) => handleEditFormChange("companyType", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select company type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Private Limited">Private Limited</SelectItem>
+                        <SelectItem value="Public Limited">Public Limited</SelectItem>
+                        <SelectItem value="Partnership">Partnership</SelectItem>
+                        <SelectItem value="Sole Proprietorship">Sole Proprietorship</SelectItem>
+                        <SelectItem value="LLP">LLP</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="positionDesignation">Position/Designation</Label>
-              <Input
-                id="positionDesignation"
-                value={editFormData.positionDesignation}
-                onChange={(e) => handleEditFormChange("positionDesignation", e.target.value)}
-                placeholder="Enter your position or designation"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Company Description</Label>
+                  <Textarea
+                    id="description"
+                    value={editFormData.description}
+                    onChange={(e) => handleEditFormChange("description", e.target.value)}
+                    placeholder="Describe your company and services"
+                    rows={3}
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="currentCompany">Current Company</Label>
-              <Input
-                id="currentCompany"
-                value={editFormData.currentCompany}
-                onChange={(e) => handleEditFormChange("currentCompany", e.target.value)}
-                placeholder="Enter your current company"
-              />
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="addressLine1">Address Line 1</Label>
+                    <Input
+                      id="addressLine1"
+                      value={editFormData.addressLine1}
+                      onChange={(e) => handleEditFormChange("addressLine1", e.target.value)}
+                      placeholder="Street address"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="addressLine2">Address Line 2 (Optional)</Label>
+                    <Input
+                      id="addressLine2"
+                      value={editFormData.addressLine2}
+                      onChange={(e) => handleEditFormChange("addressLine2", e.target.value)}
+                      placeholder="Apartment, suite, etc."
+                    />
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="about">About</Label>
-              <Textarea
-                id="about"
-                value={editFormData.about}
-                onChange={(e) => handleEditFormChange("about", e.target.value)}
-                placeholder="Tell us about yourself"
-                rows={3}
-              />
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <Input
+                      id="country"
+                      value={editFormData.country}
+                      onChange={(e) => handleEditFormChange("country", e.target.value)}
+                      placeholder="Enter country"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="stateName">State</Label>
+                    <Input
+                      id="stateName"
+                      value={editFormData.stateName}
+                      onChange={(e) => handleEditFormChange("stateName", e.target.value)}
+                      placeholder="Enter state"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      value={editFormData.city}
+                      onChange={(e) => handleEditFormChange("city", e.target.value)}
+                      placeholder="Enter city"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="pincode">Pincode</Label>
+                    <Input
+                      id="pincode"
+                      value={editFormData.pincode}
+                      onChange={(e) => handleEditFormChange("pincode", e.target.value)}
+                      placeholder="Enter pincode"
+                    />
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="gender">Gender</Label>
-                <Select value={editFormData.gender} onValueChange={(value) => handleEditFormChange("gender", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select gender" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="dateOfBirth">Date of Birth</Label>
-                <Input
-                  id="dateOfBirth"
-                  type="date"
-                  value={editFormData.dateOfBirth}
-                  onChange={(e) => handleEditFormChange("dateOfBirth", e.target.value)}
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="website">Website</Label>
+                    <Input
+                      id="website"
+                      value={editFormData.website}
+                      onChange={(e) => handleEditFormChange("website", e.target.value)}
+                      placeholder="https://example.com"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="registrationNumber">Registration Number</Label>
+                    <Input
+                      id="registrationNumber"
+                      value={editFormData.registrationNumber}
+                      onChange={(e) => handleEditFormChange("registrationNumber", e.target.value)}
+                      placeholder="Enter registration number"
+                    />
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
-                <Input
-                  id="city"
-                  value={editFormData.city}
-                  onChange={(e) => handleEditFormChange("city", e.target.value)}
-                  placeholder="Enter your city"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="stateName">State</Label>
-                <Input
-                  id="stateName"
-                  value={editFormData.stateName}
-                  onChange={(e) => handleEditFormChange("stateName", e.target.value)}
-                  placeholder="Enter your state"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
-                <Input
-                  id="country"
-                  value={editFormData.country}
-                  onChange={(e) => handleEditFormChange("country", e.target.value)}
-                  placeholder="Enter your country"
-                />
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="companySize">Company Size</Label>
+                  <Select value={editFormData.companySize} onValueChange={(value) => handleEditFormChange("companySize", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select company size" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1-10">1-10 employees</SelectItem>
+                      <SelectItem value="11-50">11-50 employees</SelectItem>
+                      <SelectItem value="51-200">51-200 employees</SelectItem>
+                      <SelectItem value="201-500">201-500 employees</SelectItem>
+                      <SelectItem value="501-1000">501-1000 employees</SelectItem>
+                      <SelectItem value="1000+">1000+ employees</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
+            ) : (
+              // Personal Profile Fields
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input
+                      id="firstName"
+                      value={editFormData.firstName}
+                      onChange={(e) => handleEditFormChange("firstName", e.target.value)}
+                      placeholder="Enter first name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input
+                      id="lastName"
+                      value={editFormData.lastName}
+                      onChange={(e) => handleEditFormChange("lastName", e.target.value)}
+                      placeholder="Enter last name"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="title">Job Title</Label>
+                  <Input
+                    id="title"
+                    value={editFormData.title}
+                    onChange={(e) => handleEditFormChange("title", e.target.value)}
+                    placeholder="Enter your job title"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="positionDesignation">Position/Designation</Label>
+                  <Input
+                    id="positionDesignation"
+                    value={editFormData.positionDesignation}
+                    onChange={(e) => handleEditFormChange("positionDesignation", e.target.value)}
+                    placeholder="Enter your position or designation"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="currentCompany">Current Company</Label>
+                  <Input
+                    id="currentCompany"
+                    value={editFormData.currentCompany}
+                    onChange={(e) => handleEditFormChange("currentCompany", e.target.value)}
+                    placeholder="Enter your current company"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="about">About</Label>
+                  <Textarea
+                    id="about"
+                    value={editFormData.about}
+                    onChange={(e) => handleEditFormChange("about", e.target.value)}
+                    placeholder="Tell us about yourself"
+                    rows={3}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="gender">Gender</Label>
+                    <Select value={editFormData.gender} onValueChange={(value) => handleEditFormChange("gender", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                        <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                    <Input
+                      id="dateOfBirth"
+                      type="date"
+                      value={editFormData.dateOfBirth}
+                      onChange={(e) => handleEditFormChange("dateOfBirth", e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      value={editFormData.city}
+                      onChange={(e) => handleEditFormChange("city", e.target.value)}
+                      placeholder="Enter your city"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="stateName">State</Label>
+                    <Input
+                      id="stateName"
+                      value={editFormData.stateName}
+                      onChange={(e) => handleEditFormChange("stateName", e.target.value)}
+                      placeholder="Enter your state"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="country">Country</Label>
+                    <Input
+                      id="country"
+                      value={editFormData.country}
+                      onChange={(e) => handleEditFormChange("country", e.target.value)}
+                      placeholder="Enter your country"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className="flex justify-end gap-3 pt-4">
               <Button
