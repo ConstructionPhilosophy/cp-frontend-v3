@@ -1074,26 +1074,6 @@ export default function ProfilePage() {
                         </div>
                       </div>
 
-                      {/* Action Buttons */}
-                      {user?.uid === profileData?.uid && (
-                        <div className="flex items-center gap-2 flex-shrink-0">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="icon">
-                                <MoreHorizontal className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem
-                                onClick={() => setShowEditProfileModal(true)}
-                              >
-                                <Edit className="mr-2 h-4 w-4" />
-                                <span>Edit Profile</span>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      )}
 
                       {user?.uid === profileData?.uid ? (
                         // Own profile - Show Edit Profile and Share buttons

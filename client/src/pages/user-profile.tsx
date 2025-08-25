@@ -92,7 +92,6 @@ export default function UserProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
-  const [followLoading, setFollowLoading] = useState<boolean>(false);
   const [showContactInfo, setShowContactInfo] = useState<boolean>(false);
   const [showFollowersModal, setShowFollowersModal] = useState<boolean>(false);
   const [showFollowingModal, setShowFollowingModal] = useState<boolean>(false);
@@ -107,7 +106,7 @@ export default function UserProfilePage() {
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState<boolean>(false);
   const [followingStatus, setFollowingStatus] = useState<{[key: string]: boolean}>({});
-  const [followLoading, setFollowLoading] = useState<{[key: string]: boolean}>({});
+  const [suggestionFollowLoading, setSuggestionFollowLoading] = useState<{[key: string]: boolean}>({});
   
   // Education and Experience State
   const [education, setEducation] = useState<any[]>([]);
@@ -1188,12 +1187,12 @@ export default function UserProfilePage() {
                               : 'bg-blue-600 hover:bg-blue-700 text-white'
                           }`}
                           data-testid="button-follow-suggestion"
-                          disabled={followLoading[person.uid]}
+                          disabled={suggestionFollowLoading[person.uid]}
                           onClick={async (e) => {
                             e.stopPropagation();
-                            if (followLoading[person.uid]) return;
+                            if (suggestionFollowLoading[person.uid]) return;
                             
-                            setFollowLoading(prev => ({ ...prev, [person.uid]: true }));
+                            setSuggestionFollowLoading(prev => ({ ...prev, [person.uid]: true }));
                             
                             try {
                               if (followingStatus[person.uid]) {
@@ -1206,11 +1205,11 @@ export default function UserProfilePage() {
                             } catch (error) {
                               console.error('Error following/unfollowing user:', error);
                             } finally {
-                              setFollowLoading(prev => ({ ...prev, [person.uid]: false }));
+                              setSuggestionFollowLoading(prev => ({ ...prev, [person.uid]: false }));
                             }
                           }}
                         >
-                          {followLoading[person.uid] ? (
+                          {suggestionFollowLoading[person.uid] ? (
                             <Loader2 className="w-3 h-3 animate-spin" />
                           ) : followingStatus[person.uid] ? (
                             'Following'
