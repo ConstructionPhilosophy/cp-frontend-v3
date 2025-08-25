@@ -19,7 +19,7 @@ import {
 } from '../components/ui/dialog';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Select as SelectUI, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import Header from '../components/layout/header';
 import { useAuth } from '../contexts/AuthContext';
 import { userApiService, UserProfile, Education, Experience, Project } from '../lib/userApi';
@@ -345,14 +345,18 @@ export default function ProfilePage() {
         userApiService.getUserSkills(profileData.uid)
       ]);
       
-      setAllSkills(allSkillsData || []);
-      setUserSkills(userSkillsData || []);
+      // Ensure data is arrays
+      const skillsArray = Array.isArray(allSkillsData) ? allSkillsData : [];
+      const userSkillsArray = Array.isArray(userSkillsData) ? userSkillsData : [];
+      
+      setAllSkills(skillsArray);
+      setUserSkills(userSkillsArray);
       
       // Set selected skills for the modal
-      const selectedSkillOptions = userSkillsData?.map(skillId => {
-        const skill = allSkillsData?.find(s => s.id === skillId);
+      const selectedSkillOptions = userSkillsArray.map(skillId => {
+        const skill = skillsArray.find(s => s.id === skillId);
         return { value: skillId, label: skill?.name || skillId };
-      }).filter(Boolean) || [];
+      }).filter(Boolean);
       
       setSelectedSkills(selectedSkillOptions);
     } catch (error) {
@@ -1415,19 +1419,19 @@ export default function ProfilePage() {
                         size="sm"
                         onClick={handleSkillsModalOpen}
                         disabled={skillsLoading}
-                        data-testid={userSkills.length === 0 ? "button-edit-skills" : "button-add-skills"}
+                        data-testid={userSkills.length === 0 ? "button-add-skills" : "button-edit-skills"}
                         className="text-cmo-primary hover:text-cmo-primary/80"
                       >
                         {skillsLoading ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
                         ) : userSkills.length === 0 ? (
                           <>
-                            <Edit className="w-4 h-4 mr-1" />
-                            Edit
+                            <Plus className="w-4 h-4 mr-1" />
                           </>
                         ) : (
                           <>
-                            <Plus className="w-4 h-4 mr-1" />
+                            <Edit className="w-4 h-4 mr-1" />
+                            Edit
                           </>
                         )}
                       </Button>
@@ -1575,7 +1579,7 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="industry">Industry</Label>
-                    <Select value={editFormData.industry} onValueChange={(value) => handleEditFormChange("industry", value)}>
+                    <SelectUI value={editFormData.industry} onValueChange={(value) => handleEditFormChange("industry", value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select industry" />
                       </SelectTrigger>
@@ -1588,11 +1592,11 @@ export default function ProfilePage() {
                         <SelectItem value="Technology">Technology</SelectItem>
                         <SelectItem value="Others">Others</SelectItem>
                       </SelectContent>
-                    </Select>
+                    </SelectUI>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="companyType">Company Type</Label>
-                    <Select value={editFormData.companyType} onValueChange={(value) => handleEditFormChange("companyType", value)}>
+                    <SelectUI value={editFormData.companyType} onValueChange={(value) => handleEditFormChange("companyType", value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select company type" />
                       </SelectTrigger>
@@ -1603,7 +1607,7 @@ export default function ProfilePage() {
                         <SelectItem value="Sole Proprietorship">Sole Proprietorship</SelectItem>
                         <SelectItem value="LLP">LLP</SelectItem>
                       </SelectContent>
-                    </Select>
+                    </SelectUI>
                   </div>
                 </div>
 
@@ -1701,7 +1705,7 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="companySize">Company Size</Label>
-                  <Select value={editFormData.companySize} onValueChange={(value) => handleEditFormChange("companySize", value)}>
+                  <SelectUI value={editFormData.companySize} onValueChange={(value) => handleEditFormChange("companySize", value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select company size" />
                     </SelectTrigger>
@@ -1784,7 +1788,7 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="gender">Gender</Label>
-                    <Select value={editFormData.gender} onValueChange={(value) => handleEditFormChange("gender", value)}>
+                    <SelectUI value={editFormData.gender} onValueChange={(value) => handleEditFormChange("gender", value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
@@ -1794,7 +1798,7 @@ export default function ProfilePage() {
                         <SelectItem value="other">Other</SelectItem>
                         <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
                       </SelectContent>
-                    </Select>
+                    </SelectUI>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="dateOfBirth">Date of Birth</Label>
@@ -1968,7 +1972,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="employmentType">Employment Type</Label>
-                <Select value={experienceFormData.employmentType} onValueChange={(value) => setExperienceFormData({ ...experienceFormData, employmentType: value })}>
+                <SelectUI value={experienceFormData.employmentType} onValueChange={(value) => setExperienceFormData({ ...experienceFormData, employmentType: value })}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select employment type" />
                   </SelectTrigger>

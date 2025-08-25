@@ -981,7 +981,7 @@ class UserApiService {
         },
         mode: "cors",
         credentials: "omit",
-        body: JSON.stringify({ skills: skillIds }),
+        body: JSON.stringify({ skillIds }),
       });
 
       if (response.status === 401) {

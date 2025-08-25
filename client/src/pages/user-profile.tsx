@@ -620,6 +620,31 @@ export default function UserProfilePage() {
               </CardContent>
             </Card>
 
+            {/* Skills Expertise Section - Only for Personal Profiles */}
+            {(profileData as any).userType !== "business" && (
+              <Card className="mb-4">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Star className="w-6 h-6 text-cmo-primary" />
+                      Skills Expertise
+                    </h3>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {((profileData as any).skills || []).length > 0 ? (
+                      ((profileData as any).skills || []).map((skill: string) => (
+                        <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
+                          {skill}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="text-cmo-text-secondary text-sm">No skills added yet</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Education Section */}
             <Card className="mb-4">
               <CardContent className="p-4">
