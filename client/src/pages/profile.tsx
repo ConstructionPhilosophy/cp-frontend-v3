@@ -1,44 +1,56 @@
-import { useState, useEffect } from 'react';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Card, CardContent } from '../components/ui/card';
-import { Separator } from '../components/ui/separator';
-import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { Textarea } from '../components/ui/textarea';
-import { 
+import { useState, useEffect } from "react";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Card, CardContent } from "../components/ui/card";
+import { Separator } from "../components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { Textarea } from "../components/ui/textarea";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../components/ui/dropdown-menu';
+} from "../components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/dialog';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Select as SelectUI, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import Header from '../components/layout/header';
-import { useAuth } from '../contexts/AuthContext';
-import { userApiService, UserProfile, Education, Experience, Project } from '../lib/userApi';
-import { useCreateConversation } from '../hooks/useChat';
-import { useLocation } from 'wouter';
-import { useToast } from '../hooks/use-toast';
-import { Loader2 } from 'lucide-react';
-import Select from 'react-select';
-import { 
-  MapPin, 
-  Mail, 
-  Phone, 
-  Globe, 
-  Building, 
-  Users, 
-  MessageSquare, 
-  ThumbsUp, 
-  Star, 
-  Plus, 
+} from "../components/ui/dialog";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import {
+  Select as SelectUI,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
+import Header from "../components/layout/header";
+import { useAuth } from "../contexts/AuthContext";
+import {
+  userApiService,
+  UserProfile,
+  Education,
+  Experience,
+  Project,
+} from "../lib/userApi";
+import { useCreateConversation } from "../hooks/useChat";
+import { useLocation } from "wouter";
+import { useToast } from "../hooks/use-toast";
+import { Loader2 } from "lucide-react";
+import Select from "react-select";
+import {
+  MapPin,
+  Mail,
+  Phone,
+  Globe,
+  Building,
+  Users,
+  MessageSquare,
+  ThumbsUp,
+  Star,
+  Plus,
   MoreHorizontal,
   Filter,
   ChevronDown,
@@ -53,36 +65,38 @@ import {
   User,
   FileText,
   Trash2,
-  X
-} from 'lucide-react';
-
-
-
+  X,
+} from "lucide-react";
 
 const mockActivities = [
   {
     id: "1",
     type: "question",
-    title: "Do you have any experience with deploying @Hubspot for a SaaS business with both a direct and self-serve model?",
-    content: "We have a $2M ARR B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith... See more",
+    title:
+      "Do you have any experience with deploying @Hubspot for a SaaS business with both a direct and self-serve model?",
+    content:
+      "We have a $2M ARR B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith... See more",
     timestamp: "Nov 19",
     category: "Questions & Answers",
-    engagement: { comments: 1, thanks: 5, insightful: 2 }
+    engagement: { comments: 1, thanks: 5, insightful: 2 },
   },
   {
     id: "2",
     type: "article",
     title: "Looking for a new landing page optimization vendor",
-    content: "We are looking for a landing page tool that they are missing a minimal with a custom solution that no... See more",
+    content:
+      "We are looking for a landing page tool that they are missing a minimal with a custom solution that no... See more",
     timestamp: "Nov 12",
     category: "#Inbound #SaaS",
-    engagement: { comments: 1, thanks: 15, insightful: 6 }
-  }
+    engagement: { comments: 1, thanks: 15, insightful: 6 },
+  },
 ];
 
 export default function ProfilePage() {
-  const [activeFilter, setActiveFilter] = useState('All');
-  const [expandedComments, setExpandedComments] = useState<{ [key: string]: boolean }>({});
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [expandedComments, setExpandedComments] = useState<{
+    [key: string]: boolean;
+  }>({});
   const [commentText, setCommentText] = useState<{ [key: string]: string }>({});
   const [profileData, setProfileData] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -90,34 +104,34 @@ export default function ProfilePage() {
   const { createConversation } = useCreateConversation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  
+
   // Edit Profile Modal State
   const [showEditProfileModal, setShowEditProfileModal] = useState(false);
   const [editFormLoading, setEditFormLoading] = useState(false);
   const [editFormData, setEditFormData] = useState({
     // Personal fields
-    firstName: '',
-    lastName: '',
-    title: '',
-    positionDesignation: '',
-    currentCompany: '',
-    about: '',
-    gender: '',
-    dateOfBirth: '',
-    city: '',
-    stateName: '',
-    country: '',
+    firstName: "",
+    lastName: "",
+    title: "",
+    positionDesignation: "",
+    currentCompany: "",
+    about: "",
+    gender: "",
+    dateOfBirth: "",
+    city: "",
+    stateName: "",
+    country: "",
     // Business fields
-    companyName: '',
-    industry: '',
-    companyType: '',
-    description: '',
-    addressLine1: '',
-    addressLine2: '',
-    pincode: '',
-    website: '',
-    registrationNumber: '',
-    companySize: '',
+    companyName: "",
+    industry: "",
+    companyType: "",
+    description: "",
+    addressLine1: "",
+    addressLine2: "",
+    pincode: "",
+    website: "",
+    registrationNumber: "",
+    companySize: "",
   });
 
   // Education, Experience, Projects State
@@ -130,54 +144,71 @@ export default function ProfilePage() {
 
   // Skills State
   const [userSkills, setUserSkills] = useState<string[]>([]);
-  const [allSkills, setAllSkills] = useState<{ id: string; name: string }[]>([]);
+  const [allSkills, setAllSkills] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [skillsLoading, setSkillsLoading] = useState(false);
   const [skillsModalOpen, setSkillsModalOpen] = useState(false);
-  const [selectedSkills, setSelectedSkills] = useState<{ value: string; label: string }[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [skillsSaving, setSkillsSaving] = useState(false);
 
   // Suggestions State
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  
+  // Contact Info State
+  const [showContactInfo, setShowContactInfo] = useState(false);
 
   // Modal States for Education, Experience, Projects
   const [showEducationModal, setShowEducationModal] = useState(false);
   const [showExperienceModal, setShowExperienceModal] = useState(false);
   const [showProjectModal, setShowProjectModal] = useState(false);
-  const [editingEducation, setEditingEducation] = useState<Education | null>(null);
-  const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
+  const [editingEducation, setEditingEducation] = useState<Education | null>(
+    null,
+  );
+  const [editingExperience, setEditingExperience] = useState<Experience | null>(
+    null,
+  );
   const [editingProject, setEditingProject] = useState<Project | null>(null);
-  const [educationFormData, setEducationFormData] = useState<Omit<Education, 'id'>>({
-    degree: '',
-    fieldOfStudy: '',
-    schoolOrCollege: '',
-    startDate: '',
-    endDate: '',
-    grade: '',
+  const [educationFormData, setEducationFormData] = useState<
+    Omit<Education, "id">
+  >({
+    degree: "",
+    fieldOfStudy: "",
+    schoolOrCollege: "",
+    startDate: "",
+    endDate: "",
+    grade: "",
   });
-  const [experienceFormData, setExperienceFormData] = useState<Omit<Experience, 'id'>>({
-    companyName: '',
-    title: '',
-    employmentType: '',
-    location: '',
-    startDate: '',
-    endDate: '',
+  const [experienceFormData, setExperienceFormData] = useState<
+    Omit<Experience, "id">
+  >({
+    companyName: "",
+    title: "",
+    employmentType: "",
+    location: "",
+    startDate: "",
+    endDate: "",
     isCurrent: false,
-    description: '',
+    description: "",
   });
-  const [projectFormData, setProjectFormData] = useState<Omit<Project, 'id' | 'imageURLs' | 'createdAt' | 'updatedAt'>>({
-    title: '',
-    description: '',
-    location: '',
+  const [projectFormData, setProjectFormData] = useState<
+    Omit<Project, "id" | "imageURLs" | "createdAt" | "updatedAt">
+  >({
+    title: "",
+    description: "",
+    location: "",
     tags: [],
   });
   const [projectImages, setProjectImages] = useState<File[]>([]);
 
-  const filters = ['All', 'News', 'Posts', 'Articles', 'Videos', 'Jobs'];
+  const filters = ["All", "News", "Posts", "Articles", "Videos", "Jobs"];
 
   const handleSendMessage = async () => {
     if (!profileData || !user) return;
-    
+
     // Don't allow messaging yourself
     if (user.uid === profileData.uid) {
       toast({
@@ -187,12 +218,12 @@ export default function ProfilePage() {
       });
       return;
     }
-    
+
     try {
       const conversationId = await createConversation(profileData.uid);
       setLocation(`/chat/${conversationId}`);
     } catch (error) {
-      console.error('Error creating conversation:', error);
+      console.error("Error creating conversation:", error);
       toast({
         title: "Failed to start conversation",
         description: "Please try again.",
@@ -204,76 +235,183 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchProfileData = async () => {
       if (!user) return;
-      
+
       setLoading(true);
       try {
         const data = await userApiService.getCurrentUser(true);
         setProfileData(data);
         // Populate edit form data based on user type
-        const isBusinessUser = (data as any).userType === 'business';
+        const isBusinessUser = (data as any).userType === "business";
         const location = (data as any).location || {};
         const businessProfile = (data as any).businessProfile || {};
         const businessLocation = businessProfile.location || {};
-        
+
         setEditFormData({
           // Personal fields
-          firstName: data.firstName || '',
-          lastName: data.lastName || '',
-          title: (data as any).title || (data as any).jobTitle || '',
-          positionDesignation: (data as any).positionDesignation || (data as any).position || '',
-          currentCompany: (data as any).currentCompany || (data as any).company || '',
-          about: (data as any).about || (data as any).description || (data as any).bio || '',
-          gender: (data as any).gender || '',
-          dateOfBirth: (data as any).dateOfBirth || (data as any).dob || '',
-          city: location.city || (data as any).city || businessLocation.city || '',
-          stateName: location.state?.name || location.stateName || (data as any).stateName || (data as any).state || businessLocation.state?.name || '',
-          country: location.country?.name || location.country || (data as any).country || businessLocation.country || '',
+          firstName: data.firstName || "",
+          lastName: data.lastName || "",
+          title: (data as any).title || (data as any).jobTitle || "",
+          positionDesignation:
+            (data as any).positionDesignation || (data as any).position || "",
+          currentCompany:
+            (data as any).currentCompany || (data as any).company || "",
+          about:
+            (data as any).about ||
+            (data as any).description ||
+            (data as any).bio ||
+            "",
+          gender: (data as any).gender || "",
+          dateOfBirth: (data as any).dateOfBirth || (data as any).dob || "",
+          city:
+            location.city || (data as any).city || businessLocation.city || "",
+          stateName:
+            location.state?.name ||
+            location.stateName ||
+            (data as any).stateName ||
+            (data as any).state ||
+            businessLocation.state?.name ||
+            "",
+          country:
+            location.country?.name ||
+            location.country ||
+            (data as any).country ||
+            businessLocation.country ||
+            "",
           // Business fields
-          companyName: isBusinessUser ? businessProfile.companyName || (data as any).companyName || '' : '',
-          industry: isBusinessUser ? businessProfile.industry || (data as any).industry || '' : '',
-          companyType: isBusinessUser ? businessProfile.companyType || (data as any).companyType || '' : '',
-          description: isBusinessUser ? businessProfile.description || (data as any).description || '' : '',
-          addressLine1: isBusinessUser ? businessProfile.addressLine1 || businessLocation.addressLine1 || '' : '',
-          addressLine2: isBusinessUser ? businessProfile.addressLine2 || businessLocation.addressLine2 || '' : '',
-          pincode: isBusinessUser ? businessProfile.pincode || businessLocation.pincode || '' : '',
-          website: isBusinessUser ? businessProfile.website || (data as any).website || '' : '',
-          registrationNumber: isBusinessUser ? businessProfile.registrationNumber || (data as any).registrationNumber || '' : '',
-          companySize: isBusinessUser ? businessProfile.companySize || (data as any).companySize || '' : '',
+          companyName: isBusinessUser
+            ? businessProfile.companyName || (data as any).companyName || ""
+            : "",
+          industry: isBusinessUser
+            ? businessProfile.industry || (data as any).industry || ""
+            : "",
+          companyType: isBusinessUser
+            ? businessProfile.companyType || (data as any).companyType || ""
+            : "",
+          description: isBusinessUser
+            ? businessProfile.description || (data as any).description || ""
+            : "",
+          addressLine1: isBusinessUser
+            ? businessProfile.addressLine1 ||
+              businessLocation.addressLine1 ||
+              ""
+            : "",
+          addressLine2: isBusinessUser
+            ? businessProfile.addressLine2 ||
+              businessLocation.addressLine2 ||
+              ""
+            : "",
+          pincode: isBusinessUser
+            ? businessProfile.pincode || businessLocation.pincode || ""
+            : "",
+          website: isBusinessUser
+            ? businessProfile.website || (data as any).website || ""
+            : "",
+          registrationNumber: isBusinessUser
+            ? businessProfile.registrationNumber ||
+              (data as any).registrationNumber ||
+              ""
+            : "",
+          companySize: isBusinessUser
+            ? businessProfile.companySize || (data as any).companySize || ""
+            : "",
         });
       } catch (error) {
-        console.error('Error fetching profile data:', error);
+        console.error("Error fetching profile data:", error);
         // Fallback to context data if API fails
         if (userProfile) {
           setProfileData(userProfile);
-          const isBusinessUser = (userProfile as any).userType === 'business';
+          const isBusinessUser = (userProfile as any).userType === "business";
           const location = (userProfile as any).location || {};
           const businessProfile = (userProfile as any).businessProfile || {};
           const businessLocation = businessProfile.location || {};
-          
+
           setEditFormData({
             // Personal fields
-            firstName: userProfile.firstName || '',
-            lastName: userProfile.lastName || '',
-            title: (userProfile as any).title || (userProfile as any).jobTitle || '',
-            positionDesignation: (userProfile as any).positionDesignation || (userProfile as any).position || '',
-            currentCompany: (userProfile as any).currentCompany || (userProfile as any).company || '',
-            about: (userProfile as any).about || (userProfile as any).description || (userProfile as any).bio || '',
-            gender: (userProfile as any).gender || '',
-            dateOfBirth: (userProfile as any).dateOfBirth || (userProfile as any).dob || '',
-            city: location.city || (userProfile as any).city || businessLocation.city || '',
-            stateName: location.state?.name || location.stateName || (userProfile as any).stateName || (userProfile as any).state || businessLocation.state?.name || '',
-            country: location.country?.name || location.country || (userProfile as any).country || businessLocation.country || '',
+            firstName: userProfile.firstName || "",
+            lastName: userProfile.lastName || "",
+            title:
+              (userProfile as any).title || (userProfile as any).jobTitle || "",
+            positionDesignation:
+              (userProfile as any).positionDesignation ||
+              (userProfile as any).position ||
+              "",
+            currentCompany:
+              (userProfile as any).currentCompany ||
+              (userProfile as any).company ||
+              "",
+            about:
+              (userProfile as any).about ||
+              (userProfile as any).description ||
+              (userProfile as any).bio ||
+              "",
+            gender: (userProfile as any).gender || "",
+            dateOfBirth:
+              (userProfile as any).dateOfBirth ||
+              (userProfile as any).dob ||
+              "",
+            city:
+              location.city ||
+              (userProfile as any).city ||
+              businessLocation.city ||
+              "",
+            stateName:
+              location.state?.name ||
+              location.stateName ||
+              (userProfile as any).stateName ||
+              (userProfile as any).state ||
+              businessLocation.state?.name ||
+              "",
+            country:
+              location.country?.name ||
+              location.country ||
+              (userProfile as any).country ||
+              businessLocation.country ||
+              "",
             // Business fields
-            companyName: isBusinessUser ? businessProfile.companyName || (userProfile as any).companyName || '' : '',
-            industry: isBusinessUser ? businessProfile.industry || (userProfile as any).industry || '' : '',
-            companyType: isBusinessUser ? businessProfile.companyType || (userProfile as any).companyType || '' : '',
-            description: isBusinessUser ? businessProfile.description || (userProfile as any).description || '' : '',
-            addressLine1: isBusinessUser ? businessProfile.addressLine1 || businessLocation.addressLine1 || '' : '',
-            addressLine2: isBusinessUser ? businessProfile.addressLine2 || businessLocation.addressLine2 || '' : '',
-            pincode: isBusinessUser ? businessProfile.pincode || businessLocation.pincode || '' : '',
-            website: isBusinessUser ? businessProfile.website || (userProfile as any).website || '' : '',
-            registrationNumber: isBusinessUser ? businessProfile.registrationNumber || (userProfile as any).registrationNumber || '' : '',
-            companySize: isBusinessUser ? businessProfile.companySize || (userProfile as any).companySize || '' : '',
+            companyName: isBusinessUser
+              ? businessProfile.companyName ||
+                (userProfile as any).companyName ||
+                ""
+              : "",
+            industry: isBusinessUser
+              ? businessProfile.industry || (userProfile as any).industry || ""
+              : "",
+            companyType: isBusinessUser
+              ? businessProfile.companyType ||
+                (userProfile as any).companyType ||
+                ""
+              : "",
+            description: isBusinessUser
+              ? businessProfile.description ||
+                (userProfile as any).description ||
+                ""
+              : "",
+            addressLine1: isBusinessUser
+              ? businessProfile.addressLine1 ||
+                businessLocation.addressLine1 ||
+                ""
+              : "",
+            addressLine2: isBusinessUser
+              ? businessProfile.addressLine2 ||
+                businessLocation.addressLine2 ||
+                ""
+              : "",
+            pincode: isBusinessUser
+              ? businessProfile.pincode || businessLocation.pincode || ""
+              : "",
+            website: isBusinessUser
+              ? businessProfile.website || (userProfile as any).website || ""
+              : "",
+            registrationNumber: isBusinessUser
+              ? businessProfile.registrationNumber ||
+                (userProfile as any).registrationNumber ||
+                ""
+              : "",
+            companySize: isBusinessUser
+              ? businessProfile.companySize ||
+                (userProfile as any).companySize ||
+                ""
+              : "",
           });
         }
       } finally {
@@ -289,10 +427,12 @@ export default function ProfilePage() {
     if (!profileData?.uid) return;
     setEducationLoading(true);
     try {
-      const educationData = await userApiService.getUserEducation(profileData.uid);
+      const educationData = await userApiService.getUserEducation(
+        profileData.uid,
+      );
       setEducation(educationData || []);
     } catch (error) {
-      console.error('Error loading education:', error);
+      console.error("Error loading education:", error);
       toast({
         title: "Error",
         description: "Failed to load education data",
@@ -307,10 +447,12 @@ export default function ProfilePage() {
     if (!profileData?.uid) return;
     setExperienceLoading(true);
     try {
-      const experienceData = await userApiService.getUserExperience(profileData.uid);
+      const experienceData = await userApiService.getUserExperience(
+        profileData.uid,
+      );
       setExperience(experienceData || []);
     } catch (error) {
-      console.error('Error loading experience:', error);
+      console.error("Error loading experience:", error);
       toast({
         title: "Error",
         description: "Failed to load experience data",
@@ -325,10 +467,12 @@ export default function ProfilePage() {
     if (!profileData?.uid) return;
     setProjectsLoading(true);
     try {
-      const projectsData = await userApiService.getUserProjects(profileData.uid);
+      const projectsData = await userApiService.getUserProjects(
+        profileData.uid,
+      );
       setProjects(projectsData || []);
     } catch (error) {
-      console.error('Error loading projects:', error);
+      console.error("Error loading projects:", error);
       toast({
         title: "Error",
         description: "Failed to load projects data",
@@ -346,25 +490,29 @@ export default function ProfilePage() {
       // Load all skills and user skills in parallel
       const [allSkillsData, userSkillsData] = await Promise.all([
         userApiService.getAllSkills(),
-        userApiService.getUserSkills(profileData.uid)
+        userApiService.getUserSkills(profileData.uid),
       ]);
-      
+
       // Ensure data is arrays
       const skillsArray = Array.isArray(allSkillsData) ? allSkillsData : [];
-      const userSkillsArray = Array.isArray(userSkillsData) ? userSkillsData : [];
-      
+      const userSkillsArray = Array.isArray(userSkillsData)
+        ? userSkillsData
+        : [];
+
       setAllSkills(skillsArray);
       setUserSkills(userSkillsArray);
-      
+
       // Set selected skills for the modal
-      const selectedSkillOptions = userSkillsArray.map(skillId => {
-        const skill = skillsArray.find(s => s.id === skillId);
-        return { value: skillId, label: skill?.name || skillId };
-      }).filter(Boolean);
-      
+      const selectedSkillOptions = userSkillsArray
+        .map((skillId) => {
+          const skill = skillsArray.find((s) => s.id === skillId);
+          return { value: skillId, label: skill?.name || skillId };
+        })
+        .filter(Boolean);
+
       setSelectedSkills(selectedSkillOptions);
     } catch (error) {
-      console.error('Error loading skills:', error);
+      console.error("Error loading skills:", error);
       toast({
         title: "Error",
         description: "Failed to load skills data",
@@ -384,22 +532,22 @@ export default function ProfilePage() {
 
   const handleSkillsSave = async () => {
     if (!profileData?.uid) return;
-    
+
     setSkillsSaving(true);
     try {
-      const skillIds = selectedSkills.map(skill => skill.value);
+      const skillIds = selectedSkills.map((skill) => skill.value);
       await userApiService.updateUserSkills(profileData.uid, skillIds);
-      
+
       // Update local state
       setUserSkills(skillIds);
       setSkillsModalOpen(false);
-      
+
       toast({
         title: "Skills updated",
         description: "Your skills have been successfully updated.",
       });
     } catch (error) {
-      console.error('Error updating skills:', error);
+      console.error("Error updating skills:", error);
       toast({
         title: "Error",
         description: "Failed to update skills",
@@ -412,7 +560,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (profileData?.uid) {
-      if ((profileData as any).userType !== 'business') {
+      if ((profileData as any).userType !== "business") {
         loadEducation();
         loadExperience();
         loadSkills();
@@ -428,7 +576,7 @@ export default function ProfilePage() {
       const suggestionsData = await userApiService.getUserSuggestions();
       setSuggestions(suggestionsData || []);
     } catch (error) {
-      console.error('Error loading suggestions:', error);
+      console.error("Error loading suggestions:", error);
       // Fallback to empty array on error
       setSuggestions([]);
     } finally {
@@ -440,12 +588,12 @@ export default function ProfilePage() {
   const handleAddEducation = () => {
     setEditingEducation(null);
     setEducationFormData({
-      degree: '',
-      fieldOfStudy: '',
-      schoolOrCollege: '',
-      startDate: '',
-      endDate: '',
-      grade: '',
+      degree: "",
+      fieldOfStudy: "",
+      schoolOrCollege: "",
+      startDate: "",
+      endDate: "",
+      grade: "",
     });
     setShowEducationModal(true);
   };
@@ -468,7 +616,11 @@ export default function ProfilePage() {
     setEditFormLoading(true);
     try {
       if (editingEducation?.id) {
-        await userApiService.updateEducation(profileData.uid, editingEducation.id, educationFormData);
+        await userApiService.updateEducation(
+          profileData.uid,
+          editingEducation.id,
+          educationFormData,
+        );
         toast({
           title: "Success",
           description: "Education updated successfully",
@@ -483,7 +635,7 @@ export default function ProfilePage() {
       setShowEducationModal(false);
       loadEducation();
     } catch (error) {
-      console.error('Error saving education:', error);
+      console.error("Error saving education:", error);
       toast({
         title: "Error",
         description: "Failed to save education",
@@ -504,7 +656,7 @@ export default function ProfilePage() {
       });
       loadEducation();
     } catch (error) {
-      console.error('Error deleting education:', error);
+      console.error("Error deleting education:", error);
       toast({
         title: "Error",
         description: "Failed to delete education",
@@ -517,14 +669,14 @@ export default function ProfilePage() {
   const handleAddExperience = () => {
     setEditingExperience(null);
     setExperienceFormData({
-      companyName: '',
-      title: '',
-      employmentType: '',
-      location: '',
-      startDate: '',
-      endDate: '',
+      companyName: "",
+      title: "",
+      employmentType: "",
+      location: "",
+      startDate: "",
+      endDate: "",
       isCurrent: false,
-      description: '',
+      description: "",
     });
     setShowExperienceModal(true);
   };
@@ -549,7 +701,11 @@ export default function ProfilePage() {
     setEditFormLoading(true);
     try {
       if (editingExperience?.id) {
-        await userApiService.updateExperience(profileData.uid, editingExperience.id, experienceFormData);
+        await userApiService.updateExperience(
+          profileData.uid,
+          editingExperience.id,
+          experienceFormData,
+        );
         toast({
           title: "Success",
           description: "Experience updated successfully",
@@ -564,7 +720,7 @@ export default function ProfilePage() {
       setShowExperienceModal(false);
       loadExperience();
     } catch (error) {
-      console.error('Error saving experience:', error);
+      console.error("Error saving experience:", error);
       toast({
         title: "Error",
         description: "Failed to save experience",
@@ -585,7 +741,7 @@ export default function ProfilePage() {
       });
       loadExperience();
     } catch (error) {
-      console.error('Error deleting experience:', error);
+      console.error("Error deleting experience:", error);
       toast({
         title: "Error",
         description: "Failed to delete experience",
@@ -598,9 +754,9 @@ export default function ProfilePage() {
   const handleAddProject = () => {
     setEditingProject(null);
     setProjectFormData({
-      title: '',
-      description: '',
-      location: '',
+      title: "",
+      description: "",
+      location: "",
       tags: [],
     });
     setProjectImages([]);
@@ -612,7 +768,7 @@ export default function ProfilePage() {
     setProjectFormData({
       title: project.title,
       description: project.description,
-      location: project.location || '',
+      location: project.location || "",
       tags: project.tags || [],
     });
     setProjectImages([]);
@@ -624,13 +780,21 @@ export default function ProfilePage() {
     setEditFormLoading(true);
     try {
       if (editingProject?.id) {
-        await userApiService.updateProject(profileData.uid, editingProject.id, projectFormData);
+        await userApiService.updateProject(
+          profileData.uid,
+          editingProject.id,
+          projectFormData,
+        );
         toast({
           title: "Success",
           description: "Project updated successfully",
         });
       } else {
-        await userApiService.addProject(profileData.uid, projectFormData, projectImages);
+        await userApiService.addProject(
+          profileData.uid,
+          projectFormData,
+          projectImages,
+        );
         toast({
           title: "Success",
           description: "Project added successfully",
@@ -639,7 +803,7 @@ export default function ProfilePage() {
       setShowProjectModal(false);
       loadProjects();
     } catch (error) {
-      console.error('Error saving project:', error);
+      console.error("Error saving project:", error);
       toast({
         title: "Error",
         description: "Failed to save project",
@@ -660,7 +824,7 @@ export default function ProfilePage() {
       });
       loadProjects();
     } catch (error) {
-      console.error('Error deleting project:', error);
+      console.error("Error deleting project:", error);
       toast({
         title: "Error",
         description: "Failed to delete project",
@@ -670,39 +834,39 @@ export default function ProfilePage() {
   };
 
   const toggleComments = (postId: string) => {
-    setExpandedComments(prev => ({
+    setExpandedComments((prev) => ({
       ...prev,
-      [postId]: !prev[postId]
+      [postId]: !prev[postId],
     }));
   };
 
   const handleCommentChange = (postId: string, text: string) => {
-    setCommentText(prev => ({
+    setCommentText((prev) => ({
       ...prev,
-      [postId]: text
+      [postId]: text,
     }));
   };
 
   const handleSubmitComment = (postId: string) => {
     console.log(`Comment for post ${postId}:`, commentText[postId]);
-    setCommentText(prev => ({
+    setCommentText((prev) => ({
       ...prev,
-      [postId]: ''
+      [postId]: "",
     }));
   };
 
   // Edit Profile Handlers
   const handleEditFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!profileData || !user) return;
-    
+
     setEditFormLoading(true);
-    
+
     try {
-      const isBusinessUser = (profileData as any).userType === 'business';
+      const isBusinessUser = (profileData as any).userType === "business";
       let updateData: any = {};
-      
+
       if (isBusinessUser) {
         // Business profile update
         updateData = {
@@ -720,9 +884,9 @@ export default function ProfilePage() {
             location: {
               city: editFormData.city,
               state: { name: editFormData.stateName },
-              country: editFormData.country
-            }
-          }
+              country: editFormData.country,
+            },
+          },
         };
       } else {
         // Personal profile update
@@ -740,17 +904,20 @@ export default function ProfilePage() {
           country: editFormData.country,
         };
       }
-      
+
       // Remove empty fields
       const removeEmptyFields = (obj: any): any => {
-        if (obj === null || typeof obj !== 'object') return obj;
-        
-        if (Array.isArray(obj)) return obj.map(removeEmptyFields).filter(v => v !== null && v !== undefined && v !== '');
-        
+        if (obj === null || typeof obj !== "object") return obj;
+
+        if (Array.isArray(obj))
+          return obj
+            .map(removeEmptyFields)
+            .filter((v) => v !== null && v !== undefined && v !== "");
+
         return Object.keys(obj).reduce((acc, key) => {
           const value = obj[key];
-          if (value !== null && value !== undefined && value !== '') {
-            if (typeof value === 'object') {
+          if (value !== null && value !== undefined && value !== "") {
+            if (typeof value === "object") {
               const cleaned = removeEmptyFields(value);
               if (Object.keys(cleaned).length > 0) {
                 acc[key] = cleaned;
@@ -762,13 +929,16 @@ export default function ProfilePage() {
           return acc;
         }, {} as any);
       };
-      
+
       updateData = removeEmptyFields(updateData);
-      
-      const updatedUser = await userApiService.updateUser(profileData.uid, updateData);
+
+      const updatedUser = await userApiService.updateUser(
+        profileData.uid,
+        updateData,
+      );
       setProfileData(updatedUser);
       setShowEditProfileModal(false);
-      
+
       toast({
         title: "Profile updated",
         description: "Your profile has been successfully updated.",
@@ -786,9 +956,9 @@ export default function ProfilePage() {
   };
 
   const handleEditFormChange = (field: string, value: string) => {
-    setEditFormData(prev => ({
+    setEditFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -811,7 +981,9 @@ export default function ProfilePage() {
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="text-center">
-            <p className="text-cmo-text-secondary">Unable to load profile data.</p>
+            <p className="text-cmo-text-secondary">
+              Unable to load profile data.
+            </p>
           </div>
         </div>
       </div>
@@ -821,73 +993,85 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-cmo-bg">
       <Header />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Banner and Profile Section */}
             <Card className="mb-4 overflow-hidden">
-              <div 
+              <div
                 className="h-32 sm:h-40 bg-gradient-to-r from-blue-500 to-purple-600"
                 style={{
-                  backgroundImage: (profileData as any).bannerUrl ? `url(${(profileData as any).bannerUrl})` : undefined,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center'
+                  backgroundImage: (profileData as any).bannerUrl
+                    ? `url(${(profileData as any).bannerUrl})`
+                    : undefined,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
                 }}
               />
-              
+
               <CardContent className="relative p-3 sm:p-4">
                 {/* Profile Info Section - Fixed Overlap */}
                 <div className="flex flex-col sm:flex-row gap-4 pt-2">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
                     <Avatar className="w-16 h-16 sm:w-20 sm:h-20 -mt-10 sm:-mt-12 border-4 border-white shadow-lg">
-                      <AvatarImage src={(profileData as any).photoUrl || (profileData as any).profilePic || ""} />
+                      <AvatarImage
+                        src={
+                          (profileData as any).photoUrl ||
+                          (profileData as any).profilePic ||
+                          ""
+                        }
+                      />
                       <AvatarFallback className="text-sm">
-                        {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
+                        {profileData.firstName?.charAt(0) || "U"}
+                        {profileData.lastName?.charAt(0) || ""}
                       </AvatarFallback>
                     </Avatar>
                   </div>
-                  
+
                   {/* Profile Details */}
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <h1 className="text-lg font-semibold text-cmo-text-primary truncate">
-                          {profileData.firstName || ''} {profileData.lastName || ''}
+                          {profileData.firstName || ""}{" "}
+                          {profileData.lastName || ""}
                         </h1>
                         <p className="text-sm sm:text-base text-cmo-text-secondary mb-1">
-                          {(profileData as any).userType === 'business' 
-                            ? (profileData as any).businessProfile?.companyName 
-                            : ((profileData as any).title || (profileData as any).positionDesignation || 'Professional')
-                          }
+                          {(profileData as any).userType === "business"
+                            ? (profileData as any).businessProfile?.companyName
+                            : (profileData as any).title ||
+                              (profileData as any).positionDesignation ||
+                              "Professional"}
                         </p>
-                        {((profileData as any).city || (profileData as any).stateName) && (
+                        {((profileData as any).city ||
+                          (profileData as any).stateName) && (
                           <div className="flex items-center gap-1 text-xs sm:text-sm text-cmo-text-secondary mb-1">
                             <MapPin className="w-4 h-4" />
                             <span>
-                              {(profileData as any).city || ''}
-                              {(profileData as any).stateName ? `, ${(profileData as any).stateName}` : ''}
-                              {(profileData as any).country ? `, ${typeof (profileData as any).country === 'string' ? (profileData as any).country : (profileData as any).country.name}` : ''}
+                              {(profileData as any).city || ""}
+                              {(profileData as any).stateName
+                                ? `, ${(profileData as any).stateName}`
+                                : ""}
+                              {(profileData as any).country
+                                ? `, ${typeof (profileData as any).country === "string" ? (profileData as any).country : (profileData as any).country.name}`
+                                : ""}
                             </span>
                           </div>
                         )}
                         <div className="flex items-center gap-3 text-xs sm:text-sm text-cmo-text-secondary">
-                          <button 
-                            className="flex items-center gap-1 hover:text-cmo-primary transition-colors"
-                          >
+                          <button className="flex items-center gap-1 hover:text-cmo-primary transition-colors">
                             <Users className="w-4 h-4" />
                             {(profileData as any).followersCount || 0} followers
                           </button>
-                          <button 
-                            className="hover:text-cmo-primary transition-colors"
-                          >
+                          <button className="hover:text-cmo-primary transition-colors">
                             {(profileData as any).followingCount || 0} following
                           </button>
                         </div>
                       </div>
-                      
+
                       {/* Action Buttons */}
                       {user?.uid === profileData?.uid && (
                         <div className="flex items-center gap-2 flex-shrink-0">
@@ -898,7 +1082,9 @@ export default function ProfilePage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem onClick={() => setShowEditProfileModal(true)}>
+                              <DropdownMenuItem
+                                onClick={() => setShowEditProfileModal(true)}
+                              >
                                 <Edit className="mr-2 h-4 w-4" />
                                 <span>Edit Profile</span>
                               </DropdownMenuItem>
@@ -919,20 +1105,23 @@ export default function ProfilePage() {
                             <Edit className="w-4 h-4 mr-2" />
                             Edit Profile
                           </Button>
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             onClick={() => {
                               if (navigator.share) {
                                 navigator.share({
                                   title: `${profileData.firstName} ${profileData.lastName}'s Profile`,
-                                  url: window.location.href
+                                  url: window.location.href,
                                 });
                               } else {
-                                navigator.clipboard.writeText(window.location.href);
+                                navigator.clipboard.writeText(
+                                  window.location.href,
+                                );
                                 toast({
                                   title: "Link copied",
-                                  description: "Profile link copied to clipboard",
+                                  description:
+                                    "Profile link copied to clipboard",
                                 });
                               }
                             }}
@@ -986,11 +1175,10 @@ export default function ProfilePage() {
                 <div className="mt-4">
                   <h3 className="text-sm font-semibold mb-2">About</h3>
                   <p className="text-sm text-cmo-text-secondary leading-relaxed">
-                    {(profileData as any).about || "Professional with expertise in the construction and civil engineering industry."}
+                    {(profileData as any).about ||
+                      "Professional with expertise in the construction and civil engineering industry."}
                   </p>
                 </div>
-
-
               </CardContent>
             </Card>
 
@@ -1002,9 +1190,9 @@ export default function ProfilePage() {
                     <Building className="w-5 h-5 text-cmo-primary" />
                     Projects
                   </h3>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={handleAddProject}
                     data-testid="button-add-project"
                   >
@@ -1025,18 +1213,26 @@ export default function ProfilePage() {
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <h4 className="font-medium text-sm">{project.title}</h4>
+                              <h4 className="font-medium text-sm">
+                                {project.title}
+                              </h4>
                               {project.location && (
                                 <p className="text-cmo-text-secondary flex items-center gap-1 text-xs">
                                   <MapPin className="w-3 h-3" />
                                   {project.location}
                                 </p>
                               )}
-                              <p className="text-xs text-cmo-text-secondary mt-2">{project.description}</p>
+                              <p className="text-xs text-cmo-text-secondary mt-2">
+                                {project.description}
+                              </p>
                               {project.tags && project.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
                                   {project.tags.map((tag, idx) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs px-2 py-0.5">
+                                    <Badge
+                                      key={idx}
+                                      variant="secondary"
+                                      className="text-xs px-2 py-0.5"
+                                    >
                                       {tag}
                                     </Badge>
                                   ))}
@@ -1044,18 +1240,20 @@ export default function ProfilePage() {
                               )}
                             </div>
                             <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
+                              <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => handleEditProject(project)}
                                 data-testid={`button-edit-project-${project.id}`}
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
-                              <Button 
-                                variant="ghost" 
-                                size="sm" 
-                                onClick={() => project.id && handleDeleteProject(project.id)}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  project.id && handleDeleteProject(project.id)
+                                }
                                 data-testid={`button-delete-project-${project.id}`}
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -1066,14 +1264,16 @@ export default function ProfilePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-cmo-text-secondary text-center py-8">No projects added yet</p>
+                    <p className="text-cmo-text-secondary text-center py-8">
+                      No projects added yet
+                    </p>
                   )}
                 </div>
               </CardContent>
             </Card>
 
             {/* Education and Experience - Only for Personal Users */}
-            {(profileData as any).userType !== 'business' && (
+            {(profileData as any).userType !== "business" && (
               <>
                 {/* Education Section */}
                 <Card className="mb-4">
@@ -1083,9 +1283,9 @@ export default function ProfilePage() {
                         <GraduationCap className="w-6 h-6 text-cmo-primary" />
                         Education
                       </h3>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={handleAddEducation}
                         data-testid="button-add-education"
                       >
@@ -1106,27 +1306,36 @@ export default function ProfilePage() {
                             <div className="flex-1">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                  <h4 className="font-medium text-sm">{edu.degree}</h4>
-                                  <p className="text-cmo-primary font-medium text-sm">{edu.fieldOfStudy}</p>
-                                  <p className="text-cmo-text-secondary text-xs">{edu.schoolOrCollege}</p>
+                                  <h4 className="font-medium text-sm">
+                                    {edu.degree}
+                                  </h4>
+                                  <p className="text-cmo-primary font-medium text-sm">
+                                    {edu.fieldOfStudy}
+                                  </p>
+                                  <p className="text-cmo-text-secondary text-xs">
+                                    {edu.schoolOrCollege}
+                                  </p>
                                   <p className="text-xs text-cmo-text-secondary mt-1">
-                                    {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
+                                    {new Date(edu.startDate).getFullYear()} -{" "}
+                                    {new Date(edu.endDate).getFullYear()}
                                     {edu.grade && ` • ${edu.grade}`}
                                   </p>
                                 </div>
                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={() => handleEditEducation(edu)}
                                     data-testid={`button-edit-education-${edu.id}`}
                                   >
                                     <Edit className="w-4 h-4" />
                                   </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => edu.id && handleDeleteEducation(edu.id)}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      edu.id && handleDeleteEducation(edu.id)
+                                    }
                                     data-testid={`button-delete-education-${edu.id}`}
                                   >
                                     <Trash2 className="w-4 h-4" />
@@ -1137,7 +1346,9 @@ export default function ProfilePage() {
                           </div>
                         ))
                       ) : (
-                        <p className="text-cmo-text-secondary text-center py-8">No education added yet</p>
+                        <p className="text-cmo-text-secondary text-center py-8">
+                          No education added yet
+                        </p>
                       )}
                     </div>
                   </CardContent>
@@ -1151,9 +1362,9 @@ export default function ProfilePage() {
                         <Briefcase className="w-6 h-6 text-cmo-primary" />
                         Experience
                       </h3>
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={handleAddExperience}
                         data-testid="button-add-experience"
                       >
@@ -1174,31 +1385,43 @@ export default function ProfilePage() {
                             <div className="flex-1">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                  <h4 className="font-medium text-sm">{exp.title}</h4>
-                                  <p className="text-cmo-primary font-medium text-sm">{exp.companyName}</p>
+                                  <h4 className="font-medium text-sm">
+                                    {exp.title}
+                                  </h4>
+                                  <p className="text-cmo-primary font-medium text-sm">
+                                    {exp.companyName}
+                                  </p>
                                   <p className="text-cmo-text-secondary flex items-center gap-1 text-xs">
                                     <MapPin className="w-3 h-3" />
                                     {exp.location}
                                   </p>
                                   <p className="text-xs text-cmo-text-secondary mt-1">
-                                    {new Date(exp.startDate).getFullYear()} - {exp.isCurrent ? 'Present' : new Date(exp.endDate).getFullYear()}
-                                    {exp.employmentType && ` • ${exp.employmentType}`}
+                                    {new Date(exp.startDate).getFullYear()} -{" "}
+                                    {exp.isCurrent
+                                      ? "Present"
+                                      : new Date(exp.endDate).getFullYear()}
+                                    {exp.employmentType &&
+                                      ` • ${exp.employmentType}`}
                                   </p>
-                                  <p className="text-xs text-cmo-text-secondary mt-2">{exp.description}</p>
+                                  <p className="text-xs text-cmo-text-secondary mt-2">
+                                    {exp.description}
+                                  </p>
                                 </div>
                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={() => handleEditExperience(exp)}
                                     data-testid={`button-edit-experience-${exp.id}`}
                                   >
                                     <Edit className="w-4 h-4" />
                                   </Button>
-                                  <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    onClick={() => exp.id && handleDeleteExperience(exp.id)}
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() =>
+                                      exp.id && handleDeleteExperience(exp.id)
+                                    }
                                     data-testid={`button-delete-experience-${exp.id}`}
                                   >
                                     <Trash2 className="w-4 h-4" />
@@ -1209,7 +1432,9 @@ export default function ProfilePage() {
                           </div>
                         ))
                       ) : (
-                        <p className="text-cmo-text-secondary text-center py-8">No experience added yet</p>
+                        <p className="text-cmo-text-secondary text-center py-8">
+                          No experience added yet
+                        </p>
                       )}
                     </div>
                   </CardContent>
@@ -1238,7 +1463,9 @@ export default function ProfilePage() {
                       variant={activeFilter === filter ? "default" : "outline"}
                       size="sm"
                       onClick={() => setActiveFilter(filter)}
-                      className={activeFilter === filter ? "bg-cmo-primary" : ""}
+                      className={
+                        activeFilter === filter ? "bg-cmo-primary" : ""
+                      }
                     >
                       {filter}
                     </Button>
@@ -1248,20 +1475,35 @@ export default function ProfilePage() {
                 {/* Activity Feed */}
                 <div className="space-y-6">
                   {mockActivities.map((activity) => (
-                    <div key={activity.id} className="border-b border-cmo-border pb-6 last:border-b-0">
+                    <div
+                      key={activity.id}
+                      className="border-b border-cmo-border pb-6 last:border-b-0"
+                    >
                       <div className="flex gap-3">
                         <Avatar className="w-12 h-12">
-                          <AvatarImage src={(profileData as any).photoUrl || (profileData as any).profilePic || ""} />
+                          <AvatarImage
+                            src={
+                              (profileData as any).photoUrl ||
+                              (profileData as any).profilePic ||
+                              ""
+                            }
+                          />
                           <AvatarFallback>
-                            {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
+                            {profileData.firstName?.charAt(0) || "U"}
+                            {profileData.lastName?.charAt(0) || ""}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
                             <div>
-                              <h4 className="font-medium text-cmo-text-primary">{activity.title}</h4>
+                              <h4 className="font-medium text-cmo-text-primary">
+                                {activity.title}
+                              </h4>
                               <div className="flex items-center gap-2 text-sm text-cmo-text-secondary mt-1">
-                                <span>{profileData.firstName || ''} {profileData.lastName || ''}</span>
+                                <span>
+                                  {profileData.firstName || ""}{" "}
+                                  {profileData.lastName || ""}
+                                </span>
                                 <span>•</span>
                                 <span>{activity.timestamp}</span>
                                 <Badge variant="secondary" className="text-xs">
@@ -1291,32 +1533,50 @@ export default function ProfilePage() {
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
-                          <p className="text-cmo-text-secondary mt-3">{activity.content}</p>
-                          
+                          <p className="text-cmo-text-secondary mt-3">
+                            {activity.content}
+                          </p>
+
                           {/* Engagement Actions - Updated with Share button */}
                           <div className="flex items-center gap-6 mt-4">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
+                            <Button
+                              variant="ghost"
+                              size="sm"
                               onClick={() => toggleComments(activity.id)}
                               className="text-cmo-text-secondary hover:text-cmo-primary"
                             >
                               <MessageSquare className="w-4 h-4 mr-1" />
                               Comment ({activity.engagement.comments})
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                            >
                               <ThumbsUp className="w-4 h-4 mr-1" />
                               Thanks ({activity.engagement.thanks})
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                            >
                               <Star className="w-4 h-4 mr-1" />
                               Insightful ({activity.engagement.insightful})
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                            >
                               <Share className="w-4 h-4 mr-1" />
                               Share
                             </Button>
-                            <Button variant="ghost" size="sm" className="text-cmo-text-secondary hover:text-cmo-primary">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-cmo-text-secondary hover:text-cmo-primary"
+                            >
                               <Bookmark className="w-4 h-4" />
                             </Button>
                           </div>
@@ -1326,30 +1586,48 @@ export default function ProfilePage() {
                             <div className="mt-4 pl-4 border-l-2 border-cmo-border">
                               <div className="flex gap-3">
                                 <Avatar className="w-8 h-8">
-                                  <AvatarImage src={(profileData as any).photoUrl || (profileData as any).profilePic || ""} />
+                                  <AvatarImage
+                                    src={
+                                      (profileData as any).photoUrl ||
+                                      (profileData as any).profilePic ||
+                                      ""
+                                    }
+                                  />
                                   <AvatarFallback className="text-xs">
-                                    {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
+                                    {profileData.firstName?.charAt(0) || "U"}
+                                    {profileData.lastName?.charAt(0) || ""}
                                   </AvatarFallback>
                                 </Avatar>
                                 <div className="flex-1">
                                   <Textarea
                                     placeholder="Write a comment..."
-                                    value={commentText[activity.id] || ''}
-                                    onChange={(e) => handleCommentChange(activity.id, e.target.value)}
+                                    value={commentText[activity.id] || ""}
+                                    onChange={(e) =>
+                                      handleCommentChange(
+                                        activity.id,
+                                        e.target.value,
+                                      )
+                                    }
                                     className="min-h-[80px] mb-2"
                                   />
                                   <div className="flex justify-end gap-2">
-                                    <Button 
-                                      variant="outline" 
+                                    <Button
+                                      variant="outline"
                                       size="sm"
-                                      onClick={() => toggleComments(activity.id)}
+                                      onClick={() =>
+                                        toggleComments(activity.id)
+                                      }
                                     >
                                       Cancel
                                     </Button>
-                                    <Button 
-                                      size="sm" 
-                                      onClick={() => handleSubmitComment(activity.id)}
-                                      disabled={!commentText[activity.id]?.trim()}
+                                    <Button
+                                      size="sm"
+                                      onClick={() =>
+                                        handleSubmitComment(activity.id)
+                                      }
+                                      disabled={
+                                        !commentText[activity.id]?.trim()
+                                      }
                                       className="bg-cmo-primary hover:bg-cmo-primary/90"
                                     >
                                       <Send className="w-4 h-4 mr-1" />
@@ -1376,37 +1654,56 @@ export default function ProfilePage() {
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Intro</h3>
                 <div className="space-y-3">
-                  {(profileData as any).userType === 'business' ? (
+                  {(profileData as any).userType === "business" ? (
                     <>
                       {/* Business Profile Info */}
                       {(profileData as any).businessProfile?.companyName && (
                         <div className="flex items-center gap-3">
                           <Building className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">{(profileData as any).businessProfile.companyName}</span>
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.companyName}
+                          </span>
                         </div>
                       )}
                       {(profileData as any).businessProfile?.industry && (
                         <div className="flex items-center gap-3">
                           <Briefcase className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">{(profileData as any).businessProfile.industry}</span>
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.industry}
+                          </span>
                         </div>
                       )}
                       {(profileData as any).businessProfile?.companySize && (
                         <div className="flex items-center gap-3">
                           <Users className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">{(profileData as any).businessProfile.companySize} employees</span>
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.companySize}{" "}
+                            employees
+                          </span>
                         </div>
                       )}
-                      {(profileData as any).businessProfile?.registrationNumber && (
+                      {(profileData as any).businessProfile
+                        ?.registrationNumber && (
                         <div className="flex items-center gap-3">
                           <FileText className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">Reg: {(profileData as any).businessProfile.registrationNumber}</span>
+                          <span className="text-sm">
+                            Reg:{" "}
+                            {
+                              (profileData as any).businessProfile
+                                .registrationNumber
+                            }
+                          </span>
                         </div>
                       )}
                       {(profileData as any).businessProfile?.website && (
                         <div className="flex items-center gap-3">
                           <Globe className="w-5 h-5 text-cmo-primary" />
-                          <a href={(profileData as any).businessProfile.website} target="_blank" rel="noopener noreferrer" className="text-sm text-cmo-primary hover:underline">
+                          <a
+                            href={(profileData as any).businessProfile.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-cmo-primary hover:underline"
+                          >
                             Website
                           </a>
                         </div>
@@ -1415,46 +1712,86 @@ export default function ProfilePage() {
                   ) : (
                     <>
                       {/* Personal Profile Info */}
-                      {((profileData as any).title || (profileData as any).positionDesignation) && (
+                      {((profileData as any).title ||
+                        (profileData as any).positionDesignation) && (
                         <div className="flex items-center gap-3">
                           <Briefcase className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">{(profileData as any).title || (profileData as any).positionDesignation}</span>
+                          <span className="text-sm">
+                            {(profileData as any).title ||
+                              (profileData as any).positionDesignation}
+                          </span>
                         </div>
                       )}
                       {(profileData as any).company && (
                         <div className="flex items-center gap-3">
                           <Building className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">{(profileData as any).company}</span>
+                          <span className="text-sm">
+                            {(profileData as any).company}
+                          </span>
                         </div>
                       )}
                       {(profileData as any).gender && (
                         <div className="flex items-center gap-3">
                           <User className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">{(profileData as any).gender}</span>
+                          <span className="text-sm">
+                            {(profileData as any).gender}
+                          </span>
                         </div>
                       )}
                       {(profileData as any).dateOfBirth && (
                         <div className="flex items-center gap-3">
                           <Calendar className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">Born {(profileData as any).dateOfBirth ? new Date((profileData as any).dateOfBirth).getFullYear() : 'N/A'}</span>
+                          <span className="text-sm">
+                            Born{" "}
+                            {(profileData as any).dateOfBirth
+                              ? new Date(
+                                  (profileData as any).dateOfBirth,
+                                ).getFullYear()
+                              : "N/A"}
+                          </span>
                         </div>
                       )}
                     </>
                   )}
-                  
+
                   {/* Common Info */}
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">Joined {(profileData as any).createdTime ? new Date((profileData as any).createdTime).getFullYear() : new Date().getFullYear()}</span>
+                    <span className="text-sm">
+                      Joined{" "}
+                      {(profileData as any).createdTime
+                        ? new Date(
+                            (profileData as any).createdTime,
+                          ).getFullYear()
+                        : new Date().getFullYear()}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <Mail className="w-5 h-5 text-cmo-primary" />
-                    <span className="text-sm">{profileData.email}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 font-medium hover:text-cmo-primary text-sm"
+                      onClick={() => setShowContactInfo(!showContactInfo)}
+                    >
+                      {showContactInfo
+                        ? profileData.email
+                        : "••••••••@gmail.com"}
+                    </Button>
                   </div>
                   {(profileData as any).phoneNumber && (
                     <div className="flex items-center gap-3">
                       <Phone className="w-5 h-5 text-cmo-primary" />
-                      <span className="text-sm">{(profileData as any).phoneNumber}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 font-medium hover:text-cmo-primary text-sm"
+                        onClick={() => setShowContactInfo(!showContactInfo)}
+                      >
+                        {showContactInfo
+                          ? (profileData as any).phoneNumber
+                          : "••••••••••"}
+                      </Button>
                     </div>
                   )}
                 </div>
@@ -1462,7 +1799,7 @@ export default function ProfilePage() {
             </Card>
 
             {/* Skills Expertise - Only for Personal Profiles */}
-            {(profileData as any).userType !== 'business' && (
+            {(profileData as any).userType !== "business" && (
               <Card className="mb-6">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-4">
@@ -1474,7 +1811,11 @@ export default function ProfilePage() {
                         size="sm"
                         onClick={handleSkillsModalOpen}
                         disabled={skillsLoading}
-                        data-testid={userSkills.length === 0 ? "button-add-skills" : "button-edit-skills"}
+                        data-testid={
+                          userSkills.length === 0
+                            ? "button-add-skills"
+                            : "button-edit-skills"
+                        }
                         className="text-cmo-primary hover:text-cmo-primary/80"
                       >
                         {skillsLoading ? (
@@ -1495,15 +1836,21 @@ export default function ProfilePage() {
                   <div className="flex flex-wrap gap-2">
                     {userSkills.length > 0 ? (
                       userSkills.map((skillId: string) => {
-                        const skill = allSkills.find(s => s.id === skillId);
+                        const skill = allSkills.find((s) => s.id === skillId);
                         return (
-                          <Badge key={skillId} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
+                          <Badge
+                            key={skillId}
+                            variant="secondary"
+                            className="bg-cmo-primary/10 text-cmo-primary"
+                          >
                             {skill?.name || skillId}
                           </Badge>
                         );
                       })
                     ) : (
-                      <p className="text-cmo-text-secondary text-sm">No skills added yet</p>
+                      <p className="text-cmo-text-secondary text-sm">
+                        No skills added yet
+                      </p>
                     )}
                   </div>
                 </CardContent>
@@ -1515,11 +1862,13 @@ export default function ProfilePage() {
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Languages Known</h3>
                 <div className="flex flex-wrap gap-2">
-                  {((profileData as any).languages || []).map((lang: string) => (
-                    <Badge key={lang} variant="outline">
-                      {lang}
-                    </Badge>
-                  ))}
+                  {((profileData as any).languages || []).map(
+                    (lang: string) => (
+                      <Badge key={lang} variant="outline">
+                        {lang}
+                      </Badge>
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -1527,21 +1876,28 @@ export default function ProfilePage() {
             {/* Suggested for You */}
             <Card className="mb-6">
               <CardContent className="p-4">
-                <h3 className="font-semibold mb-4 text-sm">Suggested for You</h3>
+                <h3 className="font-semibold mb-4 text-sm">
+                  Suggested for You
+                </h3>
                 <div className="space-y-3">
                   {suggestionsLoading ? (
                     // Loading state
                     <div className="flex items-center justify-center py-4">
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-sm text-cmo-text-secondary ml-2">Loading suggestions...</span>
+                      <span className="text-sm text-cmo-text-secondary ml-2">
+                        Loading suggestions...
+                      </span>
                     </div>
                   ) : suggestions.length > 0 ? (
                     suggestions.map((person) => (
                       <div key={person.uid} className="flex items-center gap-3">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={person.photoUrl || person.profilePic} />
+                          <AvatarImage
+                            src={person.photoUrl || person.profilePic}
+                          />
                           <AvatarFallback className="text-xs">
-                            {(person.firstName?.[0] || '') + (person.lastName?.[0] || '')}
+                            {(person.firstName?.[0] || "") +
+                              (person.lastName?.[0] || "")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
@@ -1549,13 +1905,19 @@ export default function ProfilePage() {
                             {person.firstName} {person.lastName}
                           </p>
                           <p className="text-xs text-cmo-text-secondary truncate">
-                            {person.title || person.positionDesignation || 'Professional'}
+                            {person.title ||
+                              person.positionDesignation ||
+                              "Professional"}
                           </p>
                           <p className="text-xs text-cmo-text-secondary truncate">
-                            {person.city || 'Location not specified'}
+                            {person.city || "Location not specified"}
                           </p>
                         </div>
-                        <Button size="sm" className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white" data-testid="button-follow-suggestion">
+                        <Button
+                          size="sm"
+                          className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white"
+                          data-testid="button-follow-suggestion"
+                        >
                           Follow
                         </Button>
                       </div>
@@ -1574,16 +1936,28 @@ export default function ProfilePage() {
               <CardContent className="p-4">
                 <h3 className="font-semibold mb-4 text-sm">Popular Filters</h3>
                 <div className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-xs h-8"
+                  >
                     Questions & Answers
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-xs h-8"
+                  >
                     Articles & Posts
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-xs h-8"
+                  >
                     Industry Updates
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-xs h-8"
+                  >
                     Job Opportunities
                   </Button>
                 </div>
@@ -1594,13 +1968,16 @@ export default function ProfilePage() {
       </div>
 
       {/* Edit Profile Modal */}
-      <Dialog open={showEditProfileModal} onOpenChange={setShowEditProfileModal}>
+      <Dialog
+        open={showEditProfileModal}
+        onOpenChange={setShowEditProfileModal}
+      >
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleEditFormSubmit} className="space-y-4">
-            {(profileData as any)?.userType === 'business' ? (
+            {(profileData as any)?.userType === "business" ? (
               // Business Profile Fields
               <>
                 <div className="space-y-2">
@@ -1608,7 +1985,9 @@ export default function ProfilePage() {
                   <Input
                     id="companyName"
                     value={editFormData.companyName}
-                    onChange={(e) => handleEditFormChange("companyName", e.target.value)}
+                    onChange={(e) =>
+                      handleEditFormChange("companyName", e.target.value)
+                    }
                     placeholder="Enter company name"
                   />
                 </div>
@@ -1616,16 +1995,27 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="industry">Industry</Label>
-                    <SelectUI value={editFormData.industry} onValueChange={(value) => handleEditFormChange("industry", value)}>
+                    <SelectUI
+                      value={editFormData.industry}
+                      onValueChange={(value) =>
+                        handleEditFormChange("industry", value)
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select industry" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Construction">Construction</SelectItem>
+                        <SelectItem value="Construction">
+                          Construction
+                        </SelectItem>
                         <SelectItem value="Engineering">Engineering</SelectItem>
-                        <SelectItem value="Architecture">Architecture</SelectItem>
+                        <SelectItem value="Architecture">
+                          Architecture
+                        </SelectItem>
                         <SelectItem value="Real Estate">Real Estate</SelectItem>
-                        <SelectItem value="Manufacturing">Manufacturing</SelectItem>
+                        <SelectItem value="Manufacturing">
+                          Manufacturing
+                        </SelectItem>
                         <SelectItem value="Technology">Technology</SelectItem>
                         <SelectItem value="Others">Others</SelectItem>
                       </SelectContent>
@@ -1633,15 +2023,26 @@ export default function ProfilePage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="companyType">Company Type</Label>
-                    <SelectUI value={editFormData.companyType} onValueChange={(value) => handleEditFormChange("companyType", value)}>
+                    <SelectUI
+                      value={editFormData.companyType}
+                      onValueChange={(value) =>
+                        handleEditFormChange("companyType", value)
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select company type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Private Limited">Private Limited</SelectItem>
-                        <SelectItem value="Public Limited">Public Limited</SelectItem>
+                        <SelectItem value="Private Limited">
+                          Private Limited
+                        </SelectItem>
+                        <SelectItem value="Public Limited">
+                          Public Limited
+                        </SelectItem>
                         <SelectItem value="Partnership">Partnership</SelectItem>
-                        <SelectItem value="Sole Proprietorship">Sole Proprietorship</SelectItem>
+                        <SelectItem value="Sole Proprietorship">
+                          Sole Proprietorship
+                        </SelectItem>
                         <SelectItem value="LLP">LLP</SelectItem>
                       </SelectContent>
                     </SelectUI>
@@ -1653,7 +2054,9 @@ export default function ProfilePage() {
                   <Textarea
                     id="description"
                     value={editFormData.description}
-                    onChange={(e) => handleEditFormChange("description", e.target.value)}
+                    onChange={(e) =>
+                      handleEditFormChange("description", e.target.value)
+                    }
                     placeholder="Describe your company and services"
                     rows={3}
                   />
@@ -1665,16 +2068,22 @@ export default function ProfilePage() {
                     <Input
                       id="addressLine1"
                       value={editFormData.addressLine1}
-                      onChange={(e) => handleEditFormChange("addressLine1", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("addressLine1", e.target.value)
+                      }
                       placeholder="Street address"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="addressLine2">Address Line 2 (Optional)</Label>
+                    <Label htmlFor="addressLine2">
+                      Address Line 2 (Optional)
+                    </Label>
                     <Input
                       id="addressLine2"
                       value={editFormData.addressLine2}
-                      onChange={(e) => handleEditFormChange("addressLine2", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("addressLine2", e.target.value)
+                      }
                       placeholder="Apartment, suite, etc."
                     />
                   </div>
@@ -1686,7 +2095,9 @@ export default function ProfilePage() {
                     <Input
                       id="country"
                       value={editFormData.country}
-                      onChange={(e) => handleEditFormChange("country", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("country", e.target.value)
+                      }
                       placeholder="Enter country"
                     />
                   </div>
@@ -1695,7 +2106,9 @@ export default function ProfilePage() {
                     <Input
                       id="stateName"
                       value={editFormData.stateName}
-                      onChange={(e) => handleEditFormChange("stateName", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("stateName", e.target.value)
+                      }
                       placeholder="Enter state"
                     />
                   </div>
@@ -1704,7 +2117,9 @@ export default function ProfilePage() {
                     <Input
                       id="city"
                       value={editFormData.city}
-                      onChange={(e) => handleEditFormChange("city", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("city", e.target.value)
+                      }
                       placeholder="Enter city"
                     />
                   </div>
@@ -1713,7 +2128,9 @@ export default function ProfilePage() {
                     <Input
                       id="pincode"
                       value={editFormData.pincode}
-                      onChange={(e) => handleEditFormChange("pincode", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("pincode", e.target.value)
+                      }
                       placeholder="Enter pincode"
                     />
                   </div>
@@ -1725,16 +2142,25 @@ export default function ProfilePage() {
                     <Input
                       id="website"
                       value={editFormData.website}
-                      onChange={(e) => handleEditFormChange("website", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("website", e.target.value)
+                      }
                       placeholder="https://example.com"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="registrationNumber">Registration Number</Label>
+                    <Label htmlFor="registrationNumber">
+                      Registration Number
+                    </Label>
                     <Input
                       id="registrationNumber"
                       value={editFormData.registrationNumber}
-                      onChange={(e) => handleEditFormChange("registrationNumber", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange(
+                          "registrationNumber",
+                          e.target.value,
+                        )
+                      }
                       placeholder="Enter registration number"
                     />
                   </div>
@@ -1742,7 +2168,12 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="companySize">Company Size</Label>
-                  <SelectUI value={editFormData.companySize} onValueChange={(value) => handleEditFormChange("companySize", value)}>
+                  <SelectUI
+                    value={editFormData.companySize}
+                    onValueChange={(value) =>
+                      handleEditFormChange("companySize", value)
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select company size" />
                     </SelectTrigger>
@@ -1751,7 +2182,9 @@ export default function ProfilePage() {
                       <SelectItem value="11-50">11-50 employees</SelectItem>
                       <SelectItem value="51-200">51-200 employees</SelectItem>
                       <SelectItem value="201-500">201-500 employees</SelectItem>
-                      <SelectItem value="501-1000">501-1000 employees</SelectItem>
+                      <SelectItem value="501-1000">
+                        501-1000 employees
+                      </SelectItem>
                       <SelectItem value="1000+">1000+ employees</SelectItem>
                     </SelectContent>
                   </SelectUI>
@@ -1766,7 +2199,9 @@ export default function ProfilePage() {
                     <Input
                       id="firstName"
                       value={editFormData.firstName}
-                      onChange={(e) => handleEditFormChange("firstName", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("firstName", e.target.value)
+                      }
                       placeholder="Enter first name"
                     />
                   </div>
@@ -1775,7 +2210,9 @@ export default function ProfilePage() {
                     <Input
                       id="lastName"
                       value={editFormData.lastName}
-                      onChange={(e) => handleEditFormChange("lastName", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("lastName", e.target.value)
+                      }
                       placeholder="Enter last name"
                     />
                   </div>
@@ -1786,17 +2223,26 @@ export default function ProfilePage() {
                   <Input
                     id="title"
                     value={editFormData.title}
-                    onChange={(e) => handleEditFormChange("title", e.target.value)}
+                    onChange={(e) =>
+                      handleEditFormChange("title", e.target.value)
+                    }
                     placeholder="Enter your job title"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="positionDesignation">Position/Designation</Label>
+                  <Label htmlFor="positionDesignation">
+                    Position/Designation
+                  </Label>
                   <Input
                     id="positionDesignation"
                     value={editFormData.positionDesignation}
-                    onChange={(e) => handleEditFormChange("positionDesignation", e.target.value)}
+                    onChange={(e) =>
+                      handleEditFormChange(
+                        "positionDesignation",
+                        e.target.value,
+                      )
+                    }
                     placeholder="Enter your position or designation"
                   />
                 </div>
@@ -1806,7 +2252,9 @@ export default function ProfilePage() {
                   <Input
                     id="currentCompany"
                     value={editFormData.currentCompany}
-                    onChange={(e) => handleEditFormChange("currentCompany", e.target.value)}
+                    onChange={(e) =>
+                      handleEditFormChange("currentCompany", e.target.value)
+                    }
                     placeholder="Enter your current company"
                   />
                 </div>
@@ -1816,7 +2264,9 @@ export default function ProfilePage() {
                   <Textarea
                     id="about"
                     value={editFormData.about}
-                    onChange={(e) => handleEditFormChange("about", e.target.value)}
+                    onChange={(e) =>
+                      handleEditFormChange("about", e.target.value)
+                    }
                     placeholder="Tell us about yourself"
                     rows={3}
                   />
@@ -1825,7 +2275,12 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="gender">Gender</Label>
-                    <SelectUI value={editFormData.gender} onValueChange={(value) => handleEditFormChange("gender", value)}>
+                    <SelectUI
+                      value={editFormData.gender}
+                      onValueChange={(value) =>
+                        handleEditFormChange("gender", value)
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
@@ -1833,7 +2288,9 @@ export default function ProfilePage() {
                         <SelectItem value="male">Male</SelectItem>
                         <SelectItem value="female">Female</SelectItem>
                         <SelectItem value="other">Other</SelectItem>
-                        <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                        <SelectItem value="prefer-not-to-say">
+                          Prefer not to say
+                        </SelectItem>
                       </SelectContent>
                     </SelectUI>
                   </div>
@@ -1843,7 +2300,9 @@ export default function ProfilePage() {
                       id="dateOfBirth"
                       type="date"
                       value={editFormData.dateOfBirth}
-                      onChange={(e) => handleEditFormChange("dateOfBirth", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("dateOfBirth", e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -1854,7 +2313,9 @@ export default function ProfilePage() {
                     <Input
                       id="city"
                       value={editFormData.city}
-                      onChange={(e) => handleEditFormChange("city", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("city", e.target.value)
+                      }
                       placeholder="Enter your city"
                     />
                   </div>
@@ -1863,7 +2324,9 @@ export default function ProfilePage() {
                     <Input
                       id="stateName"
                       value={editFormData.stateName}
-                      onChange={(e) => handleEditFormChange("stateName", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("stateName", e.target.value)
+                      }
                       placeholder="Enter your state"
                     />
                   </div>
@@ -1872,7 +2335,9 @@ export default function ProfilePage() {
                     <Input
                       id="country"
                       value={editFormData.country}
-                      onChange={(e) => handleEditFormChange("country", e.target.value)}
+                      onChange={(e) =>
+                        handleEditFormChange("country", e.target.value)
+                      }
                       placeholder="Enter your country"
                     />
                   </div>
@@ -1889,7 +2354,9 @@ export default function ProfilePage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={editFormLoading}>
-                {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {editFormLoading && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
                 Save Changes
               </Button>
             </div>
@@ -1901,16 +2368,29 @@ export default function ProfilePage() {
       <Dialog open={showEducationModal} onOpenChange={setShowEducationModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingEducation ? 'Edit Education' : 'Add Education'}</DialogTitle>
+            <DialogTitle>
+              {editingEducation ? "Edit Education" : "Add Education"}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={(e) => { e.preventDefault(); handleSaveEducation(); }} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSaveEducation();
+            }}
+            className="space-y-4"
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="degree">Degree</Label>
                 <Input
                   id="degree"
                   value={educationFormData.degree}
-                  onChange={(e) => setEducationFormData({ ...educationFormData, degree: e.target.value })}
+                  onChange={(e) =>
+                    setEducationFormData({
+                      ...educationFormData,
+                      degree: e.target.value,
+                    })
+                  }
                   placeholder="e.g., Bachelor's, Master's, MBA"
                 />
               </div>
@@ -1919,7 +2399,12 @@ export default function ProfilePage() {
                 <Input
                   id="fieldOfStudy"
                   value={educationFormData.fieldOfStudy}
-                  onChange={(e) => setEducationFormData({ ...educationFormData, fieldOfStudy: e.target.value })}
+                  onChange={(e) =>
+                    setEducationFormData({
+                      ...educationFormData,
+                      fieldOfStudy: e.target.value,
+                    })
+                  }
                   placeholder="e.g., Computer Science, Business"
                 />
               </div>
@@ -1930,7 +2415,12 @@ export default function ProfilePage() {
               <Input
                 id="schoolOrCollege"
                 value={educationFormData.schoolOrCollege}
-                onChange={(e) => setEducationFormData({ ...educationFormData, schoolOrCollege: e.target.value })}
+                onChange={(e) =>
+                  setEducationFormData({
+                    ...educationFormData,
+                    schoolOrCollege: e.target.value,
+                  })
+                }
                 placeholder="e.g., Harvard University"
               />
             </div>
@@ -1942,7 +2432,12 @@ export default function ProfilePage() {
                   id="startDate"
                   type="date"
                   value={educationFormData.startDate}
-                  onChange={(e) => setEducationFormData({ ...educationFormData, startDate: e.target.value })}
+                  onChange={(e) =>
+                    setEducationFormData({
+                      ...educationFormData,
+                      startDate: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -1951,7 +2446,12 @@ export default function ProfilePage() {
                   id="endDate"
                   type="date"
                   value={educationFormData.endDate}
-                  onChange={(e) => setEducationFormData({ ...educationFormData, endDate: e.target.value })}
+                  onChange={(e) =>
+                    setEducationFormData({
+                      ...educationFormData,
+                      endDate: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -1959,19 +2459,30 @@ export default function ProfilePage() {
                 <Input
                   id="grade"
                   value={educationFormData.grade}
-                  onChange={(e) => setEducationFormData({ ...educationFormData, grade: e.target.value })}
+                  onChange={(e) =>
+                    setEducationFormData({
+                      ...educationFormData,
+                      grade: e.target.value,
+                    })
+                  }
                   placeholder="e.g., First Class, 3.8 GPA"
                 />
               </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setShowEducationModal(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowEducationModal(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={editFormLoading}>
-                {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {editingEducation ? 'Update' : 'Add'} Education
+                {editFormLoading && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                {editingEducation ? "Update" : "Add"} Education
               </Button>
             </div>
           </form>
@@ -1982,16 +2493,29 @@ export default function ProfilePage() {
       <Dialog open={showExperienceModal} onOpenChange={setShowExperienceModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingExperience ? 'Edit Experience' : 'Add Experience'}</DialogTitle>
+            <DialogTitle>
+              {editingExperience ? "Edit Experience" : "Add Experience"}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={(e) => { e.preventDefault(); handleSaveExperience(); }} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSaveExperience();
+            }}
+            className="space-y-4"
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="expCompanyName">Company Name</Label>
                 <Input
                   id="expCompanyName"
                   value={experienceFormData.companyName}
-                  onChange={(e) => setExperienceFormData({ ...experienceFormData, companyName: e.target.value })}
+                  onChange={(e) =>
+                    setExperienceFormData({
+                      ...experienceFormData,
+                      companyName: e.target.value,
+                    })
+                  }
                   placeholder="e.g., Google, Microsoft"
                 />
               </div>
@@ -2000,7 +2524,12 @@ export default function ProfilePage() {
                 <Input
                   id="expTitle"
                   value={experienceFormData.title}
-                  onChange={(e) => setExperienceFormData({ ...experienceFormData, title: e.target.value })}
+                  onChange={(e) =>
+                    setExperienceFormData({
+                      ...experienceFormData,
+                      title: e.target.value,
+                    })
+                  }
                   placeholder="e.g., Software Engineer, Manager"
                 />
               </div>
@@ -2009,7 +2538,15 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="employmentType">Employment Type</Label>
-                <SelectUI value={experienceFormData.employmentType} onValueChange={(value) => setExperienceFormData({ ...experienceFormData, employmentType: value })}>
+                <SelectUI
+                  value={experienceFormData.employmentType}
+                  onValueChange={(value) =>
+                    setExperienceFormData({
+                      ...experienceFormData,
+                      employmentType: value,
+                    })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select employment type" />
                   </SelectTrigger>
@@ -2027,7 +2564,12 @@ export default function ProfilePage() {
                 <Input
                   id="expLocation"
                   value={experienceFormData.location}
-                  onChange={(e) => setExperienceFormData({ ...experienceFormData, location: e.target.value })}
+                  onChange={(e) =>
+                    setExperienceFormData({
+                      ...experienceFormData,
+                      location: e.target.value,
+                    })
+                  }
                   placeholder="e.g., San Francisco, CA"
                 />
               </div>
@@ -2040,7 +2582,12 @@ export default function ProfilePage() {
                   id="expStartDate"
                   type="date"
                   value={experienceFormData.startDate}
-                  onChange={(e) => setExperienceFormData({ ...experienceFormData, startDate: e.target.value })}
+                  onChange={(e) =>
+                    setExperienceFormData({
+                      ...experienceFormData,
+                      startDate: e.target.value,
+                    })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -2049,7 +2596,13 @@ export default function ProfilePage() {
                   id="expEndDate"
                   type="date"
                   value={experienceFormData.endDate}
-                  onChange={(e) => setExperienceFormData({ ...experienceFormData, endDate: e.target.value, isCurrent: false })}
+                  onChange={(e) =>
+                    setExperienceFormData({
+                      ...experienceFormData,
+                      endDate: e.target.value,
+                      isCurrent: false,
+                    })
+                  }
                   disabled={experienceFormData.isCurrent}
                 />
               </div>
@@ -2060,7 +2613,13 @@ export default function ProfilePage() {
                 type="checkbox"
                 id="isCurrent"
                 checked={experienceFormData.isCurrent}
-                onChange={(e) => setExperienceFormData({ ...experienceFormData, isCurrent: e.target.checked, endDate: e.target.checked ? '' : experienceFormData.endDate })}
+                onChange={(e) =>
+                  setExperienceFormData({
+                    ...experienceFormData,
+                    isCurrent: e.target.checked,
+                    endDate: e.target.checked ? "" : experienceFormData.endDate,
+                  })
+                }
               />
               <Label htmlFor="isCurrent">I currently work here</Label>
             </div>
@@ -2070,19 +2629,30 @@ export default function ProfilePage() {
               <Textarea
                 id="expDescription"
                 value={experienceFormData.description}
-                onChange={(e) => setExperienceFormData({ ...experienceFormData, description: e.target.value })}
+                onChange={(e) =>
+                  setExperienceFormData({
+                    ...experienceFormData,
+                    description: e.target.value,
+                  })
+                }
                 placeholder="Describe your responsibilities and achievements"
                 rows={3}
               />
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setShowExperienceModal(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowExperienceModal(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={editFormLoading}>
-                {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {editingExperience ? 'Update' : 'Add'} Experience
+                {editFormLoading && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                {editingExperience ? "Update" : "Add"} Experience
               </Button>
             </div>
           </form>
@@ -2093,15 +2663,28 @@ export default function ProfilePage() {
       <Dialog open={showProjectModal} onOpenChange={setShowProjectModal}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>{editingProject ? 'Edit Project' : 'Add Project'}</DialogTitle>
+            <DialogTitle>
+              {editingProject ? "Edit Project" : "Add Project"}
+            </DialogTitle>
           </DialogHeader>
-          <form onSubmit={(e) => { e.preventDefault(); handleSaveProject(); }} className="space-y-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSaveProject();
+            }}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="projectTitle">Project Title</Label>
               <Input
                 id="projectTitle"
                 value={projectFormData.title}
-                onChange={(e) => setProjectFormData({ ...projectFormData, title: e.target.value })}
+                onChange={(e) =>
+                  setProjectFormData({
+                    ...projectFormData,
+                    title: e.target.value,
+                  })
+                }
                 placeholder="e.g., E-commerce Website, Mobile App"
               />
             </div>
@@ -2111,7 +2694,12 @@ export default function ProfilePage() {
               <Textarea
                 id="projectDescription"
                 value={projectFormData.description}
-                onChange={(e) => setProjectFormData({ ...projectFormData, description: e.target.value })}
+                onChange={(e) =>
+                  setProjectFormData({
+                    ...projectFormData,
+                    description: e.target.value,
+                  })
+                }
                 placeholder="Describe the project, technologies used, and your role"
                 rows={3}
               />
@@ -2121,8 +2709,13 @@ export default function ProfilePage() {
               <Label htmlFor="projectLocation">Location (Optional)</Label>
               <Input
                 id="projectLocation"
-                value={projectFormData.location || ''}
-                onChange={(e) => setProjectFormData({ ...projectFormData, location: e.target.value })}
+                value={projectFormData.location || ""}
+                onChange={(e) =>
+                  setProjectFormData({
+                    ...projectFormData,
+                    location: e.target.value,
+                  })
+                }
                 placeholder="e.g., New York, NY"
               />
             </div>
@@ -2131,8 +2724,18 @@ export default function ProfilePage() {
               <Label htmlFor="projectTags">Tags (Optional)</Label>
               <Input
                 id="projectTags"
-                value={(projectFormData.tags || []).join(', ')}
-                onChange={(e) => setProjectFormData({ ...projectFormData, tags: e.target.value ? e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '') : [] })}
+                value={(projectFormData.tags || []).join(", ")}
+                onChange={(e) =>
+                  setProjectFormData({
+                    ...projectFormData,
+                    tags: e.target.value
+                      ? e.target.value
+                          .split(",")
+                          .map((tag) => tag.trim())
+                          .filter((tag) => tag !== "")
+                      : [],
+                  })
+                }
                 placeholder="e.g., React, Node.js, MongoDB (comma separated)"
               />
             </div>
@@ -2145,18 +2748,26 @@ export default function ProfilePage() {
                   type="file"
                   multiple
                   accept="image/*"
-                  onChange={(e) => setProjectImages(Array.from(e.target.files || []))}
+                  onChange={(e) =>
+                    setProjectImages(Array.from(e.target.files || []))
+                  }
                 />
               </div>
             )}
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setShowProjectModal(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowProjectModal(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={editFormLoading}>
-                {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {editingProject ? 'Update' : 'Add'} Project
+                {editFormLoading && (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                )}
+                {editingProject ? "Update" : "Add"} Project
               </Button>
             </div>
           </form>
@@ -2175,7 +2786,10 @@ export default function ProfilePage() {
               <Select
                 isMulti
                 isSearchable
-                options={allSkills.map(skill => ({ value: skill.id, label: skill.name }))}
+                options={allSkills.map((skill) => ({
+                  value: skill.id,
+                  label: skill.name,
+                }))}
                 value={selectedSkills}
                 onChange={(newValue) => setSelectedSkills(newValue as any)}
                 className="mt-2"
@@ -2184,23 +2798,25 @@ export default function ProfilePage() {
                 isLoading={skillsLoading}
                 data-testid="select-skills"
                 classNames={{
-                  control: () => "border border-gray-300 rounded-md min-h-[40px]",
-                  multiValue: () => "bg-cmo-primary/10 text-cmo-primary rounded-sm",
+                  control: () =>
+                    "border border-gray-300 rounded-md min-h-[40px]",
+                  multiValue: () =>
+                    "bg-cmo-primary/10 text-cmo-primary rounded-sm",
                   multiValueLabel: () => "text-cmo-primary",
                   multiValueRemove: () => "text-cmo-primary hover:text-red-500",
                 }}
               />
             </div>
             <div className="flex justify-end space-x-2">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => setSkillsModalOpen(false)}
                 disabled={skillsSaving}
                 data-testid="button-cancel-skills"
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 onClick={handleSkillsSave}
                 disabled={skillsSaving}
                 data-testid="button-save-skills"
@@ -2211,7 +2827,7 @@ export default function ProfilePage() {
                     Saving...
                   </>
                 ) : (
-                  'Save'
+                  "Save"
                 )}
               </Button>
             </div>

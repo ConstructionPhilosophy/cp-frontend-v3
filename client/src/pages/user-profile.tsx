@@ -56,49 +56,6 @@ import {
 } from "lucide-react";
 import { useToast } from "../hooks/use-toast";
 
-const mockEducation = [
-  {
-    id: "edu1",
-    degree: "MBA",
-    fieldOfStudy: "Marketing & Business Strategy",
-    schoolOrCollege: "Oxford International",
-    startDate: "2008-09-01",
-    endDate: "2010-06-30",
-    grade: "Distinction",
-  },
-  {
-    id: "edu2",
-    degree: "B.A.",
-    fieldOfStudy: "Business Administration",
-    schoolOrCollege: "Stanford University",
-    startDate: "2003-09-01",
-    endDate: "2007-05-31",
-    grade: "Magna Cum Laude",
-  },
-];
-
-const mockExperience = [
-  {
-    id: "exp1",
-    company: "SingleFire",
-    role: "Chief Marketing Officer",
-    location: "Virginia, NY",
-    startDate: "2020-01-01",
-    endDate: null,
-    description:
-      "Leading global marketing strategy and brand management for digital transformation initiatives.",
-  },
-  {
-    id: "exp2",
-    company: "Blue Chip CPG",
-    role: "Senior Brand Manager",
-    location: "New York, NY",
-    startDate: "2015-03-01",
-    endDate: "2019-12-31",
-    description:
-      "Managed multi-million dollar brand portfolios and launched successful product campaigns.",
-  },
-];
 
 const mockActivities = [
   {
@@ -149,6 +106,12 @@ export default function UserProfilePage() {
   // Suggestions State
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState<boolean>(false);
+  
+  // Education and Experience State
+  const [education, setEducation] = useState<any[]>([]);
+  const [experience, setExperience] = useState<any[]>([]);
+  const [educationLoading, setEducationLoading] = useState<boolean>(false);
+  const [experienceLoading, setExperienceLoading] = useState<boolean>(false);
   const [editFormData, setEditFormData] = useState({
     firstName: "",
     lastName: "",
@@ -247,6 +210,41 @@ export default function UserProfilePage() {
       loadSuggestions();
     }
   }, [user?.uid]);
+
+  // Load Education and Experience when profile data is available
+  useEffect(() => {
+    const loadEducationAndExperience = async () => {
+      if (!profileData?.uid) return;
+      
+      if ((profileData as any).userType !== "business") {
+        // Load Education
+        setEducationLoading(true);
+        try {
+          const educationData = await userApiService.getUserEducation(profileData.uid);
+          setEducation(educationData || []);
+        } catch (error) {
+          console.error('Error loading education:', error);
+          setEducation([]);
+        } finally {
+          setEducationLoading(false);
+        }
+        
+        // Load Experience
+        setExperienceLoading(true);
+        try {
+          const experienceData = await userApiService.getUserExperience(profileData.uid);
+          setExperience(experienceData || []);
+        } catch (error) {
+          console.error('Error loading experience:', error);
+          setExperience([]);
+        } finally {
+          setExperienceLoading(false);
+        }
+      }
+    };
+    
+    loadEducationAndExperience();
+  }, [profileData?.uid, (profileData as any)?.userType]);
 
   const handleSendMessage = async () => {
     if (!profileData || !user) return;
@@ -702,27 +700,35 @@ export default function UserProfilePage() {
                   </h3>
                 </div>
                 <div className="space-y-4">
-                  {mockEducation.map((edu) => (
-                    <div key={edu.id} className="flex gap-3">
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <GraduationCap className="w-5 h-5 text-cmo-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-base">{edu.degree}</h4>
-                        <p className="text-sm text-cmo-primary font-medium">
-                          {edu.fieldOfStudy}
-                        </p>
-                        <p className="text-sm text-cmo-text-secondary">
-                          {edu.schoolOrCollege}
-                        </p>
-                        <p className="text-xs text-cmo-text-secondary mt-1">
-                          {new Date(edu.startDate).getFullYear()} -{" "}
-                          {new Date(edu.endDate).getFullYear()}
-                          {edu.grade && ` • ${edu.grade}`}
-                        </p>
-                      </div>
+                  {educationLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
-                  ))}
+                  ) : education && education.length > 0 ? (
+                    education.map((edu) => (
+                      <div key={edu.id} className="flex gap-3">
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <GraduationCap className="w-5 h-5 text-cmo-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-base">{edu.degree}</h4>
+                          <p className="text-sm text-cmo-primary font-medium">
+                            {edu.fieldOfStudy}
+                          </p>
+                          <p className="text-sm text-cmo-text-secondary">
+                            {edu.schoolOrCollege}
+                          </p>
+                          <p className="text-xs text-cmo-text-secondary mt-1">
+                            {edu.startDate ? new Date(edu.startDate).getFullYear() : 'N/A'} -{" "}
+                            {edu.endDate ? new Date(edu.endDate).getFullYear() : 'Present'}
+                            {edu.grade && ` • ${edu.grade}`}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-cmo-text-secondary text-center py-8">No education information available</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -737,32 +743,44 @@ export default function UserProfilePage() {
                   </h3>
                 </div>
                 <div className="space-y-4">
-                  {mockExperience.map((exp) => (
-                    <div key={exp.id} className="flex gap-3">
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Briefcase className="w-5 h-5 text-cmo-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-base">{exp.role}</h4>
-                        <p className="text-sm text-cmo-primary font-medium">
-                          {exp.company}
-                        </p>
-                        <p className="text-xs text-cmo-text-secondary flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {exp.location}
-                        </p>
-                        <p className="text-xs text-cmo-text-secondary mt-1">
-                          {new Date(exp.startDate).getFullYear()} -{" "}
-                          {exp.endDate
-                            ? new Date(exp.endDate).getFullYear()
-                            : "Present"}
-                        </p>
-                        <p className="text-xs text-cmo-text-secondary mt-2">
-                          {exp.description}
-                        </p>
-                      </div>
+                  {experienceLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
-                  ))}
+                  ) : experience && experience.length > 0 ? (
+                    experience.map((exp) => (
+                      <div key={exp.id} className="flex gap-3">
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Briefcase className="w-5 h-5 text-cmo-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-base">{exp.title || exp.role}</h4>
+                          <p className="text-sm text-cmo-primary font-medium">
+                            {exp.companyName || exp.company}
+                          </p>
+                          {exp.location && (
+                            <p className="text-xs text-cmo-text-secondary flex items-center gap-1">
+                              <MapPin className="w-3 h-3" />
+                              {exp.location}
+                            </p>
+                          )}
+                          <p className="text-xs text-cmo-text-secondary mt-1">
+                            {exp.startDate ? new Date(exp.startDate).getFullYear() : 'N/A'} -{" "}
+                            {exp.endDate && !exp.isCurrent
+                              ? new Date(exp.endDate).getFullYear()
+                              : "Present"}
+                          </p>
+                          {exp.description && (
+                            <p className="text-xs text-cmo-text-secondary mt-2">
+                              {exp.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-cmo-text-secondary text-center py-8">No work experience available</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -961,26 +979,122 @@ export default function UserProfilePage() {
             {/* Intro */}
             <Card className="mb-4">
               <CardContent className="p-4">
-                <h3 className="font-semibold text-cmo-text-primary mb-3">
-                  Intro
-                </h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-cmo-text-secondary">Position:</span>
-                    <span className="font-medium">
-                      {profileData.positionDesignation || "Professional"}
+                <h3 className="font-semibold mb-4">Intro</h3>
+                <div className="space-y-3">
+                  {(profileData as any).userType === "business" ? (
+                    <>
+                      {/* Business Profile Info */}
+                      {(profileData as any).businessProfile?.companyName && (
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.companyName}
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.industry && (
+                        <div className="flex items-center gap-3">
+                          <Briefcase className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.industry}
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.companySize && (
+                        <div className="flex items-center gap-3">
+                          <Users className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.companySize}{" "}
+                            employees
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.registrationNumber && (
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            Reg:{" "}
+                            {(profileData as any).businessProfile.registrationNumber}
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.website && (
+                        <div className="flex items-center gap-3">
+                          <Globe className="w-5 h-5 text-cmo-primary" />
+                          <a
+                            href={(profileData as any).businessProfile.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-cmo-primary hover:underline"
+                          >
+                            Website
+                          </a>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {/* Personal Profile Info */}
+                      {((profileData as any).title ||
+                        (profileData as any).positionDesignation) && (
+                        <div className="flex items-center gap-3">
+                          <Briefcase className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).title ||
+                              (profileData as any).positionDesignation}
+                          </span>
+                        </div>
+                      )}
+                      {((profileData as any).company || (profileData as any).currentCompany) && (
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).company || (profileData as any).currentCompany}
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).gender && (
+                        <div className="flex items-center gap-3">
+                          <User className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).gender}
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).dateOfBirth && (
+                        <div className="flex items-center gap-3">
+                          <Calendar className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            Born{" "}
+                            {(profileData as any).dateOfBirth
+                              ? new Date(
+                                  (profileData as any).dateOfBirth,
+                                ).getFullYear()
+                              : "N/A"}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Common Info */}
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-5 h-5 text-cmo-primary" />
+                    <span className="text-sm">
+                      Joined{" "}
+                      {(profileData as any).createdTime
+                        ? new Date(
+                            (profileData as any).createdTime,
+                          ).getFullYear()
+                        : new Date().getFullYear()}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-cmo-text-secondary">Joined:</span>
-                    <span className="font-medium">2025</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-cmo-text-secondary">Email:</span>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-cmo-primary" />
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-auto p-0 font-medium hover:text-cmo-primary"
+                      className="h-auto p-0 font-medium hover:text-cmo-primary text-sm"
                       onClick={() => setShowContactInfo(!showContactInfo)}
                     >
                       {showContactInfo
@@ -988,18 +1102,18 @@ export default function UserProfilePage() {
                         : "••••••••@gmail.com"}
                     </Button>
                   </div>
-                  {profileData.phoneNumber && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-cmo-text-secondary">Phone:</span>
+                  {(profileData as any).phoneNumber && (
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-5 h-5 text-cmo-primary" />
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-auto p-0 font-medium hover:text-cmo-primary"
+                        className="h-auto p-0 font-medium hover:text-cmo-primary text-sm"
                         onClick={() => setShowContactInfo(!showContactInfo)}
                       >
                         {showContactInfo
-                          ? profileData.phoneNumber
-                          : "Phone number is missing"}
+                          ? (profileData as any).phoneNumber
+                          : "••••••••••"}
                       </Button>
                     </div>
                   )}
