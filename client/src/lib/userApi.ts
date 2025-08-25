@@ -903,8 +903,7 @@ class UserApiService {
     try {
       const headers = await this.getAuthHeaders();
 
-      // Call the real backend endpoint for all skills
-      const response = await fetch(`${API_BASE_URL}/skills/all`, {
+      const response = await fetch(`${API_BASE_URL}/skills`, {
         method: "GET",
         headers: {
           ...headers,
