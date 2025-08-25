@@ -187,8 +187,8 @@ export default function UserProfilePage() {
         setProfileData(userData);
         
         // Update isFollowing from API response
-        if (userData.hasOwnProperty('isFollowing')) {
-          setIsFollowing(userData.isFollowing);
+        if ((userData as any).hasOwnProperty('isFollowing')) {
+          setIsFollowing((userData as any).isFollowing);
         } else if (userData.followerlist && user?.uid) {
           // Fallback to old logic if isFollowing field not present
           setIsFollowing(userData.followerlist.includes(user.uid));
@@ -648,30 +648,6 @@ export default function UserProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Skills Expertise Section - Only for Personal Profiles */}
-            {(profileData as any).userType !== "business" && (
-              <Card className="mb-4">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <Star className="w-6 h-6 text-cmo-primary" />
-                      Skills Expertise
-                    </h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {((profileData as any).skills || []).length > 0 ? (
-                      ((profileData as any).skills || []).map((skill: string) => (
-                        <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
-                          {skill}
-                        </Badge>
-                      ))
-                    ) : (
-                      <p className="text-cmo-text-secondary text-sm">No skills added yet</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Education Section */}
             <Card className="mb-4">
@@ -988,6 +964,28 @@ export default function UserProfilePage() {
               </CardContent>
             </Card>
 
+            {/* Skills Expertise Section - Only for Personal Profiles */}
+            {(profileData as any).userType !== "business" && (
+              <Card className="mb-4">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Skills Expertise</h3>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {((profileData as any).skills || []).length > 0 ? (
+                      ((profileData as any).skills || []).map((skill: string) => (
+                        <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
+                          {skill}
+                        </Badge>
+                      ))
+                    ) : (
+                      <p className="text-cmo-text-secondary text-sm">No skills added yet</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Suggested for You */}
             <Card className="mb-4">
               <CardContent className="p-4">
@@ -1003,7 +1001,7 @@ export default function UserProfilePage() {
                     suggestions.map((person) => (
                       <div key={person.uid} className="flex items-center gap-3">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={person.photoUrl || person.profilePicture} />
+                          <AvatarImage src={person.photoUrl || person.profilePic} />
                           <AvatarFallback className="text-xs">
                             {(person.firstName?.[0] || '') + (person.lastName?.[0] || '')}
                           </AvatarFallback>
@@ -1016,7 +1014,7 @@ export default function UserProfilePage() {
                             {person.title || person.positionDesignation || 'Professional'}
                           </p>
                           <p className="text-xs text-cmo-text-secondary truncate">
-                            {person.city || person.location || 'Location not specified'}
+                            {person.city || 'Location not specified'}
                           </p>
                         </div>
                         <Button size="sm" className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white" data-testid="button-follow-suggestion">

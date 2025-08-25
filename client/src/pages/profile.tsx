@@ -913,7 +913,7 @@ export default function ProfilePage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setShowEditModal(true)}
+                            onClick={() => setShowEditProfileModal(true)}
                             data-testid="button-edit-profile"
                           >
                             <Edit className="w-4 h-4 mr-2" />
@@ -1539,7 +1539,7 @@ export default function ProfilePage() {
                     suggestions.map((person) => (
                       <div key={person.uid} className="flex items-center gap-3">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={person.photoUrl || person.profilePicture} />
+                          <AvatarImage src={person.photoUrl || person.profilePic} />
                           <AvatarFallback className="text-xs">
                             {(person.firstName?.[0] || '') + (person.lastName?.[0] || '')}
                           </AvatarFallback>
@@ -1552,7 +1552,7 @@ export default function ProfilePage() {
                             {person.title || person.positionDesignation || 'Professional'}
                           </p>
                           <p className="text-xs text-cmo-text-secondary truncate">
-                            {person.city || person.location || 'Location not specified'}
+                            {person.city || 'Location not specified'}
                           </p>
                         </div>
                         <Button size="sm" className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white" data-testid="button-follow-suggestion">
