@@ -488,6 +488,132 @@ export default function UserProfilePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Mobile-First: Intro Card visible at top on mobile */}
+          <div className="lg:hidden mb-4">
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-4">Intro</h3>
+                <div className="space-y-3">
+                  {(profileData as any).userType === "business" ? (
+                    <>
+                      {/* Business Profile Info */}
+                      {(profileData as any).businessProfile?.companyName && (
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.companyName}
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.industry && (
+                        <div className="flex items-center gap-3">
+                          <Briefcase className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.industry}
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.companySize && (
+                        <div className="flex items-center gap-3">
+                          <Users className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).businessProfile.companySize}{" "}
+                            employees
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.registrationNumber && (
+                        <div className="flex items-center gap-3">
+                          <FileText className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            Reg:{" "}
+                            {(profileData as any).businessProfile.registrationNumber}
+                          </span>
+                        </div>
+                      )}
+                      {(profileData as any).businessProfile?.website && (
+                        <div className="flex items-center gap-3">
+                          <Globe className="w-5 h-5 text-cmo-primary" />
+                          <a
+                            href={(profileData as any).businessProfile.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-cmo-primary hover:underline"
+                          >
+                            Website
+                          </a>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      {/* Personal Profile Info */}
+                      {((profileData as any).title ||
+                        (profileData as any).positionDesignation) && (
+                        <div className="flex items-center gap-3">
+                          <Briefcase className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).title ||
+                              (profileData as any).positionDesignation}
+                          </span>
+                        </div>
+                      )}
+                      {((profileData as any).company || (profileData as any).currentCompany) && (
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-cmo-primary" />
+                          <span className="text-sm">
+                            {(profileData as any).company || (profileData as any).currentCompany}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {/* Common Info */}
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-5 h-5 text-cmo-primary" />
+                    <span className="text-sm">
+                      Joined{" "}
+                      {(profileData as any).createdTime
+                        ? new Date(
+                            (profileData as any).createdTime,
+                          ).getFullYear()
+                        : new Date().getFullYear()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-5 h-5 text-cmo-primary" />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-auto p-0 font-medium hover:text-cmo-primary text-sm"
+                      onClick={() => setShowContactInfo(!showContactInfo)}
+                    >
+                      {showContactInfo
+                        ? profileData.email
+                        : "••••••••@gmail.com"}
+                    </Button>
+                  </div>
+                  {(profileData as any).phoneNumber && (
+                    <div className="flex items-center gap-3">
+                      <Phone className="w-5 h-5 text-cmo-primary" />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto p-0 font-medium hover:text-cmo-primary text-sm"
+                        onClick={() => setShowContactInfo(!showContactInfo)}
+                      >
+                        {showContactInfo
+                          ? (profileData as any).phoneNumber
+                          : "••••••••••"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Banner and Profile Section */}
@@ -978,8 +1104,8 @@ export default function UserProfilePage() {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            {/* Intro */}
-            <Card className="mb-4">
+            {/* Intro - Hidden on mobile since we show it at top */}
+            <Card className="mb-4 hidden lg:block">
               <CardContent className="p-4">
                 <h3 className="font-semibold mb-4">Intro</h3>
                 <div className="space-y-3">
