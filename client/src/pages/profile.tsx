@@ -723,11 +723,11 @@ export default function ProfilePage() {
       <Header />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Banner and Profile Section */}
-            <Card className="mb-4 overflow-hidden">
+            <Card className="mb-3 overflow-hidden">
               <div 
                 className="h-32 sm:h-40 bg-gradient-to-r from-blue-500 to-purple-600"
                 style={{
@@ -737,14 +737,14 @@ export default function ProfilePage() {
                 }}
               />
               
-              <CardContent className="relative p-4 sm:p-6">
+              <CardContent className="relative p-3 sm:p-4">
                 {/* Profile Info Section - Fixed Overlap */}
                 <div className="flex flex-col sm:flex-row gap-4 pt-2">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
-                    <Avatar className="w-24 h-24 sm:w-28 sm:h-28 -mt-14 sm:-mt-16 border-4 border-white shadow-lg">
+                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 -mt-10 sm:-mt-12 border-4 border-white shadow-lg">
                       <AvatarImage src={(profileData as any).photoUrl || (profileData as any).profilePic || ""} />
-                      <AvatarFallback className="text-lg sm:text-xl">
+                      <AvatarFallback className="text-sm">
                         {profileData.firstName?.charAt(0) || 'U'}{profileData.lastName?.charAt(0) || ''}
                       </AvatarFallback>
                     </Avatar>
@@ -754,7 +754,7 @@ export default function ProfilePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h1 className="text-xl sm:text-2xl font-semibold text-cmo-text-primary truncate">
+                        <h1 className="text-lg sm:text-xl font-semibold text-cmo-text-primary truncate">
                           {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
                         <p className="text-sm sm:text-base text-cmo-text-secondary mb-2">
@@ -936,11 +936,11 @@ export default function ProfilePage() {
             {(profileData as any).userType !== 'business' && (
               <>
                 {/* Education Section */}
-                <Card className="mb-6">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                <Card className="mb-4">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <GraduationCap className="w-5 h-5 text-cmo-primary" />
                         Education
                       </h3>
                       <Button 
@@ -1004,11 +1004,11 @@ export default function ProfilePage() {
                 </Card>
 
                 {/* Experience Section */}
-                <Card className="mb-6">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-semibold flex items-center gap-2">
-                        <Briefcase className="w-6 h-6 text-cmo-primary" />
+                <Card className="mb-4">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <Briefcase className="w-5 h-5 text-cmo-primary" />
                         Experience
                       </h3>
                       <Button 

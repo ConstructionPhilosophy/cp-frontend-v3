@@ -436,9 +436,9 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen bg-cmo-bg">
         <Header />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="text-center">
-            <p className="text-cmo-text-secondary text-lg mb-2">
+            <p className="text-cmo-text-secondary text-sm mb-2">
               {error || "User not found"}
             </p>
             <Button variant="outline" onClick={() => setLocation("/")}>
@@ -459,7 +459,7 @@ export default function UserProfilePage() {
       <Header />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Banner and Profile Section */}
@@ -475,12 +475,12 @@ export default function UserProfilePage() {
                 }}
               />
 
-              <CardContent className="relative p-4 sm:p-6">
+              <CardContent className="relative p-3 sm:p-4">
                 {/* Profile Info Section */}
                 <div className="flex flex-col sm:flex-row gap-4 pt-2">
                   {/* Avatar */}
                   <div className="flex-shrink-0">
-                    <Avatar className="w-24 h-24 sm:w-28 sm:h-28 -mt-14 sm:-mt-16 border-4 border-white shadow-lg">
+                    <Avatar className="w-16 h-16 sm:w-20 sm:h-20 -mt-10 sm:-mt-12 border-4 border-white shadow-lg">
                       <AvatarImage
                         src={
                           profileData.photoUrl || profileData.profilePic || ""

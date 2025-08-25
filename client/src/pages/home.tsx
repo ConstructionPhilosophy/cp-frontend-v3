@@ -75,7 +75,7 @@ export default function Home() {
             )}
 
             {/* Question Input */}
-            <div className="bg-cmo-card rounded-lg border border-cmo-border p-4 mb-6">
+            <div className="bg-cmo-card rounded-lg border border-cmo-border p-3 mb-4">
               <div className="flex items-center space-x-3">
                 <Avatar className="w-10 h-10">
                   <AvatarImage src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" />
@@ -89,7 +89,7 @@ export default function Home() {
             </div>
 
             {/* Questions and Answers */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {mockQuestions.map((question, index) => {
                 const author = mockUsers.find(user => user.id === question.authorId);
                 if (!author) return null;
@@ -100,7 +100,7 @@ export default function Home() {
                     
                     {/* Show answer for first question */}
                     {index === 0 && (
-                      <div className="ml-8 mt-6">
+                      <div className="ml-6 mt-4">
                         <AnswerCard 
                           answer={{
                             id: "1",
