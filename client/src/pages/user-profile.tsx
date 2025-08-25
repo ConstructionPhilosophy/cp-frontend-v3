@@ -648,6 +648,49 @@ export default function UserProfilePage() {
               </CardContent>
             </Card>
 
+            {/* Projects Section */}
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Building className="w-5 h-5 text-cmo-primary" />
+                    Projects
+                  </h3>
+                </div>
+                <div className="space-y-4">
+                  {((profileData as any).projects || []).length > 0 ? (
+                    ((profileData as any).projects || []).map((project: any, index: number) => (
+                      <div key={project.id || index} className="flex gap-3">
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Building className="w-4 h-4 text-cmo-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-sm">{project.title}</h4>
+                          {project.location && (
+                            <p className="text-cmo-text-secondary flex items-center gap-1 text-xs">
+                              <MapPin className="w-3 h-3" />
+                              {project.location}
+                            </p>
+                          )}
+                          <p className="text-xs text-cmo-text-secondary mt-2">{project.description}</p>
+                          {project.tags && project.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {project.tags.map((tag: string, idx: number) => (
+                                <Badge key={idx} variant="secondary" className="text-xs px-2 py-0.5">
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-cmo-text-secondary text-center py-8">No projects added yet</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Education Section */}
             <Card className="mb-4">
@@ -986,6 +1029,23 @@ export default function UserProfilePage() {
               </Card>
             )}
 
+            {/* Languages Known */}
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-4">Languages Known</h3>
+                <div className="flex flex-wrap gap-2">
+                  {((profileData as any).languages || []).map((lang: string) => (
+                    <Badge key={lang} variant="outline">
+                      {lang}
+                    </Badge>
+                  ))}
+                  {(!((profileData as any).languages) || ((profileData as any).languages || []).length === 0) && (
+                    <p className="text-cmo-text-secondary text-sm">No languages specified</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Suggested for You */}
             <Card className="mb-4">
               <CardContent className="p-4">
@@ -1031,29 +1091,23 @@ export default function UserProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Profile Stats */}
+            {/* Popular Filters */}
             <Card>
               <CardContent className="p-4">
-                <h3 className="font-semibold text-cmo-text-primary mb-3">
-                  Profile Stats
-                </h3>
+                <h3 className="font-semibold mb-4 text-sm">Popular Filters</h3>
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-cmo-text-secondary">Posts:</span>
-                    <span className="font-semibold">24</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-cmo-text-secondary">Views:</span>
-                    <span className="font-semibold">1.2k</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-cmo-text-secondary">Thanks:</span>
-                    <span className="font-semibold">156</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-cmo-text-secondary">Followers:</span>
-                    <span className="font-semibold">500+</span>
-                  </div>
+                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                    Questions & Answers
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                    Articles & Posts
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                    Industry Updates
+                  </Button>
+                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
+                    Job Opportunities
+                  </Button>
                 </div>
               </CardContent>
             </Card>
