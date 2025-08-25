@@ -114,6 +114,9 @@ export default function UserProfilePage() {
   const [experience, setExperience] = useState<any[]>([]);
   const [educationLoading, setEducationLoading] = useState<boolean>(false);
   const [experienceLoading, setExperienceLoading] = useState<boolean>(false);
+  
+  // Skills State
+  const [userSkills, setUserSkills] = useState<string[]>([]);
   const [editFormData, setEditFormData] = useState({
     firstName: "",
     lastName: "",
@@ -242,6 +245,22 @@ export default function UserProfilePage() {
         } finally {
           setExperienceLoading(false);
         }
+      }
+
+      // Load Skills for all user types
+      try {
+        const userSkillsData = await userApiService.getUserSkills(profileData.uid);
+        
+        // Handle the new API format
+        if (userSkillsData && userSkillsData.skills) {
+          // Store the skill names for display
+          setUserSkills(userSkillsData.skills.map(skill => skill.name));
+        } else {
+          setUserSkills([]);
+        }
+      } catch (error) {
+        console.error('Error loading skills:', error);
+        setUserSkills([]);
       }
     };
     
@@ -1236,10 +1255,10 @@ export default function UserProfilePage() {
                     <h3 className="font-semibold">Skills Expertise</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {((profileData as any).skills || []).length > 0 ? (
-                      ((profileData as any).skills || []).map((skill: string) => (
-                        <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
-                          {skill}
+                    {userSkills.length > 0 ? (
+                      userSkills.map((skillName: string, index: number) => (
+                        <Badge key={index} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
+                          {skillName}
                         </Badge>
                       ))
                     ) : (

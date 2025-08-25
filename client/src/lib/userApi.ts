@@ -934,7 +934,7 @@ class UserApiService {
     }
   }
 
-  async getUserSkills(uid: string): Promise<string[]> {
+  async getUserSkills(uid: string): Promise<{skillIds: string[], skills: {skillId: string, name: string}[]}> {
     try {
       const headers = await this.getAuthHeaders();
 
@@ -958,8 +958,8 @@ class UserApiService {
         );
       }
 
-      const skillIds = await response.json();
-      return skillIds;
+      const skillsData = await response.json();
+      return skillsData;
     } catch (error: any) {
       if (error.message === "AUTH_EXPIRED") {
         throw error;

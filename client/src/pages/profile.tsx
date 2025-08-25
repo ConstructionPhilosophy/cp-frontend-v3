@@ -497,22 +497,27 @@ export default function ProfilePage() {
 
       // Ensure data is arrays
       const skillsArray = Array.isArray(allSkillsData) ? allSkillsData : [];
-      const userSkillsArray = Array.isArray(userSkillsData)
-        ? userSkillsData
-        : [];
-
+      
       setAllSkills(skillsArray);
-      setUserSkills(userSkillsArray);
+      
+      // Update to handle the new API format
+      if (userSkillsData && userSkillsData.skills) {
+        // Store the skill names for display
+        setUserSkills(userSkillsData.skills.map(skill => skill.name));
+        
+        // Set selected skills for the modal using all skills data
+        const selectedSkillOptions = userSkillsData.skills
+          .map((userSkill) => {
+            const skill = skillsArray.find((s) => s.id === userSkill.skillId);
+            return { value: userSkill.skillId, label: userSkill.name };
+          })
+          .filter(Boolean);
 
-      // Set selected skills for the modal
-      const selectedSkillOptions = userSkillsArray
-        .map((skillId) => {
-          const skill = skillsArray.find((s) => s.id === skillId);
-          return { value: skillId, label: skill?.name || skillId };
-        })
-        .filter(Boolean);
-
-      setSelectedSkills(selectedSkillOptions);
+        setSelectedSkills(selectedSkillOptions);
+      } else {
+        setUserSkills([]);
+        setSelectedSkills([]);
+      }
     } catch (error) {
       console.error("Error loading skills:", error);
       toast({
@@ -1922,18 +1927,15 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {userSkills.length > 0 ? (
-                      userSkills.map((skillId: string) => {
-                        const skill = allSkills.find((s) => s.id === skillId);
-                        return (
-                          <Badge
-                            key={skillId}
-                            variant="secondary"
-                            className="bg-cmo-primary/10 text-cmo-primary"
-                          >
-                            {skill?.name || skillId}
-                          </Badge>
-                        );
-                      })
+                      userSkills.map((skillName: string, index: number) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="bg-cmo-primary/10 text-cmo-primary"
+                        >
+                          {skillName}
+                        </Badge>
+                      ))
                     ) : (
                       <p className="text-cmo-text-secondary text-sm">
                         No skills added yet
