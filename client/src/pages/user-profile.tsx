@@ -106,6 +106,8 @@ export default function UserProfilePage() {
   // Suggestions State
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState<boolean>(false);
+  const [followingStatus, setFollowingStatus] = useState<{[key: string]: boolean}>({});
+  const [followLoading, setFollowLoading] = useState<{[key: string]: boolean}>({});
   
   // Education and Experience State
   const [education, setEducation] = useState<any[]>([]);
@@ -1053,27 +1055,6 @@ export default function UserProfilePage() {
                           </span>
                         </div>
                       )}
-                      {(profileData as any).gender && (
-                        <div className="flex items-center gap-3">
-                          <User className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">
-                            {(profileData as any).gender}
-                          </span>
-                        </div>
-                      )}
-                      {(profileData as any).dateOfBirth && (
-                        <div className="flex items-center gap-3">
-                          <Calendar className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">
-                            Born{" "}
-                            {(profileData as any).dateOfBirth
-                              ? new Date(
-                                  (profileData as any).dateOfBirth,
-                                ).getFullYear()
-                              : "N/A"}
-                          </span>
-                        </div>
-                      )}
                     </>
                   )}
 
@@ -1174,25 +1155,68 @@ export default function UserProfilePage() {
                   ) : suggestions.length > 0 ? (
                     suggestions.map((person) => (
                       <div key={person.uid} className="flex items-center gap-3">
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={person.photoUrl || person.profilePic} />
-                          <AvatarFallback className="text-xs">
-                            {(person.firstName?.[0] || '') + (person.lastName?.[0] || '')}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-xs text-cmo-text-primary truncate">
-                            {person.firstName} {person.lastName}
-                          </p>
-                          <p className="text-xs text-cmo-text-secondary truncate">
-                            {person.title || person.positionDesignation || 'Professional'}
-                          </p>
-                          <p className="text-xs text-cmo-text-secondary truncate">
-                            {person.city || 'Location not specified'}
-                          </p>
+                        <div 
+                          className="flex items-center gap-3 flex-1 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg p-1 transition-colors"
+                          onClick={() => {
+                            const userIdentifier = person.username && person.username.trim() !== '' ? person.username : person.uid;
+                            window.open(`/u/${userIdentifier}`, '_blank');
+                          }}
+                        >
+                          <Avatar className="w-10 h-10">
+                            <AvatarImage src={person.photoUrl || person.profilePic} />
+                            <AvatarFallback className="text-xs">
+                              {(person.firstName?.[0] || '') + (person.lastName?.[0] || '')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-xs text-cmo-text-primary truncate">
+                              {person.firstName} {person.lastName}
+                            </p>
+                            <p className="text-xs text-cmo-text-secondary truncate">
+                              {person.title || person.positionDesignation || 'Professional'}
+                            </p>
+                            <p className="text-xs text-cmo-text-secondary truncate">
+                              {person.city || 'Location not specified'}
+                            </p>
+                          </div>
                         </div>
-                        <Button size="sm" className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white" data-testid="button-follow-suggestion">
-                          Follow
+                        <Button 
+                          size="sm" 
+                          className={`text-xs px-3 py-1 h-6 ${
+                            followingStatus[person.uid] 
+                              ? 'bg-gray-200 hover:bg-gray-300 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300'
+                              : 'bg-blue-600 hover:bg-blue-700 text-white'
+                          }`}
+                          data-testid="button-follow-suggestion"
+                          disabled={followLoading[person.uid]}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            if (followLoading[person.uid]) return;
+                            
+                            setFollowLoading(prev => ({ ...prev, [person.uid]: true }));
+                            
+                            try {
+                              if (followingStatus[person.uid]) {
+                                await userApiService.unfollowUser(person.uid);
+                                setFollowingStatus(prev => ({ ...prev, [person.uid]: false }));
+                              } else {
+                                await userApiService.followUser(person.uid);
+                                setFollowingStatus(prev => ({ ...prev, [person.uid]: true }));
+                              }
+                            } catch (error) {
+                              console.error('Error following/unfollowing user:', error);
+                            } finally {
+                              setFollowLoading(prev => ({ ...prev, [person.uid]: false }));
+                            }
+                          }}
+                        >
+                          {followLoading[person.uid] ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : followingStatus[person.uid] ? (
+                            'Following'
+                          ) : (
+                            'Follow'
+                          )}
                         </Button>
                       </div>
                     ))

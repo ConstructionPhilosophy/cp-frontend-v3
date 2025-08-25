@@ -157,6 +157,8 @@ export default function ProfilePage() {
   // Suggestions State
   const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [followingStatus, setFollowingStatus] = useState<{[key: string]: boolean}>({});
+  const [followLoading, setFollowLoading] = useState<{[key: string]: boolean}>({});
   
   // Contact Info State
   const [showContactInfo, setShowContactInfo] = useState(false);
@@ -1727,27 +1729,6 @@ export default function ProfilePage() {
                           <Building className="w-5 h-5 text-cmo-primary" />
                           <span className="text-sm">
                             {(profileData as any).company}
-                          </span>
-                        </div>
-                      )}
-                      {(profileData as any).gender && (
-                        <div className="flex items-center gap-3">
-                          <User className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">
-                            {(profileData as any).gender}
-                          </span>
-                        </div>
-                      )}
-                      {(profileData as any).dateOfBirth && (
-                        <div className="flex items-center gap-3">
-                          <Calendar className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">
-                            Born{" "}
-                            {(profileData as any).dateOfBirth
-                              ? new Date(
-                                  (profileData as any).dateOfBirth,
-                                ).getFullYear()
-                              : "N/A"}
                           </span>
                         </div>
                       )}
