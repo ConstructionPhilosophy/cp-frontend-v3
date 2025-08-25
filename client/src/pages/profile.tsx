@@ -11,6 +11,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '../components/ui/dialog';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import Header from '../components/layout/header';
 import { useAuth } from '../contexts/AuthContext';
 import { userApiService, UserProfile } from '../lib/userApi';
@@ -119,6 +128,23 @@ export default function ProfilePage() {
   const { createConversation } = useCreateConversation();
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  
+  // Edit Profile Modal State
+  const [showEditProfileModal, setShowEditProfileModal] = useState(false);
+  const [editFormLoading, setEditFormLoading] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    firstName: '',
+    lastName: '',
+    title: '',
+    positionDesignation: '',
+    currentCompany: '',
+    about: '',
+    gender: '',
+    dateOfBirth: '',
+    city: '',
+    stateName: '',
+    country: '',
+  });
 
   const filters = ['All', 'News', 'Posts', 'Articles', 'Videos', 'Jobs'];
 
@@ -156,11 +182,38 @@ export default function ProfilePage() {
       try {
         const data = await userApiService.getCurrentUser(true);
         setProfileData(data);
+        // Populate edit form data
+        setEditFormData({
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          title: (data as any).title || '',
+          positionDesignation: (data as any).positionDesignation || '',
+          currentCompany: (data as any).company || '',
+          about: (data as any).description || (data as any).about || '',
+          gender: (data as any).gender || '',
+          dateOfBirth: (data as any).dateOfBirth || '',
+          city: (data as any).city || '',
+          stateName: (data as any).stateName || '',
+          country: (data as any).country || '',
+        });
       } catch (error) {
         console.error('Error fetching profile data:', error);
         // Fallback to context data if API fails
         if (userProfile) {
           setProfileData(userProfile);
+          setEditFormData({
+            firstName: userProfile.firstName || '',
+            lastName: userProfile.lastName || '',
+            title: (userProfile as any).title || '',
+            positionDesignation: (userProfile as any).positionDesignation || '',
+            currentCompany: (userProfile as any).company || '',
+            about: (userProfile as any).description || (userProfile as any).about || '',
+            gender: (userProfile as any).gender || '',
+            dateOfBirth: (userProfile as any).dateOfBirth || '',
+            city: (userProfile as any).city || '',
+            stateName: (userProfile as any).stateName || '',
+            country: (userProfile as any).country || '',
+          });
         }
       } finally {
         setLoading(false);
@@ -189,6 +242,55 @@ export default function ProfilePage() {
     setCommentText(prev => ({
       ...prev,
       [postId]: ''
+    }));
+  };
+
+  // Edit Profile Handlers
+  const handleEditFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!profileData || !user) return;
+    
+    setEditFormLoading(true);
+    
+    try {
+      const updateData: any = {
+        ...editFormData,
+        company: editFormData.currentCompany,
+        description: editFormData.about,
+      };
+      
+      // Remove empty fields
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key] === "") {
+          delete updateData[key];
+        }
+      });
+      
+      const updatedUser = await userApiService.updateUser(profileData.uid, updateData);
+      setProfileData(updatedUser);
+      setShowEditProfileModal(false);
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error: any) {
+      console.error("Error updating profile:", error);
+      toast({
+        title: "Failed to update profile",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setEditFormLoading(false);
+    }
+  };
+
+  const handleEditFormChange = (field: string, value: string) => {
+    setEditFormData(prev => ({
+      ...prev,
+      [field]: value
     }));
   };
 
@@ -318,7 +420,7 @@ export default function ProfilePage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setShowEditProfileModal(true)}>
                               <Edit className="mr-2 h-4 w-4" />
                               <span>Edit Profile</span>
                             </DropdownMenuItem>
@@ -748,21 +850,84 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
+            {/* Suggested for You */}
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-4 text-sm">Suggested for You</h3>
+                <div className="space-y-3">
+                  {[
+                    {
+                      id: 1,
+                      name: "Sarah Johnson",
+                      title: "Senior Project Manager",
+                      location: "Austin, TX",
+                      photoUrl: "https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=150&h=150&fit=crop&crop=face"
+                    },
+                    {
+                      id: 2,
+                      name: "Michael Chen",
+                      title: "Construction Engineer",
+                      location: "Seattle, WA",
+                      photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+                    },
+                    {
+                      id: 3,
+                      name: "Emily Rodriguez",
+                      title: "Architect",
+                      location: "Denver, CO",
+                      photoUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
+                    },
+                    {
+                      id: 4,
+                      name: "David Thompson",
+                      title: "Civil Engineer",
+                      location: "Phoenix, AZ",
+                      photoUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+                    },
+                    {
+                      id: 5,
+                      name: "Lisa Wang",
+                      title: "Construction Manager",
+                      location: "Portland, OR",
+                      photoUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face"
+                    }
+                  ].map((person) => (
+                    <div key={person.id} className="flex items-center gap-3">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={person.photoUrl} />
+                        <AvatarFallback className="text-xs">
+                          {person.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-xs text-cmo-text-primary truncate">{person.name}</p>
+                        <p className="text-xs text-cmo-text-secondary truncate">{person.title}</p>
+                        <p className="text-xs text-cmo-text-secondary truncate">{person.location}</p>
+                      </div>
+                      <Button variant="outline" size="sm" className="text-xs px-2 py-1 h-6">
+                        Follow
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             {/* Popular Filters */}
             <Card>
-              <CardContent className="p-6">
-                <h3 className="font-semibold mb-4">Popular Filters</h3>
+              <CardContent className="p-4">
+                <h3 className="font-semibold mb-4 text-sm">Popular Filters</h3>
                 <div className="space-y-2">
-                  <Button variant="ghost" className="w-full justify-start text-sm">
+                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
                     Questions & Answers
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-sm">
+                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
                     Articles & Posts
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-sm">
+                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
                     Industry Updates
                   </Button>
-                  <Button variant="ghost" className="w-full justify-start text-sm">
+                  <Button variant="ghost" className="w-full justify-start text-xs h-8">
                     Job Opportunities
                   </Button>
                 </div>
@@ -771,6 +936,148 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <Dialog open={showEditProfileModal} onOpenChange={setShowEditProfileModal}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleEditFormSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="firstName">First Name</Label>
+                <Input
+                  id="firstName"
+                  value={editFormData.firstName}
+                  onChange={(e) => handleEditFormChange("firstName", e.target.value)}
+                  placeholder="Enter first name"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
+                <Input
+                  id="lastName"
+                  value={editFormData.lastName}
+                  onChange={(e) => handleEditFormChange("lastName", e.target.value)}
+                  placeholder="Enter last name"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
+                value={editFormData.title}
+                onChange={(e) => handleEditFormChange("title", e.target.value)}
+                placeholder="Enter your title"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="positionDesignation">Position/Designation</Label>
+              <Input
+                id="positionDesignation"
+                value={editFormData.positionDesignation}
+                onChange={(e) => handleEditFormChange("positionDesignation", e.target.value)}
+                placeholder="Enter your position or designation"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="currentCompany">Current Company</Label>
+              <Input
+                id="currentCompany"
+                value={editFormData.currentCompany}
+                onChange={(e) => handleEditFormChange("currentCompany", e.target.value)}
+                placeholder="Enter your current company"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="about">About</Label>
+              <Textarea
+                id="about"
+                value={editFormData.about}
+                onChange={(e) => handleEditFormChange("about", e.target.value)}
+                placeholder="Tell us about yourself"
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="gender">Gender</Label>
+                <Select value={editFormData.gender} onValueChange={(value) => handleEditFormChange("gender", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select gender" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                    <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="dateOfBirth">Date of Birth</Label>
+                <Input
+                  id="dateOfBirth"
+                  type="date"
+                  value={editFormData.dateOfBirth}
+                  onChange={(e) => handleEditFormChange("dateOfBirth", e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  value={editFormData.city}
+                  onChange={(e) => handleEditFormChange("city", e.target.value)}
+                  placeholder="Enter your city"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="stateName">State</Label>
+                <Input
+                  id="stateName"
+                  value={editFormData.stateName}
+                  onChange={(e) => handleEditFormChange("stateName", e.target.value)}
+                  placeholder="Enter your state"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  value={editFormData.country}
+                  onChange={(e) => handleEditFormChange("country", e.target.value)}
+                  placeholder="Enter your country"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowEditProfileModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={editFormLoading}>
+                {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Save Changes
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
