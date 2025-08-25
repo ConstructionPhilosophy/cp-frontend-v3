@@ -545,8 +545,9 @@ export default function ProfilePage() {
       const skillIds = selectedSkills.map((skill) => skill.value);
       await userApiService.updateUserSkills(profileData.uid, skillIds);
 
-      // Update local state
-      setUserSkills(skillIds);
+      // Update local state with skill names, not IDs
+      const skillNames = selectedSkills.map((skill) => skill.label);
+      setUserSkills(skillNames);
       setSkillsModalOpen(false);
 
       toast({
