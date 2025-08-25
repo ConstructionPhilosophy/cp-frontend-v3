@@ -22,7 +22,7 @@ import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import Header from '../components/layout/header';
 import { useAuth } from '../contexts/AuthContext';
-import { userApiService, UserProfile } from '../lib/userApi';
+import { userApiService, UserProfile, Education, Experience, Project } from '../lib/userApi';
 import { useCreateConversation } from '../hooks/useChat';
 import { useLocation } from 'wouter';
 import { useToast } from '../hooks/use-toast';
@@ -50,52 +50,13 @@ import {
   GraduationCap,
   Briefcase,
   User,
-  FileText
+  FileText,
+  Trash2,
+  X
 } from 'lucide-react';
 
 
 
-const mockEducation = [
-  {
-    id: "edu1",
-    degree: "MBA",
-    fieldOfStudy: "Marketing & Business Strategy",
-    schoolOrCollege: "Oxford International",
-    startDate: "2008-09-01",
-    endDate: "2010-06-30",
-    grade: "Distinction"
-  },
-  {
-    id: "edu2",
-    degree: "B.A.",
-    fieldOfStudy: "Business Administration",
-    schoolOrCollege: "Stanford University",
-    startDate: "2003-09-01",
-    endDate: "2007-05-31",
-    grade: "Magna Cum Laude"
-  }
-];
-
-const mockExperience = [
-  {
-    id: "exp1",
-    company: "SingleFire",
-    role: "Chief Marketing Officer",
-    location: "Virginia, NY",
-    startDate: "2020-01-01",
-    endDate: null,
-    description: "Leading global marketing strategy and brand management for digital transformation initiatives."
-  },
-  {
-    id: "exp2", 
-    company: "Blue Chip CPG",
-    role: "Senior Brand Manager",
-    location: "New York, NY",
-    startDate: "2015-03-01",
-    endDate: "2019-12-31",
-    description: "Managed multi-million dollar brand portfolios and launched successful product campaigns."
-  }
-];
 
 const mockActivities = [
   {
@@ -157,6 +118,47 @@ export default function ProfilePage() {
     registrationNumber: '',
     companySize: '',
   });
+
+  // Education, Experience, Projects State
+  const [education, setEducation] = useState<Education[]>([]);
+  const [experience, setExperience] = useState<Experience[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [educationLoading, setEducationLoading] = useState(false);
+  const [experienceLoading, setExperienceLoading] = useState(false);
+  const [projectsLoading, setProjectsLoading] = useState(false);
+
+  // Modal States for Education, Experience, Projects
+  const [showEducationModal, setShowEducationModal] = useState(false);
+  const [showExperienceModal, setShowExperienceModal] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
+  const [editingEducation, setEditingEducation] = useState<Education | null>(null);
+  const [editingExperience, setEditingExperience] = useState<Experience | null>(null);
+  const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [educationFormData, setEducationFormData] = useState<Omit<Education, 'id'>>({
+    degree: '',
+    fieldOfStudy: '',
+    schoolOrCollege: '',
+    startDate: '',
+    endDate: '',
+    grade: '',
+  });
+  const [experienceFormData, setExperienceFormData] = useState<Omit<Experience, 'id'>>({
+    companyName: '',
+    title: '',
+    employmentType: '',
+    location: '',
+    startDate: '',
+    endDate: '',
+    isCurrent: false,
+    description: '',
+  });
+  const [projectFormData, setProjectFormData] = useState<Omit<Project, 'id' | 'imageURLs' | 'createdAt' | 'updatedAt'>>({
+    title: '',
+    description: '',
+    location: '',
+    tags: [],
+  });
+  const [projectImages, setProjectImages] = useState<File[]>([]);
 
   const filters = ['All', 'News', 'Posts', 'Articles', 'Videos', 'Jobs'];
 
@@ -260,6 +262,304 @@ export default function ProfilePage() {
 
     fetchProfileData();
   }, [user, userProfile]);
+
+  // Load Education, Experience, Projects
+  const loadEducation = async () => {
+    if (!profileData?.uid) return;
+    setEducationLoading(true);
+    try {
+      const educationData = await userApiService.getUserEducation(profileData.uid);
+      setEducation(educationData);
+    } catch (error) {
+      console.error('Error loading education:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load education data",
+        variant: "destructive",
+      });
+    } finally {
+      setEducationLoading(false);
+    }
+  };
+
+  const loadExperience = async () => {
+    if (!profileData?.uid) return;
+    setExperienceLoading(true);
+    try {
+      const experienceData = await userApiService.getUserExperience(profileData.uid);
+      setExperience(experienceData);
+    } catch (error) {
+      console.error('Error loading experience:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load experience data",
+        variant: "destructive",
+      });
+    } finally {
+      setExperienceLoading(false);
+    }
+  };
+
+  const loadProjects = async () => {
+    if (!profileData?.uid) return;
+    setProjectsLoading(true);
+    try {
+      const projectsData = await userApiService.getUserProjects(profileData.uid);
+      setProjects(projectsData);
+    } catch (error) {
+      console.error('Error loading projects:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load projects data",
+        variant: "destructive",
+      });
+    } finally {
+      setProjectsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (profileData?.uid) {
+      if ((profileData as any).userType !== 'business') {
+        loadEducation();
+        loadExperience();
+      }
+      loadProjects();
+    }
+  }, [profileData?.uid, (profileData as any)?.userType]);
+
+  // Education Handlers
+  const handleAddEducation = () => {
+    setEditingEducation(null);
+    setEducationFormData({
+      degree: '',
+      fieldOfStudy: '',
+      schoolOrCollege: '',
+      startDate: '',
+      endDate: '',
+      grade: '',
+    });
+    setShowEducationModal(true);
+  };
+
+  const handleEditEducation = (edu: Education) => {
+    setEditingEducation(edu);
+    setEducationFormData({
+      degree: edu.degree,
+      fieldOfStudy: edu.fieldOfStudy,
+      schoolOrCollege: edu.schoolOrCollege,
+      startDate: edu.startDate,
+      endDate: edu.endDate,
+      grade: edu.grade,
+    });
+    setShowEducationModal(true);
+  };
+
+  const handleSaveEducation = async () => {
+    if (!profileData?.uid) return;
+    setEditFormLoading(true);
+    try {
+      if (editingEducation?.id) {
+        await userApiService.updateEducation(profileData.uid, editingEducation.id, educationFormData);
+        toast({
+          title: "Success",
+          description: "Education updated successfully",
+        });
+      } else {
+        await userApiService.addEducation(profileData.uid, educationFormData);
+        toast({
+          title: "Success",
+          description: "Education added successfully",
+        });
+      }
+      setShowEducationModal(false);
+      loadEducation();
+    } catch (error) {
+      console.error('Error saving education:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save education",
+        variant: "destructive",
+      });
+    } finally {
+      setEditFormLoading(false);
+    }
+  };
+
+  const handleDeleteEducation = async (educationId: string) => {
+    if (!profileData?.uid) return;
+    try {
+      await userApiService.deleteEducation(profileData.uid, educationId);
+      toast({
+        title: "Success",
+        description: "Education deleted successfully",
+      });
+      loadEducation();
+    } catch (error) {
+      console.error('Error deleting education:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete education",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Experience Handlers
+  const handleAddExperience = () => {
+    setEditingExperience(null);
+    setExperienceFormData({
+      companyName: '',
+      title: '',
+      employmentType: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      isCurrent: false,
+      description: '',
+    });
+    setShowExperienceModal(true);
+  };
+
+  const handleEditExperience = (exp: Experience) => {
+    setEditingExperience(exp);
+    setExperienceFormData({
+      companyName: exp.companyName,
+      title: exp.title,
+      employmentType: exp.employmentType,
+      location: exp.location,
+      startDate: exp.startDate,
+      endDate: exp.endDate,
+      isCurrent: exp.isCurrent,
+      description: exp.description,
+    });
+    setShowExperienceModal(true);
+  };
+
+  const handleSaveExperience = async () => {
+    if (!profileData?.uid) return;
+    setEditFormLoading(true);
+    try {
+      if (editingExperience?.id) {
+        await userApiService.updateExperience(profileData.uid, editingExperience.id, experienceFormData);
+        toast({
+          title: "Success",
+          description: "Experience updated successfully",
+        });
+      } else {
+        await userApiService.addExperience(profileData.uid, experienceFormData);
+        toast({
+          title: "Success",
+          description: "Experience added successfully",
+        });
+      }
+      setShowExperienceModal(false);
+      loadExperience();
+    } catch (error) {
+      console.error('Error saving experience:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save experience",
+        variant: "destructive",
+      });
+    } finally {
+      setEditFormLoading(false);
+    }
+  };
+
+  const handleDeleteExperience = async (experienceId: string) => {
+    if (!profileData?.uid) return;
+    try {
+      await userApiService.deleteExperience(profileData.uid, experienceId);
+      toast({
+        title: "Success",
+        description: "Experience deleted successfully",
+      });
+      loadExperience();
+    } catch (error) {
+      console.error('Error deleting experience:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete experience",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Projects Handlers
+  const handleAddProject = () => {
+    setEditingProject(null);
+    setProjectFormData({
+      title: '',
+      description: '',
+      location: '',
+      tags: [],
+    });
+    setProjectImages([]);
+    setShowProjectModal(true);
+  };
+
+  const handleEditProject = (project: Project) => {
+    setEditingProject(project);
+    setProjectFormData({
+      title: project.title,
+      description: project.description,
+      location: project.location || '',
+      tags: project.tags || [],
+    });
+    setProjectImages([]);
+    setShowProjectModal(true);
+  };
+
+  const handleSaveProject = async () => {
+    if (!profileData?.uid) return;
+    setEditFormLoading(true);
+    try {
+      if (editingProject?.id) {
+        await userApiService.updateProject(profileData.uid, editingProject.id, projectFormData);
+        toast({
+          title: "Success",
+          description: "Project updated successfully",
+        });
+      } else {
+        await userApiService.addProject(profileData.uid, projectFormData, projectImages);
+        toast({
+          title: "Success",
+          description: "Project added successfully",
+        });
+      }
+      setShowProjectModal(false);
+      loadProjects();
+    } catch (error) {
+      console.error('Error saving project:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save project",
+        variant: "destructive",
+      });
+    } finally {
+      setEditFormLoading(false);
+    }
+  };
+
+  const handleDeleteProject = async (projectId: string) => {
+    if (!profileData?.uid) return;
+    try {
+      await userApiService.deleteProject(profileData.uid, projectId);
+      toast({
+        title: "Success",
+        description: "Project deleted successfully",
+      });
+      loadProjects();
+    } catch (error) {
+      console.error('Error deleting project:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete project",
+        variant: "destructive",
+      });
+    }
+  };
 
   const toggleComments = (postId: string) => {
     setExpandedComments(prev => ({
@@ -546,52 +846,88 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {(profileData as any).userType === 'business' ? (
-              /* Projects Section for Business */
-              <Card className="mb-6">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-semibold flex items-center gap-2">
-                      <Building className="w-6 h-6 text-cmo-primary" />
-                      Projects
-                    </h3>
-                    <Button variant="ghost" size="icon">
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="space-y-6">
-                    {((profileData as any).projects || []).length > 0 ? (
-                      ((profileData as any).projects || []).map((project: any, index: number) => (
-                        <div key={index} className="flex gap-4">
-                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Building className="w-6 h-6 text-cmo-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-lg">{project.name || project.title}</h4>
-                            <p className="text-cmo-primary font-medium">{project.client || project.company}</p>
-                            <p className="text-cmo-text-secondary flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
-                              {project.location}
-                            </p>
-                            <p className="text-sm text-cmo-text-secondary mt-1">
-                              {project.startDate && new Date(project.startDate).getFullYear()} - 
-                              {project.endDate ? new Date(project.endDate).getFullYear() : 'Ongoing'}
-                            </p>
-                            {project.description && (
+            {/* Projects Section - Show for all users */}
+            <Card className="mb-6">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold flex items-center gap-2">
+                    <Building className="w-6 h-6 text-cmo-primary" />
+                    Projects
+                  </h3>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={handleAddProject}
+                    data-testid="button-add-project"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                <div className="space-y-6">
+                  {projectsLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                    </div>
+                  ) : projects.length > 0 ? (
+                    projects.map((project) => (
+                      <div key={project.id} className="flex gap-4 group">
+                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Building className="w-6 h-6 text-cmo-primary" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-lg">{project.title}</h4>
+                              {project.location && (
+                                <p className="text-cmo-text-secondary flex items-center gap-1">
+                                  <MapPin className="w-4 h-4" />
+                                  {project.location}
+                                </p>
+                              )}
                               <p className="text-cmo-text-secondary mt-2">{project.description}</p>
-                            )}
+                              {project.tags && project.tags.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                  {project.tags.map((tag, idx) => (
+                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                      {tag}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleEditProject(project)}
+                                data-testid={`button-edit-project-${project.id}`}
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => project.id && handleDeleteProject(project.id)}
+                                data-testid={`button-delete-project-${project.id}`}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                      ))
-                    ) : (
-                      <p className="text-cmo-text-secondary text-center py-8">No projects added yet</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-cmo-text-secondary text-center py-8">No projects added yet</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Education and Experience - Only for Personal Users */}
+            {(profileData as any).userType !== 'business' && (
               <>
-                {/* Education Section for Personal */}
+                {/* Education Section */}
                 <Card className="mb-6">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-6">
@@ -599,32 +935,67 @@ export default function ProfilePage() {
                         <GraduationCap className="w-6 h-6 text-cmo-primary" />
                         Education
                       </h3>
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={handleAddEducation}
+                        data-testid="button-add-education"
+                      >
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
                     <div className="space-y-6">
-                      {mockEducation.map((edu) => (
-                        <div key={edu.id} className="flex gap-4">
-                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <GraduationCap className="w-6 h-6 text-cmo-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-lg">{edu.degree}</h4>
-                            <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
-                            <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
-                            <p className="text-sm text-cmo-text-secondary mt-1">
-                              {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
-                              {edu.grade && ` • ${edu.grade}`}
-                            </p>
-                          </div>
+                      {educationLoading ? (
+                        <div className="flex justify-center py-8">
+                          <Loader2 className="w-6 h-6 animate-spin" />
                         </div>
-                      ))}
+                      ) : education.length > 0 ? (
+                        education.map((edu) => (
+                          <div key={edu.id} className="flex gap-4 group">
+                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-lg">{edu.degree}</h4>
+                                  <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
+                                  <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
+                                  <p className="text-sm text-cmo-text-secondary mt-1">
+                                    {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
+                                    {edu.grade && ` • ${edu.grade}`}
+                                  </p>
+                                </div>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => handleEditEducation(edu)}
+                                    data-testid={`button-edit-education-${edu.id}`}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => edu.id && handleDeleteEducation(edu.id)}
+                                    data-testid={`button-delete-education-${edu.id}`}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-cmo-text-secondary text-center py-8">No education added yet</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Experience Section for Personal */}
+                {/* Experience Section */}
                 <Card className="mb-6">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-6">
@@ -632,30 +1003,66 @@ export default function ProfilePage() {
                         <Briefcase className="w-6 h-6 text-cmo-primary" />
                         Experience
                       </h3>
-                      <Button variant="ghost" size="icon">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={handleAddExperience}
+                        data-testid="button-add-experience"
+                      >
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
                     <div className="space-y-6">
-                      {mockExperience.map((exp) => (
-                        <div key={exp.id} className="flex gap-4">
-                          <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Briefcase className="w-6 h-6 text-cmo-primary" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-lg">{exp.role}</h4>
-                            <p className="text-cmo-primary font-medium">{exp.company}</p>
-                            <p className="text-cmo-text-secondary flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
-                              {exp.location}
-                            </p>
-                            <p className="text-sm text-cmo-text-secondary mt-1">
-                              {new Date(exp.startDate).getFullYear()} - {exp.endDate ? new Date(exp.endDate).getFullYear() : 'Present'}
-                            </p>
-                            <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
-                          </div>
+                      {experienceLoading ? (
+                        <div className="flex justify-center py-8">
+                          <Loader2 className="w-6 h-6 animate-spin" />
                         </div>
-                      ))}
+                      ) : experience.length > 0 ? (
+                        experience.map((exp) => (
+                          <div key={exp.id} className="flex gap-4 group">
+                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Briefcase className="w-6 h-6 text-cmo-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-lg">{exp.title}</h4>
+                                  <p className="text-cmo-primary font-medium">{exp.companyName}</p>
+                                  <p className="text-cmo-text-secondary flex items-center gap-1">
+                                    <MapPin className="w-4 h-4" />
+                                    {exp.location}
+                                  </p>
+                                  <p className="text-sm text-cmo-text-secondary mt-1">
+                                    {new Date(exp.startDate).getFullYear()} - {exp.isCurrent ? 'Present' : new Date(exp.endDate).getFullYear()}
+                                    {exp.employmentType && ` • ${exp.employmentType}`}
+                                  </p>
+                                  <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
+                                </div>
+                                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => handleEditExperience(exp)}
+                                    data-testid={`button-edit-experience-${exp.id}`}
+                                  >
+                                    <Edit className="w-4 h-4" />
+                                  </Button>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="sm" 
+                                    onClick={() => exp.id && handleDeleteExperience(exp.id)}
+                                    data-testid={`button-delete-experience-${exp.id}`}
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-cmo-text-secondary text-center py-8">No experience added yet</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -1325,6 +1732,272 @@ export default function ProfilePage() {
               <Button type="submit" disabled={editFormLoading}>
                 {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Save Changes
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Education Modal */}
+      <Dialog open={showEducationModal} onOpenChange={setShowEducationModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingEducation ? 'Edit Education' : 'Add Education'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); handleSaveEducation(); }} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="degree">Degree</Label>
+                <Input
+                  id="degree"
+                  value={educationFormData.degree}
+                  onChange={(e) => setEducationFormData({ ...educationFormData, degree: e.target.value })}
+                  placeholder="e.g., Bachelor's, Master's, MBA"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="fieldOfStudy">Field of Study</Label>
+                <Input
+                  id="fieldOfStudy"
+                  value={educationFormData.fieldOfStudy}
+                  onChange={(e) => setEducationFormData({ ...educationFormData, fieldOfStudy: e.target.value })}
+                  placeholder="e.g., Computer Science, Business"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="schoolOrCollege">School/College</Label>
+              <Input
+                id="schoolOrCollege"
+                value={educationFormData.schoolOrCollege}
+                onChange={(e) => setEducationFormData({ ...educationFormData, schoolOrCollege: e.target.value })}
+                placeholder="e.g., Harvard University"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Start Date</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={educationFormData.startDate}
+                  onChange={(e) => setEducationFormData({ ...educationFormData, startDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endDate">End Date</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={educationFormData.endDate}
+                  onChange={(e) => setEducationFormData({ ...educationFormData, endDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="grade">Grade</Label>
+                <Input
+                  id="grade"
+                  value={educationFormData.grade}
+                  onChange={(e) => setEducationFormData({ ...educationFormData, grade: e.target.value })}
+                  placeholder="e.g., First Class, 3.8 GPA"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => setShowEducationModal(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={editFormLoading}>
+                {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {editingEducation ? 'Update' : 'Add'} Education
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Experience Modal */}
+      <Dialog open={showExperienceModal} onOpenChange={setShowExperienceModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingExperience ? 'Edit Experience' : 'Add Experience'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); handleSaveExperience(); }} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="expCompanyName">Company Name</Label>
+                <Input
+                  id="expCompanyName"
+                  value={experienceFormData.companyName}
+                  onChange={(e) => setExperienceFormData({ ...experienceFormData, companyName: e.target.value })}
+                  placeholder="e.g., Google, Microsoft"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="expTitle">Job Title</Label>
+                <Input
+                  id="expTitle"
+                  value={experienceFormData.title}
+                  onChange={(e) => setExperienceFormData({ ...experienceFormData, title: e.target.value })}
+                  placeholder="e.g., Software Engineer, Manager"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="employmentType">Employment Type</Label>
+                <Select value={experienceFormData.employmentType} onValueChange={(value) => setExperienceFormData({ ...experienceFormData, employmentType: value })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select employment type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Full-time">Full-time</SelectItem>
+                    <SelectItem value="Part-time">Part-time</SelectItem>
+                    <SelectItem value="Contract">Contract</SelectItem>
+                    <SelectItem value="Internship">Internship</SelectItem>
+                    <SelectItem value="Freelance">Freelance</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="expLocation">Location</Label>
+                <Input
+                  id="expLocation"
+                  value={experienceFormData.location}
+                  onChange={(e) => setExperienceFormData({ ...experienceFormData, location: e.target.value })}
+                  placeholder="e.g., San Francisco, CA"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="expStartDate">Start Date</Label>
+                <Input
+                  id="expStartDate"
+                  type="date"
+                  value={experienceFormData.startDate}
+                  onChange={(e) => setExperienceFormData({ ...experienceFormData, startDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="expEndDate">End Date</Label>
+                <Input
+                  id="expEndDate"
+                  type="date"
+                  value={experienceFormData.endDate}
+                  onChange={(e) => setExperienceFormData({ ...experienceFormData, endDate: e.target.value, isCurrent: false })}
+                  disabled={experienceFormData.isCurrent}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isCurrent"
+                checked={experienceFormData.isCurrent}
+                onChange={(e) => setExperienceFormData({ ...experienceFormData, isCurrent: e.target.checked, endDate: e.target.checked ? '' : experienceFormData.endDate })}
+              />
+              <Label htmlFor="isCurrent">I currently work here</Label>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="expDescription">Description</Label>
+              <Textarea
+                id="expDescription"
+                value={experienceFormData.description}
+                onChange={(e) => setExperienceFormData({ ...experienceFormData, description: e.target.value })}
+                placeholder="Describe your responsibilities and achievements"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => setShowExperienceModal(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={editFormLoading}>
+                {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {editingExperience ? 'Update' : 'Add'} Experience
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Projects Modal */}
+      <Dialog open={showProjectModal} onOpenChange={setShowProjectModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{editingProject ? 'Edit Project' : 'Add Project'}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); handleSaveProject(); }} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="projectTitle">Project Title</Label>
+              <Input
+                id="projectTitle"
+                value={projectFormData.title}
+                onChange={(e) => setProjectFormData({ ...projectFormData, title: e.target.value })}
+                placeholder="e.g., E-commerce Website, Mobile App"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="projectDescription">Description</Label>
+              <Textarea
+                id="projectDescription"
+                value={projectFormData.description}
+                onChange={(e) => setProjectFormData({ ...projectFormData, description: e.target.value })}
+                placeholder="Describe the project, technologies used, and your role"
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="projectLocation">Location (Optional)</Label>
+              <Input
+                id="projectLocation"
+                value={projectFormData.location || ''}
+                onChange={(e) => setProjectFormData({ ...projectFormData, location: e.target.value })}
+                placeholder="e.g., New York, NY"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="projectTags">Tags (Optional)</Label>
+              <Input
+                id="projectTags"
+                value={projectFormData.tags?.join(', ') || ''}
+                onChange={(e) => setProjectFormData({ ...projectFormData, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '') })}
+                placeholder="e.g., React, Node.js, MongoDB (comma separated)"
+              />
+            </div>
+
+            {!editingProject && (
+              <div className="space-y-2">
+                <Label htmlFor="projectImages">Project Images (Optional)</Label>
+                <Input
+                  id="projectImages"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => setProjectImages(Array.from(e.target.files || []))}
+                />
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => setShowProjectModal(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={editFormLoading}>
+                {editFormLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                {editingProject ? 'Update' : 'Add'} Project
               </Button>
             </div>
           </form>

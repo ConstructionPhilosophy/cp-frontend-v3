@@ -1054,7 +1054,7 @@ export default function UserProfilePage() {
                     className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
                     onClick={() => {
                       setShowFollowersModal(false);
-                      setLocation(`/u/${follower.username}`);
+                      setLocation(`/u/${follower.username || follower.uid}`);
                     }}
                   >
                     <Avatar className="w-8 h-8 flex-shrink-0">
@@ -1106,7 +1106,7 @@ export default function UserProfilePage() {
                     className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
                     onClick={() => {
                       setShowFollowingModal(false);
-                      setLocation(`/u/${followedUser.username}`);
+                      setLocation(`/u/${followedUser.username || followedUser.uid}`);
                     }}
                   >
                     <Avatar className="w-8 h-8 flex-shrink-0">

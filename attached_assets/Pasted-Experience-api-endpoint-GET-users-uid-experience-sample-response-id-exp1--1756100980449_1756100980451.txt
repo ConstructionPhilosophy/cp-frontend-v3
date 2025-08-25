@@ -1,0 +1,163 @@
+Experience
+
+api endpoint – GET /users/{uid}/experience
+sample response
+
+[
+  {
+    "id": "exp1",
+    "companyName": "Larsen & Toubro",
+    "title": "Site Engineer",
+    "employmentType": "Full-time",
+    "location": "Chennai",
+    "startDate": "2019-07-01",
+    "endDate": "2021-12-31",
+    "isCurrent": false,
+    "description": "Managed on-site execution, vendor coordination, and safety compliance."
+  },
+  {
+    "id": "exp2",
+    "companyName": "Shapoorji Pallonji",
+    "title": "Project Manager",
+    "employmentType": "Full-time",
+    "location": "Bangalore",
+    "startDate": "2022-01-01",
+    "endDate": "",
+    "isCurrent": true,
+    "description": "Leading a 40-member team delivering a commercial high-rise."
+  }
+]
+
+
+api endpoint – POST /users/{uid}/experience
+sample request body
+
+{
+  "companyName": "Tata Projects",
+  "title": "Senior Civil Engineer",
+  "employmentType": "Full-time",
+  "location": "Hyderabad",
+  "startDate": "2020-04-01",
+  "endDate": "2023-03-31",
+  "isCurrent": false,
+  "description": "Handled structural works, BOQ, and client billing."
+}
+
+
+api endpoint – PUT /users/{uid}/experience/{docId}
+sample request body
+
+{
+  "companyName": "Tata Projects",
+  "title": "Deputy Project Manager",
+  "employmentType": "Full-time",
+  "location": "Hyderabad",
+  "startDate": "2020-04-01",
+  "endDate": "2024-12-31",
+  "isCurrent": false,
+  "description": "Promoted to lead contractor interfaces and schedule control."
+}
+
+
+api endpoint – DELETE /users/{uid}/experience/{docId}
+sample response
+
+{
+  "message": "Experience deleted"
+}
+
+Projects
+
+Note: Per your backend, create uses multipart/form-data (with image uploads), update uses JSON.
+
+api endpoint – GET /users/{uid}/projects
+sample response
+
+[
+  {
+    "id": "proj1",
+    "title": "Green Concrete Plant Setup",
+    "description": "Commissioned a mid-scale plant with recycled aggregates.",
+    "location": "Bangalore",
+    "tags": ["green", "concrete", "recycling"],
+    "imageURLs": [
+      "https://firebasestorage.googleapis.com/v0/b/.../project1-img1.jpg",
+      "https://firebasestorage.googleapis.com/v0/b/.../project1-img2.jpg"
+    ],
+    "createdAt": "2025-08-25T09:15:00Z",
+    "updatedAt": "2025-08-25T09:15:00Z"
+  }
+]
+
+
+api endpoint – POST /users/{uid}/projects
+Content-Type: multipart/form-data
+form fields
+
+title (string, required)
+
+description (string, required)
+
+location (string, optional)
+
+tags[] (string, repeatable, optional)
+
+images (file, repeatable, required — multiple files allowed)
+
+sample form-data (conceptual)
+
+title: Sustainable Pavement Trial
+description: Full-depth reclamation demo with foam bitumen.
+location: Pune
+tags[]: pavement
+tags[]: sustainability
+images: <file1.jpg>
+images: <file2.jpg>
+
+
+sample response
+
+{
+  "id": "proj_abc123",
+  "title": "Sustainable Pavement Trial",
+  "description": "Full-depth reclamation demo with foam bitumen.",
+  "location": "Pune",
+  "tags": ["pavement", "sustainability"],
+  "imageURLs": [
+    "https://firebasestorage.googleapis.com/v0/b/.../proj_abc123_1.jpg",
+    "https://firebasestorage.googleapis.com/v0/b/.../proj_abc123_2.jpg"
+  ],
+  "createdAt": "2025-08-25T10:02:00Z",
+  "updatedAt": "2025-08-25T10:02:00Z"
+}
+
+
+api endpoint – PUT /users/{uid}/projects/{projectId}
+Content-Type: application/json (no file upload; send updated fields and/or updated imageURLs if you already uploaded elsewhere)
+sample request body
+
+{
+  "title": "Sustainable Pavement Trial – Phase 2",
+  "description": "Extended trial with field performance monitoring and LCCA.",
+  "location": "Pune",
+  "tags": ["pavement", "sustainability", "LCCA"],
+  "imageURLs": [
+    "https://firebasestorage.googleapis.com/v0/b/.../proj_abc123_1.jpg",
+    "https://firebasestorage.googleapis.com/v0/b/.../proj_abc123_new.jpg"
+  ]
+}
+
+
+sample response
+
+{
+  "message": "Project updated"
+}
+
+
+api endpoint – DELETE /users/{uid}/projects/{projectId}
+sample response
+
+{
+  "message": "Project deleted"
+}

@@ -73,6 +73,40 @@ export interface UpdateUserData {
   bannerPic?: File | string;
 }
 
+// Types for Education, Experience, and Projects
+export interface Education {
+  id?: string;
+  degree: string;
+  fieldOfStudy: string;
+  schoolOrCollege: string;
+  startDate: string;
+  endDate: string;
+  grade: string;
+}
+
+export interface Experience {
+  id?: string;
+  companyName: string;
+  title: string;
+  employmentType: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
+  description: string;
+}
+
+export interface Project {
+  id?: string;
+  title: string;
+  description: string;
+  location?: string;
+  tags?: string[];
+  imageURLs?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 class UserApiService {
   private userCache: UserProfile | null = null;
   private cacheTimestamp: number | null = null;
@@ -472,6 +506,395 @@ class UserApiService {
       }
       console.error("Error fetching following:", error);
       throw new Error("Failed to fetch following");
+    }
+  }
+
+  // Education Methods
+  async getUserEducation(uid: string): Promise<Education[]> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/education`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch education: ${response.status}`);
+      }
+
+      const education: Education[] = await response.json();
+      return education;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error fetching education:", error);
+      throw new Error("Failed to fetch education");
+    }
+  }
+
+  async addEducation(uid: string, education: Omit<Education, 'id'>): Promise<Education> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/education`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(education),
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to add education: ${response.status}`);
+      }
+
+      const newEducation: Education = await response.json();
+      return newEducation;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error adding education:", error);
+      throw new Error("Failed to add education");
+    }
+  }
+
+  async updateEducation(uid: string, docId: string, education: Omit<Education, 'id'>): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/education/${docId}`, {
+        method: "PUT",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(education),
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to update education: ${response.status}`);
+      }
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error updating education:", error);
+      throw new Error("Failed to update education");
+    }
+  }
+
+  async deleteEducation(uid: string, docId: string): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/education/${docId}`, {
+        method: "DELETE",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete education: ${response.status}`);
+      }
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error deleting education:", error);
+      throw new Error("Failed to delete education");
+    }
+  }
+
+  // Experience Methods
+  async getUserExperience(uid: string): Promise<Experience[]> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/experience`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch experience: ${response.status}`);
+      }
+
+      const experience: Experience[] = await response.json();
+      return experience;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error fetching experience:", error);
+      throw new Error("Failed to fetch experience");
+    }
+  }
+
+  async addExperience(uid: string, experience: Omit<Experience, 'id'>): Promise<Experience> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/experience`, {
+        method: "POST",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(experience),
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to add experience: ${response.status}`);
+      }
+
+      const newExperience: Experience = await response.json();
+      return newExperience;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error adding experience:", error);
+      throw new Error("Failed to add experience");
+    }
+  }
+
+  async updateExperience(uid: string, docId: string, experience: Omit<Experience, 'id'>): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/experience/${docId}`, {
+        method: "PUT",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(experience),
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to update experience: ${response.status}`);
+      }
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error updating experience:", error);
+      throw new Error("Failed to update experience");
+    }
+  }
+
+  async deleteExperience(uid: string, docId: string): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/experience/${docId}`, {
+        method: "DELETE",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete experience: ${response.status}`);
+      }
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error deleting experience:", error);
+      throw new Error("Failed to delete experience");
+    }
+  }
+
+  // Projects Methods
+  async getUserProjects(uid: string): Promise<Project[]> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/projects`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch projects: ${response.status}`);
+      }
+
+      const projects: Project[] = await response.json();
+      return projects;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error fetching projects:", error);
+      throw new Error("Failed to fetch projects");
+    }
+  }
+
+  async addProject(uid: string, project: Omit<Project, 'id' | 'createdAt' | 'updatedAt' | 'imageURLs'>, images?: File[]): Promise<Project> {
+    try {
+      const headers = await this.getAuthHeaders();
+      
+      // Use multipart/form-data for project creation with images
+      const formData = new FormData();
+      formData.append('title', project.title);
+      formData.append('description', project.description);
+      if (project.location) formData.append('location', project.location);
+      
+      if (project.tags) {
+        project.tags.forEach(tag => formData.append('tags[]', tag));
+      }
+      
+      if (images) {
+        images.forEach(image => formData.append('images', image));
+      }
+
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/projects`, {
+        method: "POST",
+        headers: {
+          Authorization: headers.Authorization,
+        },
+        body: formData,
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to add project: ${response.status}`);
+      }
+
+      const newProject: Project = await response.json();
+      return newProject;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error adding project:", error);
+      throw new Error("Failed to add project");
+    }
+  }
+
+  async updateProject(uid: string, projectId: string, project: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/projects/${projectId}`, {
+        method: "PUT",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(project),
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to update project: ${response.status}`);
+      }
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error updating project:", error);
+      throw new Error("Failed to update project");
+    }
+  }
+
+  async deleteProject(uid: string, projectId: string): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/projects/${projectId}`, {
+        method: "DELETE",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete project: ${response.status}`);
+      }
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error deleting project:", error);
+      throw new Error("Failed to delete project");
     }
   }
 }
