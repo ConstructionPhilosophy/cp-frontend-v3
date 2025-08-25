@@ -277,7 +277,7 @@ export default function ProfilePage() {
     setEducationLoading(true);
     try {
       const educationData = await userApiService.getUserEducation(profileData.uid);
-      setEducation(educationData);
+      setEducation(educationData || []);
     } catch (error) {
       console.error('Error loading education:', error);
       toast({
@@ -295,7 +295,7 @@ export default function ProfilePage() {
     setExperienceLoading(true);
     try {
       const experienceData = await userApiService.getUserExperience(profileData.uid);
-      setExperience(experienceData);
+      setExperience(experienceData || []);
     } catch (error) {
       console.error('Error loading experience:', error);
       toast({
@@ -313,7 +313,7 @@ export default function ProfilePage() {
     setProjectsLoading(true);
     try {
       const projectsData = await userApiService.getUserProjects(profileData.uid);
-      setProjects(projectsData);
+      setProjects(projectsData || []);
     } catch (error) {
       console.error('Error loading projects:', error);
       toast({
@@ -876,7 +876,7 @@ export default function ProfilePage() {
                     <div className="flex justify-center py-8">
                       <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
-                  ) : projects.length > 0 ? (
+                  ) : projects && projects.length > 0 ? (
                     projects.map((project) => (
                       <div key={project.id} className="flex gap-4 group">
                         <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -957,7 +957,7 @@ export default function ProfilePage() {
                         <div className="flex justify-center py-8">
                           <Loader2 className="w-6 h-6 animate-spin" />
                         </div>
-                      ) : education.length > 0 ? (
+                      ) : education && education.length > 0 ? (
                         education.map((edu) => (
                           <div key={edu.id} className="flex gap-4 group">
                             <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -1025,7 +1025,7 @@ export default function ProfilePage() {
                         <div className="flex justify-center py-8">
                           <Loader2 className="w-6 h-6 animate-spin" />
                         </div>
-                      ) : experience.length > 0 ? (
+                      ) : experience && experience.length > 0 ? (
                         experience.map((exp) => (
                           <div key={exp.id} className="flex gap-4 group">
                             <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -1296,7 +1296,7 @@ export default function ProfilePage() {
                       {(profileData as any).dateOfBirth && (
                         <div className="flex items-center gap-3">
                           <Calendar className="w-5 h-5 text-cmo-primary" />
-                          <span className="text-sm">Born {new Date((profileData as any).dateOfBirth).getFullYear()}</span>
+                          <span className="text-sm">Born {(profileData as any).dateOfBirth ? new Date((profileData as any).dateOfBirth).getFullYear() : 'N/A'}</span>
                         </div>
                       )}
                     </>
@@ -1980,8 +1980,8 @@ export default function ProfilePage() {
               <Label htmlFor="projectTags">Tags (Optional)</Label>
               <Input
                 id="projectTags"
-                value={projectFormData.tags?.join(', ') || ''}
-                onChange={(e) => setProjectFormData({ ...projectFormData, tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '') })}
+                value={(projectFormData.tags || []).join(', ')}
+                onChange={(e) => setProjectFormData({ ...projectFormData, tags: e.target.value ? e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag !== '') : [] })}
                 placeholder="e.g., React, Node.js, MongoDB (comma separated)"
               />
             </div>

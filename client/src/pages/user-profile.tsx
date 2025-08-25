@@ -300,7 +300,7 @@ export default function UserProfilePage() {
     
     try {
       const followersList = await userApiService.getUserFollowers(profileData.uid);
-      setFollowers(followersList);
+      setFollowers(followersList || []);
     } catch (error) {
       console.error('Error fetching followers:', error);
       toast({
@@ -321,7 +321,7 @@ export default function UserProfilePage() {
     
     try {
       const followingList = await userApiService.getUserFollowing(profileData.uid);
-      setFollowing(followingList);
+      setFollowing(followingList || []);
     } catch (error) {
       console.error('Error fetching following:', error);
       toast({
@@ -1041,7 +1041,7 @@ export default function UserProfilePage() {
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-cmo-primary" />
               </div>
-            ) : followers.length === 0 ? (
+            ) : !followers || followers.length === 0 ? (
               <div className="text-center py-8">
                 <Users className="w-12 h-12 text-cmo-text-secondary mx-auto mb-2" />
                 <p className="text-cmo-text-secondary">No followers yet</p>
@@ -1094,7 +1094,7 @@ export default function UserProfilePage() {
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-cmo-primary" />
               </div>
-            ) : following.length === 0 ? (
+            ) : !following || following.length === 0 ? (
               <div className="text-center py-8">
                 <Users className="w-12 h-12 text-cmo-text-secondary mx-auto mb-2" />
                 <p className="text-cmo-text-secondary">Not following anyone yet</p>
