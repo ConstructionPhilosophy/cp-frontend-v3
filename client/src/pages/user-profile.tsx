@@ -182,8 +182,11 @@ export default function UserProfilePage() {
         const userData = await userApiService.getUserByUid(username);
         setProfileData(userData);
         
-        // Check if current user is in the followerlist
-        if (userData.followerlist && user?.uid) {
+        // Update isFollowing from API response
+        if (userData.hasOwnProperty('isFollowing')) {
+          setIsFollowing(userData.isFollowing);
+        } else if (userData.followerlist && user?.uid) {
+          // Fallback to old logic if isFollowing field not present
           setIsFollowing(userData.followerlist.includes(user.uid));
         }
         

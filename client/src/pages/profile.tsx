@@ -888,7 +888,43 @@ export default function ProfilePage() {
                         </div>
                       )}
 
-                      {user?.uid !== profileData?.uid && (
+                      {user?.uid === profileData?.uid ? (
+                        // Own profile - Show Edit Profile and Share buttons
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowEditModal(true)}
+                            data-testid="button-edit-profile"
+                          >
+                            <Edit className="w-4 h-4 mr-2" />
+                            Edit Profile
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              if (navigator.share) {
+                                navigator.share({
+                                  title: `${profileData.firstName} ${profileData.lastName}'s Profile`,
+                                  url: window.location.href
+                                });
+                              } else {
+                                navigator.clipboard.writeText(window.location.href);
+                                toast({
+                                  title: "Link copied",
+                                  description: "Profile link copied to clipboard",
+                                });
+                              }
+                            }}
+                            data-testid="button-share-profile"
+                          >
+                            <Share className="w-4 h-4 mr-2" />
+                            Share
+                          </Button>
+                        </div>
+                      ) : (
+                        // Other user's profile - Show Message and Follow buttons
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <Button
                             variant="outline"
@@ -1717,7 +1753,7 @@ export default function ProfilePage() {
                       <SelectItem value="501-1000">501-1000 employees</SelectItem>
                       <SelectItem value="1000+">1000+ employees</SelectItem>
                     </SelectContent>
-                  </Select>
+                  </SelectUI>
                 </div>
               </>
             ) : (
@@ -1983,7 +2019,7 @@ export default function ProfilePage() {
                     <SelectItem value="Internship">Internship</SelectItem>
                     <SelectItem value="Freelance">Freelance</SelectItem>
                   </SelectContent>
-                </Select>
+                </SelectUI>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="expLocation">Location</Label>
