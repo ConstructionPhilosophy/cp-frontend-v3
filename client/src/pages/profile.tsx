@@ -26,6 +26,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../components/ui/select";
+import { Combobox } from "../components/ui/combobox";
+import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import Header from "../components/layout/header";
 import { useAuth } from "../contexts/AuthContext";
 import {
@@ -67,6 +69,87 @@ import {
   Trash2,
   X,
 } from "lucide-react";
+
+// Constants from basic-info
+const JOB_TITLES = [
+  'Architect',
+  'Urban Planner',
+  'Interior Designer/Architect',
+  'Landscape Architect/Designer',
+  'Sustainability Consultant',
+  'Draughtsman',
+  'Cad/BIM technician',
+  'Civil Engineer',
+  'Structural Engineer/Designer',
+  'Project Director',
+  'Construction Manager',
+  'Contracts Manager',
+  'MEP Engineer',
+  'Quality Control Engineer',
+  'Planning Engineer',
+  'Tendering Engineer',
+  'Project Engineer',
+  'Supervisor',
+  'Foreman',
+  'Site Engineer',
+  'Site Manager',
+  'Electrical Engineer',
+  'Geotechnical Engineer',
+  'Project Manager',
+  'Document Controller',
+  'Purchase Manager/Officer',
+  'Procurement Manager/Officer',
+  'Operations Manager',
+  'Trainee',
+  'Student',
+  'Intern',
+  'Project Coordinator',
+  'Projects Head',
+  'Supplier',
+  'Manufacturer',
+  'Builder',
+  'Contractor',
+  'Dealer',
+  'Agent',
+  'Surveyor',
+  'Valuer',
+  'Arbitrator',
+  'Lecturer',
+  'Professor',
+  'Other (Specify)',
+];
+
+const COMPANY_TYPES = [
+  'Construction Contractor',
+  'Design & Engineering Services',
+  'Project Management & Consultancy',
+  'Cost & Quantity Services',
+  'Construction Material Suppliers',
+  'Construction Equipment & Machinery',
+  'Infrastructure & Utilities',
+  'Prefabrication & Modular Construction',
+  'Green & Sustainable Construction',
+  'Safety & Compliance',
+  'Technology & Software',
+  'Logistics & Support Services',
+  'Testing & Laboratory Services',
+];
+
+const INDUSTRIES = [
+  'Construction',
+  'Real Estate',
+  'Infrastructure',
+  'Others',
+];
+
+const COMPANY_SIZES = [
+  '1-10',
+  '10-50',
+  '50-100',
+  '100-500',
+  '500-1000',
+  '1000+',
+];
 
 const mockActivities = [
   {
@@ -133,6 +216,12 @@ export default function ProfilePage() {
     registrationNumber: "",
     companySize: "",
   });
+
+  // Location data state
+  const [countries, setCountries] = useState<{name: string, code: string}[]>([]);
+  const [states, setStates] = useState<{name: string, code: string}[]>([]);
+  const [cities, setCities] = useState<string[]>([]);
+  const [loadingLocations, setLoadingLocations] = useState(false);
 
   // Education, Experience, Projects State
   const [education, setEducation] = useState<Education[]>([]);
@@ -970,6 +1059,155 @@ export default function ProfilePage() {
     }));
   };
 
+  // Location loading functions
+  const loadCountries = async () => {
+    try {
+      setLoadingLocations(true);
+      const response = await fetch('/api/countries');
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCountries(data);
+      } else {
+        throw new Error('Failed to load countries');
+      }
+    } catch (error) {
+      console.error('Error loading countries:', error);
+      toast({
+        title: "Error Loading Countries",
+        description: "Failed to load country data. Please refresh the page.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingLocations(false);
+    }
+  };
+
+  const loadStates = async (countryCode: string) => {
+    try {
+      setLoadingLocations(true);
+      const response = await fetch(`/api/states?country_code=${countryCode}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setStates(data);
+      } else {
+        throw new Error('Failed to load states');
+      }
+    } catch (error) {
+      console.error('Error loading states:', error);
+      toast({
+        title: "Error Loading States",
+        description: "Failed to load state data. Please try again.",
+        variant: "destructive",
+      });
+      setStates([]);
+    } finally {
+      setLoadingLocations(false);
+    }
+  };
+
+  const loadCities = async (countryCode: string, stateCode: string) => {
+    try {
+      setLoadingLocations(true);
+      const response = await fetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        const citiesArray = Array.isArray(data) ? data : (data.data || []);
+        setCities(citiesArray);
+      } else {
+        throw new Error('Failed to load cities');
+      }
+    } catch (error) {
+      console.error('Error loading cities:', error);
+      toast({
+        title: "Error Loading Cities",
+        description: "Failed to load city data. Please try again.",
+        variant: "destructive",
+      });
+      setCities([]);
+    } finally {
+      setLoadingLocations(false);
+    }
+  };
+
+  // Function to populate edit form with existing data
+  const handleEditProfileClick = () => {
+    if (!profileData) return;
+    
+    const isBusinessUser = (profileData as any).userType === "business";
+    
+    if (isBusinessUser) {
+      setEditFormData({
+        // Business fields
+        companyName: (profileData as any).companyName || "",
+        industry: (profileData as any).industry || "",
+        companyType: (profileData as any).companyType || "",
+        description: (profileData as any).description || "",
+        addressLine1: (profileData as any).addressLine1 || "",
+        addressLine2: (profileData as any).addressLine2 || "",
+        pincode: (profileData as any).pincode || "",
+        website: (profileData as any).website || "",
+        registrationNumber: (profileData as any).registrationNumber || "",
+        companySize: (profileData as any).companySize || "",
+        city: (profileData as any).city || "",
+        stateName: (profileData as any).stateName || "",
+        country: (profileData as any).country || "",
+        // Personal fields (empty for business)
+        firstName: "",
+        lastName: "",
+        title: "",
+        positionDesignation: "",
+        currentCompany: "",
+        about: "",
+        gender: "",
+        dateOfBirth: "",
+      });
+    } else {
+      setEditFormData({
+        // Personal fields
+        firstName: (profileData as any).firstName || "",
+        lastName: (profileData as any).lastName || "",
+        title: (profileData as any).title || "",
+        positionDesignation: (profileData as any).positionDesignation || "",
+        currentCompany: (profileData as any).company || "",
+        about: (profileData as any).description || "",
+        gender: (profileData as any).gender || "",
+        dateOfBirth: (profileData as any).dateOfBirth || "",
+        city: (profileData as any).city || "",
+        stateName: (profileData as any).stateName || "",
+        country: (profileData as any).country || "",
+        // Business fields (empty for personal)
+        companyName: "",
+        industry: "",
+        companyType: "",
+        description: "",
+        addressLine1: "",
+        addressLine2: "",
+        pincode: "",
+        website: "",
+        registrationNumber: "",
+        companySize: "",
+      });
+    }
+    
+    // Load countries when modal opens
+    if (countries.length === 0) {
+      loadCountries();
+    }
+    
+    // Load states if country is already selected
+    if (editFormData.country) {
+      const selectedCountry = countries.find(c => c.name === editFormData.country);
+      if (selectedCountry) {
+        loadStates(selectedCountry.code);
+      }
+    }
+    
+    setShowEditProfileModal(true);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-cmo-bg">
@@ -1213,7 +1451,7 @@ export default function ProfilePage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setShowEditProfileModal(true)}
+                            onClick={handleEditProfileClick}
                             data-testid="button-edit-profile"
                           >
                             <Edit className="w-4 h-4 mr-2" />
@@ -2085,57 +2323,27 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="industry">Industry</Label>
-                    <SelectUI
+                    <Combobox
+                      options={INDUSTRIES.map((industry) => ({
+                        value: industry,
+                        label: industry,
+                      }))}
                       value={editFormData.industry}
-                      onValueChange={(value) =>
-                        handleEditFormChange("industry", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select industry" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Construction">
-                          Construction
-                        </SelectItem>
-                        <SelectItem value="Engineering">Engineering</SelectItem>
-                        <SelectItem value="Architecture">
-                          Architecture
-                        </SelectItem>
-                        <SelectItem value="Real Estate">Real Estate</SelectItem>
-                        <SelectItem value="Manufacturing">
-                          Manufacturing
-                        </SelectItem>
-                        <SelectItem value="Technology">Technology</SelectItem>
-                        <SelectItem value="Others">Others</SelectItem>
-                      </SelectContent>
-                    </SelectUI>
+                      onValueChange={(value: string) => handleEditFormChange("industry", value)}
+                      placeholder="Select industry"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="companyType">Company Type</Label>
-                    <SelectUI
+                    <Combobox
+                      options={COMPANY_TYPES.map((type) => ({
+                        value: type,
+                        label: type,
+                      }))}
                       value={editFormData.companyType}
-                      onValueChange={(value) =>
-                        handleEditFormChange("companyType", value)
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select company type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Private Limited">
-                          Private Limited
-                        </SelectItem>
-                        <SelectItem value="Public Limited">
-                          Public Limited
-                        </SelectItem>
-                        <SelectItem value="Partnership">Partnership</SelectItem>
-                        <SelectItem value="Sole Proprietorship">
-                          Sole Proprietorship
-                        </SelectItem>
-                        <SelectItem value="LLP">LLP</SelectItem>
-                      </SelectContent>
-                    </SelectUI>
+                      onValueChange={(value: string) => handleEditFormChange("companyType", value)}
+                      placeholder="Select company type"
+                    />
                   </div>
                 </div>
 
@@ -2182,35 +2390,56 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="country">Country</Label>
-                    <Input
-                      id="country"
+                    <Combobox
+                      options={countries.map((country) => ({
+                        value: country.name,
+                        label: country.name,
+                      }))}
                       value={editFormData.country}
-                      onChange={(e) =>
-                        handleEditFormChange("country", e.target.value)
-                      }
-                      placeholder="Enter country"
+                      onValueChange={(value: string) => {
+                        handleEditFormChange("country", value);
+                        const selectedCountry = countries.find(c => c.name === value);
+                        if (selectedCountry) {
+                          loadStates(selectedCountry.code);
+                          handleEditFormChange("stateName", "");
+                          handleEditFormChange("city", "");
+                        }
+                      }}
+                      placeholder="Select country"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="stateName">State</Label>
-                    <Input
-                      id="stateName"
+                    <Combobox
+                      options={states.map((state) => ({
+                        value: state.name,
+                        label: state.name,
+                      }))}
                       value={editFormData.stateName}
-                      onChange={(e) =>
-                        handleEditFormChange("stateName", e.target.value)
-                      }
-                      placeholder="Enter state"
+                      onValueChange={(value: string) => {
+                        handleEditFormChange("stateName", value);
+                        const selectedCountry = countries.find(c => c.name === editFormData.country);
+                        const selectedState = states.find(s => s.name === value);
+                        if (selectedCountry && selectedState) {
+                          loadCities(selectedCountry.code, selectedState.code);
+                          handleEditFormChange("city", "");
+                        }
+                      }}
+                      placeholder="Select state"
+                      disabled={!editFormData.country}
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
+                    <Combobox
+                      options={cities.map((city) => ({
+                        value: city,
+                        label: city,
+                      }))}
                       value={editFormData.city}
-                      onChange={(e) =>
-                        handleEditFormChange("city", e.target.value)
-                      }
-                      placeholder="Enter city"
+                      onValueChange={(value: string) => handleEditFormChange("city", value)}
+                      placeholder="Select city"
+                      disabled={!editFormData.stateName}
                     />
                   </div>
                   <div className="space-y-2">
@@ -2310,13 +2539,14 @@ export default function ProfilePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="title">Job Title</Label>
-                  <Input
-                    id="title"
+                  <Combobox
+                    options={JOB_TITLES.map((title) => ({
+                      value: title,
+                      label: title,
+                    }))}
                     value={editFormData.title}
-                    onChange={(e) =>
-                      handleEditFormChange("title", e.target.value)
-                    }
-                    placeholder="Enter your job title"
+                    onValueChange={(value: string) => handleEditFormChange("title", value)}
+                    placeholder="Select your job title"
                   />
                 </div>
 
@@ -2399,36 +2629,57 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      value={editFormData.city}
-                      onChange={(e) =>
-                        handleEditFormChange("city", e.target.value)
-                      }
-                      placeholder="Enter your city"
+                    <Label htmlFor="country">Country</Label>
+                    <Combobox
+                      options={countries.map((country) => ({
+                        value: country.name,
+                        label: country.name,
+                      }))}
+                      value={editFormData.country}
+                      onValueChange={(value: string) => {
+                        handleEditFormChange("country", value);
+                        const selectedCountry = countries.find(c => c.name === value);
+                        if (selectedCountry) {
+                          loadStates(selectedCountry.code);
+                          handleEditFormChange("stateName", "");
+                          handleEditFormChange("city", "");
+                        }
+                      }}
+                      placeholder="Select your country"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="stateName">State</Label>
-                    <Input
-                      id="stateName"
+                    <Combobox
+                      options={states.map((state) => ({
+                        value: state.name,
+                        label: state.name,
+                      }))}
                       value={editFormData.stateName}
-                      onChange={(e) =>
-                        handleEditFormChange("stateName", e.target.value)
-                      }
-                      placeholder="Enter your state"
+                      onValueChange={(value: string) => {
+                        handleEditFormChange("stateName", value);
+                        const selectedCountry = countries.find(c => c.name === editFormData.country);
+                        const selectedState = states.find(s => s.name === value);
+                        if (selectedCountry && selectedState) {
+                          loadCities(selectedCountry.code, selectedState.code);
+                          handleEditFormChange("city", "");
+                        }
+                      }}
+                      placeholder="Select your state"
+                      disabled={!editFormData.country}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="country">Country</Label>
-                    <Input
-                      id="country"
-                      value={editFormData.country}
-                      onChange={(e) =>
-                        handleEditFormChange("country", e.target.value)
-                      }
-                      placeholder="Enter your country"
+                    <Label htmlFor="city">City</Label>
+                    <Combobox
+                      options={cities.map((city) => ({
+                        value: city,
+                        label: city,
+                      }))}
+                      value={editFormData.city}
+                      onValueChange={(value: string) => handleEditFormChange("city", value)}
+                      placeholder="Select your city"
+                      disabled={!editFormData.stateName}
                     />
                   </div>
                 </div>
