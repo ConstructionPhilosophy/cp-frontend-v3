@@ -1054,7 +1054,8 @@ export default function UserProfilePage() {
                     className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
                     onClick={() => {
                       setShowFollowersModal(false);
-                      setLocation(`/u/${follower.username || follower.uid}`);
+                      const userIdentifier = follower.username && follower.username.trim() !== '' ? follower.username : follower.uid;
+                      setLocation(`/u/${userIdentifier}`);
                     }}
                   >
                     <Avatar className="w-8 h-8 flex-shrink-0">
@@ -1106,7 +1107,8 @@ export default function UserProfilePage() {
                     className="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg cursor-pointer transition-colors"
                     onClick={() => {
                       setShowFollowingModal(false);
-                      setLocation(`/u/${followedUser.username || followedUser.uid}`);
+                      const userIdentifier = followedUser.username && followedUser.username.trim() !== '' ? followedUser.username : followedUser.uid;
+                      setLocation(`/u/${userIdentifier}`);
                     }}
                   >
                     <Avatar className="w-8 h-8 flex-shrink-0">

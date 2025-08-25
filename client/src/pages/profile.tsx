@@ -198,30 +198,34 @@ export default function ProfilePage() {
         setProfileData(data);
         // Populate edit form data based on user type
         const isBusinessUser = (data as any).userType === 'business';
+        const location = (data as any).location || {};
+        const businessProfile = (data as any).businessProfile || {};
+        const businessLocation = businessProfile.location || {};
+        
         setEditFormData({
           // Personal fields
           firstName: data.firstName || '',
           lastName: data.lastName || '',
-          title: (data as any).title || '',
-          positionDesignation: (data as any).positionDesignation || '',
-          currentCompany: (data as any).company || '',
-          about: (data as any).description || (data as any).about || '',
+          title: (data as any).title || (data as any).jobTitle || '',
+          positionDesignation: (data as any).positionDesignation || (data as any).position || '',
+          currentCompany: (data as any).currentCompany || (data as any).company || '',
+          about: (data as any).about || (data as any).description || (data as any).bio || '',
           gender: (data as any).gender || '',
-          dateOfBirth: (data as any).dateOfBirth || '',
-          city: (data as any).city || '',
-          stateName: (data as any).stateName || '',
-          country: (data as any).country || '',
+          dateOfBirth: (data as any).dateOfBirth || (data as any).dob || '',
+          city: location.city || (data as any).city || businessLocation.city || '',
+          stateName: location.state?.name || location.stateName || (data as any).stateName || (data as any).state || businessLocation.state?.name || '',
+          country: location.country?.name || location.country || (data as any).country || businessLocation.country || '',
           // Business fields
-          companyName: isBusinessUser ? (data as any).businessProfile?.companyName || '' : '',
-          industry: isBusinessUser ? (data as any).businessProfile?.industry || '' : '',
-          companyType: isBusinessUser ? (data as any).businessProfile?.companyType || '' : '',
-          description: isBusinessUser ? (data as any).businessProfile?.description || '' : '',
-          addressLine1: isBusinessUser ? (data as any).businessProfile?.addressLine1 || '' : '',
-          addressLine2: isBusinessUser ? (data as any).businessProfile?.addressLine2 || '' : '',
-          pincode: isBusinessUser ? (data as any).businessProfile?.pincode || '' : '',
-          website: isBusinessUser ? (data as any).businessProfile?.website || '' : '',
-          registrationNumber: isBusinessUser ? (data as any).businessProfile?.registrationNumber || '' : '',
-          companySize: isBusinessUser ? (data as any).businessProfile?.companySize || '' : '',
+          companyName: isBusinessUser ? businessProfile.companyName || (data as any).companyName || '' : '',
+          industry: isBusinessUser ? businessProfile.industry || (data as any).industry || '' : '',
+          companyType: isBusinessUser ? businessProfile.companyType || (data as any).companyType || '' : '',
+          description: isBusinessUser ? businessProfile.description || (data as any).description || '' : '',
+          addressLine1: isBusinessUser ? businessProfile.addressLine1 || businessLocation.addressLine1 || '' : '',
+          addressLine2: isBusinessUser ? businessProfile.addressLine2 || businessLocation.addressLine2 || '' : '',
+          pincode: isBusinessUser ? businessProfile.pincode || businessLocation.pincode || '' : '',
+          website: isBusinessUser ? businessProfile.website || (data as any).website || '' : '',
+          registrationNumber: isBusinessUser ? businessProfile.registrationNumber || (data as any).registrationNumber || '' : '',
+          companySize: isBusinessUser ? businessProfile.companySize || (data as any).companySize || '' : '',
         });
       } catch (error) {
         console.error('Error fetching profile data:', error);
@@ -229,30 +233,34 @@ export default function ProfilePage() {
         if (userProfile) {
           setProfileData(userProfile);
           const isBusinessUser = (userProfile as any).userType === 'business';
+          const location = (userProfile as any).location || {};
+          const businessProfile = (userProfile as any).businessProfile || {};
+          const businessLocation = businessProfile.location || {};
+          
           setEditFormData({
             // Personal fields
             firstName: userProfile.firstName || '',
             lastName: userProfile.lastName || '',
-            title: (userProfile as any).title || '',
-            positionDesignation: (userProfile as any).positionDesignation || '',
-            currentCompany: (userProfile as any).company || '',
-            about: (userProfile as any).description || (userProfile as any).about || '',
+            title: (userProfile as any).title || (userProfile as any).jobTitle || '',
+            positionDesignation: (userProfile as any).positionDesignation || (userProfile as any).position || '',
+            currentCompany: (userProfile as any).currentCompany || (userProfile as any).company || '',
+            about: (userProfile as any).about || (userProfile as any).description || (userProfile as any).bio || '',
             gender: (userProfile as any).gender || '',
-            dateOfBirth: (userProfile as any).dateOfBirth || '',
-            city: (userProfile as any).city || '',
-            stateName: (userProfile as any).stateName || '',
-            country: (userProfile as any).country || '',
+            dateOfBirth: (userProfile as any).dateOfBirth || (userProfile as any).dob || '',
+            city: location.city || (userProfile as any).city || businessLocation.city || '',
+            stateName: location.state?.name || location.stateName || (userProfile as any).stateName || (userProfile as any).state || businessLocation.state?.name || '',
+            country: location.country?.name || location.country || (userProfile as any).country || businessLocation.country || '',
             // Business fields
-            companyName: isBusinessUser ? (userProfile as any).businessProfile?.companyName || '' : '',
-            industry: isBusinessUser ? (userProfile as any).businessProfile?.industry || '' : '',
-            companyType: isBusinessUser ? (userProfile as any).businessProfile?.companyType || '' : '',
-            description: isBusinessUser ? (userProfile as any).businessProfile?.description || '' : '',
-            addressLine1: isBusinessUser ? (userProfile as any).businessProfile?.addressLine1 || '' : '',
-            addressLine2: isBusinessUser ? (userProfile as any).businessProfile?.addressLine2 || '' : '',
-            pincode: isBusinessUser ? (userProfile as any).businessProfile?.pincode || '' : '',
-            website: isBusinessUser ? (userProfile as any).businessProfile?.website || '' : '',
-            registrationNumber: isBusinessUser ? (userProfile as any).businessProfile?.registrationNumber || '' : '',
-            companySize: isBusinessUser ? (userProfile as any).businessProfile?.companySize || '' : '',
+            companyName: isBusinessUser ? businessProfile.companyName || (userProfile as any).companyName || '' : '',
+            industry: isBusinessUser ? businessProfile.industry || (userProfile as any).industry || '' : '',
+            companyType: isBusinessUser ? businessProfile.companyType || (userProfile as any).companyType || '' : '',
+            description: isBusinessUser ? businessProfile.description || (userProfile as any).description || '' : '',
+            addressLine1: isBusinessUser ? businessProfile.addressLine1 || businessLocation.addressLine1 || '' : '',
+            addressLine2: isBusinessUser ? businessProfile.addressLine2 || businessLocation.addressLine2 || '' : '',
+            pincode: isBusinessUser ? businessProfile.pincode || businessLocation.pincode || '' : '',
+            website: isBusinessUser ? businessProfile.website || (userProfile as any).website || '' : '',
+            registrationNumber: isBusinessUser ? businessProfile.registrationNumber || (userProfile as any).registrationNumber || '' : '',
+            companySize: isBusinessUser ? businessProfile.companySize || (userProfile as any).companySize || '' : '',
           });
         }
       } finally {
