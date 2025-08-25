@@ -871,32 +871,32 @@ export default function ProfilePage() {
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {projectsLoading ? (
                     <div className="flex justify-center py-8">
                       <Loader2 className="w-6 h-6 animate-spin" />
                     </div>
                   ) : projects && projects.length > 0 ? (
                     projects.map((project) => (
-                      <div key={project.id} className="flex gap-4 group">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                          <Building className="w-6 h-6 text-cmo-primary" />
+                      <div key={project.id} className="flex gap-3 group">
+                        <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                          <Building className="w-4 h-4 text-cmo-primary" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <h4 className="font-semibold text-lg">{project.title}</h4>
+                              <h4 className="font-medium text-sm">{project.title}</h4>
                               {project.location && (
-                                <p className="text-cmo-text-secondary flex items-center gap-1">
-                                  <MapPin className="w-4 h-4" />
+                                <p className="text-cmo-text-secondary flex items-center gap-1 text-xs">
+                                  <MapPin className="w-3 h-3" />
                                   {project.location}
                                 </p>
                               )}
-                              <p className="text-cmo-text-secondary mt-2">{project.description}</p>
+                              <p className="text-xs text-cmo-text-secondary mt-2">{project.description}</p>
                               {project.tags && project.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
                                   {project.tags.map((tag, idx) => (
-                                    <Badge key={idx} variant="secondary" className="text-xs">
+                                    <Badge key={idx} variant="secondary" className="text-xs px-2 py-0.5">
                                       {tag}
                                     </Badge>
                                   ))}
@@ -952,24 +952,24 @@ export default function ProfilePage() {
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                       {educationLoading ? (
                         <div className="flex justify-center py-8">
                           <Loader2 className="w-6 h-6 animate-spin" />
                         </div>
                       ) : education && education.length > 0 ? (
                         education.map((edu) => (
-                          <div key={edu.id} className="flex gap-4 group">
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <GraduationCap className="w-6 h-6 text-cmo-primary" />
+                          <div key={edu.id} className="flex gap-3 group">
+                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <GraduationCap className="w-4 h-4 text-cmo-primary" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                  <h4 className="font-semibold text-lg">{edu.degree}</h4>
-                                  <p className="text-cmo-primary font-medium">{edu.fieldOfStudy}</p>
-                                  <p className="text-cmo-text-secondary">{edu.schoolOrCollege}</p>
-                                  <p className="text-sm text-cmo-text-secondary mt-1">
+                                  <h4 className="font-medium text-sm">{edu.degree}</h4>
+                                  <p className="text-cmo-primary font-medium text-sm">{edu.fieldOfStudy}</p>
+                                  <p className="text-cmo-text-secondary text-xs">{edu.schoolOrCollege}</p>
+                                  <p className="text-xs text-cmo-text-secondary mt-1">
                                     {new Date(edu.startDate).getFullYear()} - {new Date(edu.endDate).getFullYear()}
                                     {edu.grade && ` • ${edu.grade}`}
                                   </p>
@@ -1020,31 +1020,31 @@ export default function ProfilePage() {
                         <Plus className="w-4 h-4" />
                       </Button>
                     </div>
-                    <div className="space-y-6">
+                    <div className="space-y-4">
                       {experienceLoading ? (
                         <div className="flex justify-center py-8">
                           <Loader2 className="w-6 h-6 animate-spin" />
                         </div>
                       ) : experience && experience.length > 0 ? (
                         experience.map((exp) => (
-                          <div key={exp.id} className="flex gap-4 group">
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <Briefcase className="w-6 h-6 text-cmo-primary" />
+                          <div key={exp.id} className="flex gap-3 group">
+                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Briefcase className="w-4 h-4 text-cmo-primary" />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-start justify-between">
                                 <div className="flex-1">
-                                  <h4 className="font-semibold text-lg">{exp.title}</h4>
-                                  <p className="text-cmo-primary font-medium">{exp.companyName}</p>
-                                  <p className="text-cmo-text-secondary flex items-center gap-1">
-                                    <MapPin className="w-4 h-4" />
+                                  <h4 className="font-medium text-sm">{exp.title}</h4>
+                                  <p className="text-cmo-primary font-medium text-sm">{exp.companyName}</p>
+                                  <p className="text-cmo-text-secondary flex items-center gap-1 text-xs">
+                                    <MapPin className="w-3 h-3" />
                                     {exp.location}
                                   </p>
-                                  <p className="text-sm text-cmo-text-secondary mt-1">
+                                  <p className="text-xs text-cmo-text-secondary mt-1">
                                     {new Date(exp.startDate).getFullYear()} - {exp.isCurrent ? 'Present' : new Date(exp.endDate).getFullYear()}
                                     {exp.employmentType && ` • ${exp.employmentType}`}
                                   </p>
-                                  <p className="text-cmo-text-secondary mt-2">{exp.description}</p>
+                                  <p className="text-xs text-cmo-text-secondary mt-2">{exp.description}</p>
                                 </div>
                                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                   <Button 
