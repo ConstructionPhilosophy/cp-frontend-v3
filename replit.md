@@ -4,6 +4,14 @@ This is a frontend-only React application designed as a Q&A community platform, 
 # User Preferences
 Preferred communication style: Simple, everyday language.
 
+## Design Standards
+**CRITICAL: Compact LinkedIn-Style Design** - ALL pages and components must follow the compact LinkedIn-style design established in user-profile.tsx:
+- **Avatar Sizes**: Use w-8 to w-10 maximum (never w-12, w-16, w-20, w-24 or larger)
+- **Font Hierarchy**: text-sm to text-lg maximum for headings (never text-xl, text-2xl or larger)
+- **Spacing**: Use p-4 for padding instead of p-6, mb-4 for margins
+- **Visual Consistency**: Maintain tight, professional spacing throughout all components
+- **Reference**: user-profile.tsx serves as the design standard - match its styling exactly
+
 # System Architecture
 
 ## Frontend Architecture
