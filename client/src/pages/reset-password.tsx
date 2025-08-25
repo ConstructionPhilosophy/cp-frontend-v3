@@ -167,7 +167,7 @@ export function ResetPasswordPage() {
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <span className="text-xl font-bold text-cmo-text-primary">CP</span>
+            <span className="text-lg font-bold text-cmo-text-primary">CP</span>
           </div>
 
           {/* Lock Icon */}
@@ -177,7 +177,7 @@ export function ResetPasswordPage() {
 
           {/* Form Header */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-cmo-text-primary mb-2">Set new password</h2>
+            <h2 className="text-lg font-bold text-cmo-text-primary mb-2">Set new password</h2>
             <p className="text-cmo-text-secondary">Your new password must be different from previous used passwords.</p>
           </div>
 

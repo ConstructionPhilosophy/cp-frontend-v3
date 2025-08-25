@@ -56,7 +56,7 @@ export default function Header() {
                   <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                 </div>
               </div>
-              <span className="text-xl font-bold text-cmo-text-primary">CP</span>
+              <span className="text-lg font-bold text-cmo-text-primary">CP</span>
             </div>
           </div>
 

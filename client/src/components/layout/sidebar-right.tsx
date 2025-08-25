@@ -17,7 +17,7 @@ export default function SidebarRight() {
       {/* User Profile Card */}
       <div className="bg-cmo-card rounded-lg border border-cmo-border p-6">
         <div className="flex items-center space-x-3 mb-4">
-          <Avatar className="w-12 h-12">
+          <Avatar className="w-10 h-10">
             <AvatarImage src={mockUsers[1].avatar} />
             <AvatarFallback>{mockUsers[1].name.charAt(0)}</AvatarFallback>
           </Avatar>

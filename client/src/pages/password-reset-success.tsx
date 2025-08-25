@@ -50,7 +50,7 @@ export function PasswordResetSuccessPage() {
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <span className="text-xl font-bold text-cmo-text-primary">CP</span>
+            <span className="text-lg font-bold text-cmo-text-primary">CP</span>
           </div>
 
           {/* Success Icon */}
@@ -60,7 +60,7 @@ export function PasswordResetSuccessPage() {
 
           {/* Content */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-cmo-text-primary mb-4">Password reset successful!</h2>
+            <h2 className="text-lg font-bold text-cmo-text-primary mb-4">Password reset successful!</h2>
             <p className="text-cmo-text-secondary leading-relaxed">
               Your password has been successfully reset. You can now use your new password to log in to your account.
             </p>

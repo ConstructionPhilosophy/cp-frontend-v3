@@ -98,7 +98,7 @@ export function CheckEmailPage() {
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <span className="text-xl font-bold text-cmo-text-primary">CP</span>
+            <span className="text-lg font-bold text-cmo-text-primary">CP</span>
           </div>
 
           {/* Email Icon */}
@@ -108,7 +108,7 @@ export function CheckEmailPage() {
 
           {/* Content */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-cmo-text-primary mb-4">Check your email</h2>
+            <h2 className="text-lg font-bold text-cmo-text-primary mb-4">Check your email</h2>
             <p className="text-cmo-text-secondary leading-relaxed">
               We've sent a verification link to your email address. Please check your email and click the link to verify your account.
             </p>

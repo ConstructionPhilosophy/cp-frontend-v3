@@ -12,9 +12,9 @@ interface QuestionCardProps {
 
 export default function QuestionCard({ question, author }: QuestionCardProps) {
   return (
-    <article className="bg-cmo-card rounded-lg border border-cmo-border p-6">
+    <article className="bg-cmo-card rounded-lg border border-cmo-border p-4">
       <div className="flex items-start space-x-4">
-        <Avatar className="w-12 h-12 flex-shrink-0">
+        <Avatar className="w-10 h-10 flex-shrink-0">
           <AvatarImage src={author.avatar || ""} />
           <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
         </Avatar>

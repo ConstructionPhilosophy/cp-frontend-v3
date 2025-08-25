@@ -1013,7 +1013,7 @@ export function BasicInfoPage() {
     <div className="min-h-screen bg-gray-50 py-4 md:py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-4 md:mb-6 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Complete Your Profile</h1>
+          <h1 className="text-lg font-bold text-gray-900 mb-2">Complete Your Profile</h1>
           <p className="text-gray-600">Provide your information to get started</p>
         </div>
 
@@ -1030,7 +1030,7 @@ export function BasicInfoPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* User Type Selection */}
               <div className="space-y-4">
-                <Label className="text-lg font-semibold">Select Profile Type *</Label>
+                <Label className="text-sm font-semibold">Select Profile Type *</Label>
                 <RadioGroup 
                   value={userType} 
                   onValueChange={(value: 'personal' | 'business') => {
