@@ -727,7 +727,7 @@ export default function ProfilePage() {
           {/* Main Content */}
           <div className="lg:col-span-3">
             {/* Banner and Profile Section */}
-            <Card className="mb-3 overflow-hidden">
+            <Card className="mb-4 overflow-hidden">
               <div 
                 className="h-32 sm:h-40 bg-gradient-to-r from-blue-500 to-purple-600"
                 style={{
@@ -754,112 +754,116 @@ export default function ProfilePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h1 className="text-lg sm:text-xl font-semibold text-cmo-text-primary truncate">
+                        <h1 className="text-lg font-semibold text-cmo-text-primary truncate">
                           {profileData.firstName || ''} {profileData.lastName || ''}
                         </h1>
-                        <p className="text-sm sm:text-base text-cmo-text-secondary mb-2">
+                        <p className="text-sm sm:text-base text-cmo-text-secondary mb-1">
                           {(profileData as any).userType === 'business' 
                             ? (profileData as any).businessProfile?.companyName 
                             : ((profileData as any).title || (profileData as any).positionDesignation || 'Professional')
                           }
                         </p>
-                        <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-cmo-text-secondary">
-                          <span className="flex items-center gap-1">
-                            <Mail className="w-4 h-4" />
-                            {profileData.email}
-                          </span>
-                          {(profileData as any).phoneNumber && (
-                            <span className="flex items-center gap-1">
-                              <Phone className="w-4 h-4" />
-                              {(profileData as any).phoneNumber}
+                        {((profileData as any).city || (profileData as any).stateName) && (
+                          <div className="flex items-center gap-1 text-xs sm:text-sm text-cmo-text-secondary mb-1">
+                            <MapPin className="w-4 h-4" />
+                            <span>
+                              {(profileData as any).city || ''}
+                              {(profileData as any).stateName ? `, ${(profileData as any).stateName}` : ''}
+                              {(profileData as any).country ? `, ${typeof (profileData as any).country === 'string' ? (profileData as any).country : (profileData as any).country.name}` : ''}
                             </span>
-                          )}
-                          {((profileData as any).userType === 'business' ? (profileData as any).businessProfile?.location : ((profileData as any).city || (profileData as any).stateName)) && (
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-4 h-4" />
-                              {(profileData as any).userType === 'business' 
-                                ? `${(profileData as any).businessProfile.location.city}, ${(profileData as any).businessProfile.location.state.name}`
-                                : `${(profileData as any).city || ''}, ${(profileData as any).stateName || ''}`
-                              }
-                            </span>
-                          )}
-                          {(profileData as any).userType === 'business' && (profileData as any).businessProfile?.website && (
-                            <span className="flex items-center gap-1">
-                              <Globe className="w-4 h-4" />
-                              <a href={(profileData as any).businessProfile.website} target="_blank" rel="noopener noreferrer" className="text-cmo-primary hover:underline">
-                                Website
-                              </a>
-                            </span>
-                          )}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-3 text-xs sm:text-sm text-cmo-text-secondary">
+                          <button 
+                            className="flex items-center gap-1 hover:text-cmo-primary transition-colors"
+                          >
+                            <Users className="w-4 h-4" />
+                            {(profileData as any).followersCount || 0} followers
+                          </button>
+                          <button 
+                            className="hover:text-cmo-primary transition-colors"
+                          >
+                            {(profileData as any).followingCount || 0} following
+                          </button>
                         </div>
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={handleSendMessage}
-                          disabled={!profileData || user?.uid === profileData?.uid}
-                        >
-                          <MessageSquare className="w-4 h-4 mr-2" />
-                          Message
-                        </Button>
-                        <Button className="bg-cmo-primary hover:bg-cmo-primary/90">
-                          <Plus className="w-4 h-4 mr-2" />
-                          Follow
-                        </Button>
-                        
-                        {/* Three Dots Menu with Icons */}
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="outline" size="icon">
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => setShowEditProfileModal(true)}>
-                              <Edit className="mr-2 h-4 w-4" />
-                              <span>Edit Profile</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Flag className="mr-2 h-4 w-4" />
-                              <span>Report</span>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Share className="mr-2 h-4 w-4" />
-                              <span>Share</span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+                      {user?.uid === profileData?.uid && (
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="icon">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => setShowEditProfileModal(true)}>
+                                <Edit className="mr-2 h-4 w-4" />
+                                <span>Edit Profile</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
+
+                      {user?.uid !== profileData?.uid && (
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleSendMessage}
+                          >
+                            <MessageSquare className="w-4 h-4 mr-2" />
+                            Message
+                          </Button>
+                          <Button className="bg-cmo-primary hover:bg-cmo-primary/90">
+                            <Plus className="w-4 h-4 mr-2" />
+                            Follow
+                          </Button>
+
+                          {/* Three Dots Menu */}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="outline" size="icon">
+                                <MoreHorizontal className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem>
+                                <Flag className="mr-2 h-4 w-4" />
+                                <span>Report</span>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Share className="mr-2 h-4 w-4" />
+                                <span>Share</span>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* About Section */}
-                {((profileData as any).userType === 'business' ? (profileData as any).businessProfile?.description : (profileData as any).about) && (
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold mb-3">About</h3>
-                    <p className="text-cmo-text-secondary leading-relaxed">
-                      {(profileData as any).userType === 'business' 
-                        ? (profileData as any).businessProfile.description 
-                        : (profileData as any).about
-                      }
-                    </p>
-                  </div>
-                )}
+                <div className="mt-4">
+                  <h3 className="text-sm font-semibold mb-2">About</h3>
+                  <p className="text-sm text-cmo-text-secondary leading-relaxed">
+                    {(profileData as any).about || "Professional with expertise in the construction and civil engineering industry."}
+                  </p>
+                </div>
 
 
               </CardContent>
             </Card>
 
             {/* Projects Section - Show for all users */}
-            <Card className="mb-6">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-xl font-semibold flex items-center gap-2">
-                    <Building className="w-6 h-6 text-cmo-primary" />
+            <Card className="mb-4">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold flex items-center gap-2">
+                    <Building className="w-5 h-5 text-cmo-primary" />
                     Projects
                   </h3>
                   <Button 
@@ -940,7 +944,7 @@ export default function ProfilePage() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold flex items-center gap-2">
-                        <GraduationCap className="w-5 h-5 text-cmo-primary" />
+                        <GraduationCap className="w-6 h-6 text-cmo-primary" />
                         Education
                       </h3>
                       <Button 
@@ -1008,7 +1012,7 @@ export default function ProfilePage() {
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold flex items-center gap-2">
-                        <Briefcase className="w-5 h-5 text-cmo-primary" />
+                        <Briefcase className="w-6 h-6 text-cmo-primary" />
                         Experience
                       </h3>
                       <Button 
