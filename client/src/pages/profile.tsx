@@ -136,6 +136,10 @@ export default function ProfilePage() {
   const [selectedSkills, setSelectedSkills] = useState<{ value: string; label: string }[]>([]);
   const [skillsSaving, setSkillsSaving] = useState(false);
 
+  // Suggestions State
+  const [suggestions, setSuggestions] = useState<UserProfile[]>([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+
   // Modal States for Education, Experience, Projects
   const [showEducationModal, setShowEducationModal] = useState(false);
   const [showExperienceModal, setShowExperienceModal] = useState(false);
@@ -414,8 +418,23 @@ export default function ProfilePage() {
         loadSkills();
       }
       loadProjects();
+      loadSuggestions();
     }
   }, [profileData?.uid, (profileData as any)?.userType]);
+
+  const loadSuggestions = async () => {
+    setSuggestionsLoading(true);
+    try {
+      const suggestionsData = await userApiService.getUserSuggestions();
+      setSuggestions(suggestionsData || []);
+    } catch (error) {
+      console.error('Error loading suggestions:', error);
+      // Fallback to empty array on error
+      setSuggestions([]);
+    } finally {
+      setSuggestionsLoading(false);
+    }
+  };
 
   // Education Handlers
   const handleAddEducation = () => {
@@ -1510,60 +1529,42 @@ export default function ProfilePage() {
               <CardContent className="p-4">
                 <h3 className="font-semibold mb-4 text-sm">Suggested for You</h3>
                 <div className="space-y-3">
-                  {[
-                    {
-                      id: 1,
-                      name: "Sarah Johnson",
-                      title: "Senior Project Manager",
-                      location: "Austin, TX",
-                      photoUrl: "https://images.unsplash.com/photo-1494790108755-2616b612b77c?w=150&h=150&fit=crop&crop=face"
-                    },
-                    {
-                      id: 2,
-                      name: "Michael Chen",
-                      title: "Construction Engineer",
-                      location: "Seattle, WA",
-                      photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
-                    },
-                    {
-                      id: 3,
-                      name: "Emily Rodriguez",
-                      title: "Architect",
-                      location: "Denver, CO",
-                      photoUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
-                    },
-                    {
-                      id: 4,
-                      name: "David Thompson",
-                      title: "Civil Engineer",
-                      location: "Phoenix, AZ",
-                      photoUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-                    },
-                    {
-                      id: 5,
-                      name: "Lisa Wang",
-                      title: "Construction Manager",
-                      location: "Portland, OR",
-                      photoUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face"
-                    }
-                  ].map((person) => (
-                    <div key={person.id} className="flex items-center gap-3">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={person.photoUrl} />
-                        <AvatarFallback className="text-xs">
-                          {person.name.split(' ').map(n => n[0]).join('')}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-xs text-cmo-text-primary truncate">{person.name}</p>
-                        <p className="text-xs text-cmo-text-secondary truncate">{person.title}</p>
-                        <p className="text-xs text-cmo-text-secondary truncate">{person.location}</p>
-                      </div>
-                      <Button size="sm" className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white">
-                        Follow
-                      </Button>
+                  {suggestionsLoading ? (
+                    // Loading state
+                    <div className="flex items-center justify-center py-4">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className="text-sm text-cmo-text-secondary ml-2">Loading suggestions...</span>
                     </div>
-                  ))}
+                  ) : suggestions.length > 0 ? (
+                    suggestions.map((person) => (
+                      <div key={person.uid} className="flex items-center gap-3">
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={person.photoUrl || person.profilePicture} />
+                          <AvatarFallback className="text-xs">
+                            {(person.firstName?.[0] || '') + (person.lastName?.[0] || '')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-xs text-cmo-text-primary truncate">
+                            {person.firstName} {person.lastName}
+                          </p>
+                          <p className="text-xs text-cmo-text-secondary truncate">
+                            {person.title || person.positionDesignation || 'Professional'}
+                          </p>
+                          <p className="text-xs text-cmo-text-secondary truncate">
+                            {person.city || person.location || 'Location not specified'}
+                          </p>
+                        </div>
+                        <Button size="sm" className="text-xs px-3 py-1 h-6 bg-blue-600 hover:bg-blue-700 text-white" data-testid="button-follow-suggestion">
+                          Follow
+                        </Button>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-cmo-text-secondary text-center py-4">
+                      No suggestions available
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
