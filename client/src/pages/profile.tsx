@@ -27,6 +27,7 @@ import { useCreateConversation } from '../hooks/useChat';
 import { useLocation } from 'wouter';
 import { useToast } from '../hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import Select from 'react-select';
 import { 
   MapPin, 
   Mail, 
@@ -126,6 +127,14 @@ export default function ProfilePage() {
   const [educationLoading, setEducationLoading] = useState(false);
   const [experienceLoading, setExperienceLoading] = useState(false);
   const [projectsLoading, setProjectsLoading] = useState(false);
+
+  // Skills State
+  const [userSkills, setUserSkills] = useState<string[]>([]);
+  const [allSkills, setAllSkills] = useState<{ id: string; name: string }[]>([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+  const [skillsModalOpen, setSkillsModalOpen] = useState(false);
+  const [selectedSkills, setSelectedSkills] = useState<{ value: string; label: string }[]>([]);
+  const [skillsSaving, setSkillsSaving] = useState(false);
 
   // Modal States for Education, Experience, Projects
   const [showEducationModal, setShowEducationModal] = useState(false);
@@ -326,11 +335,79 @@ export default function ProfilePage() {
     }
   };
 
+  const loadSkills = async () => {
+    if (!profileData?.uid) return;
+    setSkillsLoading(true);
+    try {
+      // Load all skills and user skills in parallel
+      const [allSkillsData, userSkillsData] = await Promise.all([
+        userApiService.getAllSkills(),
+        userApiService.getUserSkills(profileData.uid)
+      ]);
+      
+      setAllSkills(allSkillsData || []);
+      setUserSkills(userSkillsData || []);
+      
+      // Set selected skills for the modal
+      const selectedSkillOptions = userSkillsData?.map(skillId => {
+        const skill = allSkillsData?.find(s => s.id === skillId);
+        return { value: skillId, label: skill?.name || skillId };
+      }).filter(Boolean) || [];
+      
+      setSelectedSkills(selectedSkillOptions);
+    } catch (error) {
+      console.error('Error loading skills:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load skills data",
+        variant: "destructive",
+      });
+    } finally {
+      setSkillsLoading(false);
+    }
+  };
+
+  const handleSkillsModalOpen = () => {
+    setSkillsModalOpen(true);
+    if (allSkills.length === 0) {
+      loadSkills();
+    }
+  };
+
+  const handleSkillsSave = async () => {
+    if (!profileData?.uid) return;
+    
+    setSkillsSaving(true);
+    try {
+      const skillIds = selectedSkills.map(skill => skill.value);
+      await userApiService.updateUserSkills(profileData.uid, skillIds);
+      
+      // Update local state
+      setUserSkills(skillIds);
+      setSkillsModalOpen(false);
+      
+      toast({
+        title: "Skills updated",
+        description: "Your skills have been successfully updated.",
+      });
+    } catch (error) {
+      console.error('Error updating skills:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update skills",
+        variant: "destructive",
+      });
+    } finally {
+      setSkillsSaving(false);
+    }
+  };
+
   useEffect(() => {
     if (profileData?.uid) {
       if ((profileData as any).userType !== 'business') {
         loadEducation();
         loadExperience();
+        loadSkills();
       }
       loadProjects();
     }
@@ -1328,15 +1405,44 @@ export default function ProfilePage() {
             {/* Skills Expertise - Only for Personal Profiles */}
             {(profileData as any).userType !== 'business' && (
               <Card className="mb-6">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold mb-4">Skills Expertise</h3>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold">Skills Expertise</h3>
+                    {/* Show Edit button if no skills, + button if has skills - only on own profile */}
+                    {profileData?.uid === user?.uid && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleSkillsModalOpen}
+                        disabled={skillsLoading}
+                        data-testid={userSkills.length === 0 ? "button-edit-skills" : "button-add-skills"}
+                        className="text-cmo-primary hover:text-cmo-primary/80"
+                      >
+                        {skillsLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : userSkills.length === 0 ? (
+                          <>
+                            <Edit className="w-4 h-4 mr-1" />
+                            Edit
+                          </>
+                        ) : (
+                          <>
+                            <Plus className="w-4 h-4 mr-1" />
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                   <div className="flex flex-wrap gap-2">
-                    {((profileData as any).skills || []).length > 0 ? (
-                      ((profileData as any).skills || []).map((skill: string) => (
-                        <Badge key={skill} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
-                          {skill}
-                        </Badge>
-                      ))
+                    {userSkills.length > 0 ? (
+                      userSkills.map((skillId: string) => {
+                        const skill = allSkills.find(s => s.id === skillId);
+                        return (
+                          <Badge key={skillId} variant="secondary" className="bg-cmo-primary/10 text-cmo-primary">
+                            {skill?.name || skillId}
+                          </Badge>
+                        );
+                      })
                     ) : (
                       <p className="text-cmo-text-secondary text-sm">No skills added yet</p>
                     )}
@@ -2013,6 +2119,62 @@ export default function ProfilePage() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Skills Modal */}
+      <Dialog open={skillsModalOpen} onOpenChange={setSkillsModalOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Manage Skills</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Select your skills</Label>
+              <Select
+                isMulti
+                isSearchable
+                options={allSkills.map(skill => ({ value: skill.id, label: skill.name }))}
+                value={selectedSkills}
+                onChange={(newValue) => setSelectedSkills(newValue as any)}
+                className="mt-2"
+                placeholder="Search and select skills..."
+                noOptionsMessage={() => "No skills found"}
+                isLoading={skillsLoading}
+                data-testid="select-skills"
+                classNames={{
+                  control: () => "border border-gray-300 rounded-md min-h-[40px]",
+                  multiValue: () => "bg-cmo-primary/10 text-cmo-primary rounded-sm",
+                  multiValueLabel: () => "text-cmo-primary",
+                  multiValueRemove: () => "text-cmo-primary hover:text-red-500",
+                }}
+              />
+            </div>
+            <div className="flex justify-end space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setSkillsModalOpen(false)}
+                disabled={skillsSaving}
+                data-testid="button-cancel-skills"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleSkillsSave}
+                disabled={skillsSaving}
+                data-testid="button-save-skills"
+              >
+                {skillsSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save'
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

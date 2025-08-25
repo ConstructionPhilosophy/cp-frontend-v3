@@ -897,6 +897,110 @@ class UserApiService {
       throw new Error("Failed to delete project");
     }
   }
+
+  // Skills API methods
+  async getAllSkills(): Promise<{ id: string; name: string }[]> {
+    try {
+      const headers = await this.getAuthHeaders();
+
+      const response = await fetch(`${API_BASE_URL}/skills`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch skills: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const skills = await response.json();
+      return skills;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error fetching skills:", error);
+      throw new Error("Failed to fetch skills");
+    }
+  }
+
+  async getUserSkills(uid: string): Promise<string[]> {
+    try {
+      const headers = await this.getAuthHeaders();
+
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/skills`, {
+        method: "GET",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch user skills: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const skillIds = await response.json();
+      return skillIds;
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error fetching user skills:", error);
+      throw new Error("Failed to fetch user skills");
+    }
+  }
+
+  async updateUserSkills(uid: string, skillIds: string[]): Promise<void> {
+    try {
+      const headers = await this.getAuthHeaders();
+
+      const response = await fetch(`${API_BASE_URL}/users/${uid}/skills`, {
+        method: "PUT",
+        headers: {
+          ...headers,
+          "Content-Type": "application/json",
+        },
+        mode: "cors",
+        credentials: "omit",
+        body: JSON.stringify({ skills: skillIds }),
+      });
+
+      if (response.status === 401) {
+        throw new Error("AUTH_EXPIRED");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to update user skills: ${response.status} ${response.statusText}`,
+        );
+      }
+    } catch (error: any) {
+      if (error.message === "AUTH_EXPIRED") {
+        throw error;
+      }
+      console.error("Error updating user skills:", error);
+      throw new Error("Failed to update user skills");
+    }
+  }
 }
 
 export const userApiService = new UserApiService();
