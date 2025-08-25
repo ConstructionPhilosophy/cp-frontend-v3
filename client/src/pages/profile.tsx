@@ -330,6 +330,7 @@ export default function ProfilePage() {
       setLoading(true);
       try {
         const data = await userApiService.getCurrentUser(true);
+        console.log('Fetched profile data:', data); // Debug log
         setProfileData(data);
         // Populate edit form data based on user type
         const isBusinessUser = (data as any).userType === "business";
@@ -666,6 +667,11 @@ export default function ProfilePage() {
       loadSuggestions();
     }
   }, [profileData?.uid, (profileData as any)?.userType]);
+
+  // Load countries on component mount
+  useEffect(() => {
+    loadCountries();
+  }, []);
 
   const loadSuggestions = async () => {
     setSuggestionsLoading(true);
@@ -1136,24 +1142,28 @@ export default function ProfilePage() {
   const handleEditProfileClick = () => {
     if (!profileData) return;
     
+    // Debug: Log the profile data to see what fields are available
+    console.log('Profile data for edit:', profileData);
+    
     const isBusinessUser = (profileData as any).userType === "business";
+    let newFormData;
     
     if (isBusinessUser) {
-      setEditFormData({
-        // Business fields
-        companyName: (profileData as any).companyName || "",
-        industry: (profileData as any).industry || "",
-        companyType: (profileData as any).companyType || "",
-        description: (profileData as any).description || "",
-        addressLine1: (profileData as any).addressLine1 || "",
-        addressLine2: (profileData as any).addressLine2 || "",
-        pincode: (profileData as any).pincode || "",
-        website: (profileData as any).website || "",
-        registrationNumber: (profileData as any).registrationNumber || "",
-        companySize: (profileData as any).companySize || "",
-        city: (profileData as any).city || "",
-        stateName: (profileData as any).stateName || "",
-        country: (profileData as any).country || "",
+      newFormData = {
+        // Business fields - check for nested businessProfile object
+        companyName: (profileData as any).businessProfile?.companyName || (profileData as any).companyName || "",
+        industry: (profileData as any).businessProfile?.industry || (profileData as any).industry || "",
+        companyType: (profileData as any).businessProfile?.companyType || (profileData as any).companyType || "",
+        description: (profileData as any).businessProfile?.description || (profileData as any).description || "",
+        addressLine1: (profileData as any).businessProfile?.addressLine1 || (profileData as any).addressLine1 || "",
+        addressLine2: (profileData as any).businessProfile?.addressLine2 || (profileData as any).addressLine2 || "",
+        pincode: (profileData as any).businessProfile?.pincode || (profileData as any).pincode || "",
+        website: (profileData as any).businessProfile?.website || (profileData as any).website || "",
+        registrationNumber: (profileData as any).businessProfile?.registrationNumber || (profileData as any).registrationNumber || "",
+        companySize: (profileData as any).businessProfile?.companySize || (profileData as any).companySize || "",
+        city: (profileData as any).businessProfile?.location?.city || (profileData as any).city || "",
+        stateName: (profileData as any).businessProfile?.location?.state?.name || (profileData as any).stateName || "",
+        country: (profileData as any).businessProfile?.location?.country || (profileData as any).country || (profileData as any).countryName || "",
         // Personal fields (empty for business)
         firstName: "",
         lastName: "",
@@ -1163,9 +1173,9 @@ export default function ProfilePage() {
         about: "",
         gender: "",
         dateOfBirth: "",
-      });
+      };
     } else {
-      setEditFormData({
+      newFormData = {
         // Personal fields
         firstName: (profileData as any).firstName || "",
         lastName: (profileData as any).lastName || "",
@@ -1177,7 +1187,7 @@ export default function ProfilePage() {
         dateOfBirth: (profileData as any).dateOfBirth || "",
         city: (profileData as any).city || "",
         stateName: (profileData as any).stateName || "",
-        country: (profileData as any).country || "",
+        country: (profileData as any).country || (profileData as any).countryName || "",
         // Business fields (empty for personal)
         companyName: "",
         industry: "",
@@ -1189,21 +1199,36 @@ export default function ProfilePage() {
         website: "",
         registrationNumber: "",
         companySize: "",
-      });
+      };
     }
+    
+    console.log('New form data:', newFormData);
+    setEditFormData(newFormData);
     
     // Load countries when modal opens
     if (countries.length === 0) {
       loadCountries();
     }
     
-    // Load states if country is already selected
-    if (editFormData.country) {
-      const selectedCountry = countries.find(c => c.name === editFormData.country);
-      if (selectedCountry) {
-        loadStates(selectedCountry.code);
+    // Load states and cities based on existing data after a brief delay
+    setTimeout(() => {
+      if (newFormData.country && countries.length > 0) {
+        const selectedCountry = countries.find(c => c.name === newFormData.country);
+        if (selectedCountry) {
+          loadStates(selectedCountry.code);
+          
+          // Load cities if state is also available
+          if (newFormData.stateName) {
+            setTimeout(() => {
+              const selectedState = states.find(s => s.name === newFormData.stateName);
+              if (selectedState) {
+                loadCities(selectedCountry.code, selectedState.code);
+              }
+            }, 500);
+          }
+        }
       }
-    }
+    }, 500);
     
     setShowEditProfileModal(true);
   };
@@ -2594,25 +2619,26 @@ export default function ProfilePage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="gender">Gender</Label>
-                    <SelectUI
+                    <Label>Gender</Label>
+                    <RadioGroup
                       value={editFormData.gender}
-                      onValueChange={(value) =>
-                        handleEditFormChange("gender", value)
-                      }
+                      onValueChange={(value) => handleEditFormChange("gender", value)}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                        <SelectItem value="prefer-not-to-say">
-                          Prefer not to say
-                        </SelectItem>
-                      </SelectContent>
-                    </SelectUI>
+                      <div className="flex items-center space-x-6">
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Male" id="male" />
+                          <Label htmlFor="male">Male</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Female" id="female" />
+                          <Label htmlFor="female">Female</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem value="Other" id="other" />
+                          <Label htmlFor="other">Other</Label>
+                        </div>
+                      </div>
+                    </RadioGroup>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="dateOfBirth">Date of Birth</Label>
