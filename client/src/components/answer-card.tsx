@@ -20,7 +20,7 @@ export default function AnswerCard({ answer, author }: AnswerCardProps) {
         </Avatar>
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
-            <h3 className="font-semibold text-cmo-text-primary">{author.name}</h3>
+            <h3 className="font-medium text-sm text-cmo-text-primary">{author.name}</h3>
             <span className="text-cmo-text-secondary text-sm">
               {author.title} • {formatDistanceToNow(answer.createdAt, { addSuffix: true })}
             </span>
@@ -29,7 +29,7 @@ export default function AnswerCard({ answer, author }: AnswerCardProps) {
             Answering a previous • Retouch #content-marketing #branding
           </p>
           
-          <p className="text-cmo-text-primary mb-4">
+          <p className="text-xs text-cmo-text-primary mb-4">
             {answer.content}
           </p>
           

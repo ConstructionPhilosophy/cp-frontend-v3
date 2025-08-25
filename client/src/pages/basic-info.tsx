@@ -1090,7 +1090,7 @@ export function BasicInfoPage() {
                           <div className="flex items-center space-x-3">
                             <RadioGroupItem value="personal" id="personal" />
                             <div>
-                              <div className="text-base font-medium cursor-pointer">
+                              <div className="text-sm font-medium cursor-pointer">
                                 Personal Profile
                               </div>
                               <p className="text-sm text-gray-500 mt-1">For individual professionals</p>
@@ -1109,7 +1109,7 @@ export function BasicInfoPage() {
                           <div className="flex items-center space-x-3">
                             <RadioGroupItem value="business" id="business" />
                             <div>
-                              <div className="text-base font-medium cursor-pointer">
+                              <div className="text-sm font-medium cursor-pointer">
                                 Business Profile
                               </div>
                               <p className="text-sm text-gray-500 mt-1">For companies and organizations</p>
@@ -1124,7 +1124,7 @@ export function BasicInfoPage() {
 
               {/* Profile & Cover Images Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-sm font-semibold text-gray-900">
                   {userType === 'business' ? 'Logo & Banner' : 'Profile Images'}
                 </h3>
                 

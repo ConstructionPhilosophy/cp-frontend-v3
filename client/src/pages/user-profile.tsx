@@ -486,7 +486,7 @@ export default function UserProfilePage() {
                           profileData.photoUrl || profileData.profilePic || ""
                         }
                       />
-                      <AvatarFallback className="text-lg sm:text-xl">
+                      <AvatarFallback className="text-sm">
                         {profileData.firstName?.charAt(0) || "U"}
                         {profileData.lastName?.charAt(0) || ""}
                       </AvatarFallback>
@@ -497,7 +497,7 @@ export default function UserProfilePage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                       <div className="flex-1 min-w-0">
-                        <h1 className="text-xl sm:text-2xl font-semibold text-cmo-text-primary truncate">
+                        <h1 className="text-lg font-semibold text-cmo-text-primary truncate">
                           {profileData.firstName || ""}{" "}
                           {profileData.lastName || ""}
                         </h1>
@@ -611,7 +611,7 @@ export default function UserProfilePage() {
 
                 {/* About Section */}
                 <div className="mt-4">
-                  <h3 className="text-base font-semibold mb-2">About</h3>
+                  <h3 className="text-sm font-semibold mb-2">About</h3>
                   <p className="text-sm text-cmo-text-secondary leading-relaxed">
                     {profileData.about ||
                       "Professional with expertise in the construction and civil engineering industry."}

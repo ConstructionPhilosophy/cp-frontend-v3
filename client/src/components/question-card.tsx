@@ -20,7 +20,7 @@ export default function QuestionCard({ question, author }: QuestionCardProps) {
         </Avatar>
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
-            <h3 className="font-semibold text-cmo-text-primary">{author.name}</h3>
+            <h3 className="font-medium text-sm text-cmo-text-primary">{author.name}</h3>
             <span className="text-cmo-text-secondary text-sm">{author.title}</span>
             <span className="text-cmo-text-secondary text-sm">
               • {formatDistanceToNow(question.createdAt, { addSuffix: true })}
@@ -30,19 +30,19 @@ export default function QuestionCard({ question, author }: QuestionCardProps) {
             Asked a question • {question.category} {question.tags?.map(tag => `#${tag}`).join(' ')}
           </p>
           
-          <h2 className="text-lg font-semibold text-cmo-text-primary mb-4">
+          <h2 className="text-sm font-semibold text-cmo-text-primary mb-4">
             {question.title}
           </h2>
           
-          <p className="text-cmo-text-primary mb-4">
+          <p className="text-xs text-cmo-text-primary mb-4">
             {question.content}
           </p>
           
           {/* Question illustration */}
-          {question.imageUrl && (
+          {(question as any).imageUrl && (
             <div className="mb-4">
               <img 
-                src={question.imageUrl} 
+                src={(question as any).imageUrl} 
                 alt="Question illustration" 
                 className="w-full h-48 object-cover rounded-lg"
               />

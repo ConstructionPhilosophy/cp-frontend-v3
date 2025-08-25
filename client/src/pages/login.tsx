@@ -107,7 +107,7 @@ export function LoginPage() {
 
         <div className="relative z-10 flex items-center justify-center w-full p-8">
           <div className="text-center max-w-md">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">
+            <h1 className="text-lg font-bold text-gray-800 mb-4">
               Professional network for construction industry
             </h1>
             <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
@@ -130,7 +130,7 @@ export function LoginPage() {
         <div className="w-full max-w-sm">
           {/* Mobile Header - Only visible on mobile */}
           <div className="lg:hidden text-center mb-6">
-            <h1 className="text-xl font-bold text-gray-800 mb-2">
+            <h1 className="text-sm font-bold text-gray-800 mb-2">
               Welcome to CP
             </h1>
             <p className="text-sm text-gray-600">
@@ -143,12 +143,12 @@ export function LoginPage() {
             <div className="w-8 h-8 bg-cmo-primary rounded-lg flex items-center justify-center mr-3">
               <div className="w-4 h-4 bg-white rounded-sm"></div>
             </div>
-            <span className="text-xl font-bold text-cmo-text-primary">CP</span>
+            <span className="text-sm font-bold text-cmo-text-primary">CP</span>
           </div>
 
           {/* Form Header */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-cmo-text-primary mb-2">Sign in</h2>
+            <h2 className="text-lg font-bold text-cmo-text-primary mb-2">Sign in</h2>
             <p className="text-cmo-text-secondary">Welcome back! Please enter your details.</p>
           </div>
 

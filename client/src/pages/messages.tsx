@@ -205,7 +205,7 @@ export const MessagesPage: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-2">
             <MessageSquare className="w-6 h-6 text-cmo-primary" />
-            <h1 className="text-2xl font-bold text-cmo-text-primary">Messages</h1>
+            <h1 className="text-lg font-bold text-cmo-text-primary">Messages</h1>
           </div>
           
           <Dialog>
