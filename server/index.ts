@@ -94,8 +94,10 @@ app.use((req, res, next) => {
 });
 
 // Deployment-ready server configuration
-// Use port 80 for production deployment (autoscale requirement), port 5000 for development
-const PORT = process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT 
+// Force port 80 for production deployment (autoscale requirement), ignore PORT env var in production
+const isProduction = process.env.NODE_ENV === 'production';
+const isDeployment = process.env.REPLIT_DEPLOYMENT === 'true';
+const PORT = isProduction || isDeployment 
   ? 80 
   : parseInt(process.env.PORT || '5000', 10);
 
@@ -103,7 +105,12 @@ console.log(`Starting server on port ${PORT}...`);
 console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`Replit Deployment: ${process.env.REPLIT_DEPLOYMENT || 'false'}`);
 console.log(`Port from env: ${process.env.PORT || 'not set'}`);
-console.log(`Deployment target port: ${process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT ? '80 (autoscale requirement)' : '5000 (development)'}`);
+console.log(`Is Production: ${isProduction}`);
+console.log(`Is Deployment: ${isDeployment}`);
+if ((isProduction || isDeployment) && process.env.PORT && process.env.PORT !== '80') {
+  console.log(`🔧 Overriding PORT env var (${process.env.PORT}) with port 80 for autoscale deployment`);
+}
+console.log(`Final PORT: ${PORT} ${isProduction || isDeployment ? '(autoscale requirement)' : '(development)'}`);
 console.log(`Node version: ${process.version}`);
 console.log(`Available memory: ${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB`);
 

@@ -63,17 +63,17 @@ The application uses a hybrid approach for maximum deployment flexibility:
 # Recent Changes
 
 ## Deployment Configuration Updates (2025-01-26)
-**Fixed autoscale deployment port configuration issues:**
-- Updated server to use port 80 for production deployment (autoscale requirement)
-- Enhanced environment detection to include `REPLIT_DEPLOYMENT` flag
-- Maintains port 5000 for development environment
+**Critical Fix: Resolved autoscale deployment port configuration**
+- **FIXED**: Server now forcibly uses port 80 in production, overriding PORT environment variable
+- Enhanced environment detection with explicit boolean checks for production/deployment flags
+- Maintains port 5000 for development environment only
 - Added comprehensive error handling for port binding issues (EADDRINUSE, EACCES, ENOTFOUND)
-- Added detailed startup logging for deployment debugging with environment context
-- Server now automatically detects deployment environment and selects appropriate port
+- Added detailed startup logging showing PORT override behavior for debugging
+- Server automatically detects deployment environment and enforces correct port
 
 **Technical Details:**
-- Production/Deployment: PORT=80 (required for autoscale deployment)
-- Development: PORT=5000 (Replit development standard)
-- Environment detection: `process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT`
-- Enhanced error handling includes environment context logging for debugging
-- Comprehensive port binding error messages with deployment-specific guidance
+- **Production/Deployment**: Always PORT=80 (autoscale requirement, overrides env vars)
+- **Development**: PORT=5000 (respects PORT env var in development only)
+- **Environment detection**: Explicit boolean checks `isProduction || isDeployment`
+- **PORT override logging**: Shows when PORT env var is overridden for deployment
+- **Deployment compatibility**: Works with both `NODE_ENV=production` and `REPLIT_DEPLOYMENT=true`
