@@ -59,3 +59,19 @@ The application uses a hybrid approach for maximum deployment flexibility:
 - **Date-fns**
 - **React Hook Form**
 - **Firebase Authentication** (for login/signup, password reset, phone auth)
+
+# Recent Changes
+
+## Deployment Configuration Updates (2025-01-26)
+**Fixed autoscale deployment port configuration issues:**
+- Updated server to use port 80 for production deployment (autoscale requirement)
+- Maintains port 5000 for development environment
+- Added enhanced error handling for port binding issues (EADDRINUSE, EACCES, ENOTFOUND)
+- Added detailed startup logging for deployment debugging
+- Server now automatically detects environment and selects appropriate port
+
+**Technical Details:**
+- Production: PORT=80 (required for autoscale deployment)
+- Development: PORT=5000 (Replit development standard)
+- Environment detection: `process.env.NODE_ENV === 'production'`
+- Error handling includes specific messages for common port binding issues

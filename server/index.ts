@@ -94,18 +94,29 @@ app.use((req, res, next) => {
 });
 
 // Deployment-ready server configuration
-const PORT = parseInt(process.env.PORT || '5000', 10);
+// Use port 5000 for development, port 80 for production deployment
+const PORT = parseInt(process.env.PORT || (process.env.NODE_ENV === 'production' ? '80' : '5000'), 10);
 
 console.log(`Starting server on port ${PORT}...`);
 console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`Replit Deployment: ${process.env.REPLIT_DEPLOYMENT || 'false'}`);
+console.log(`Port from env: ${process.env.PORT || 'not set'}`);
+console.log(`Node version: ${process.version}`);
+console.log(`Available memory: ${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB`);
 
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on 0.0.0.0:${PORT}`);
 });
 
-server.on('error', (error) => {
+server.on('error', (error: any) => {
   console.error('Server error:', error);
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Please use a different port.`);
+  } else if (error.code === 'EACCES') {
+    console.error(`Permission denied to bind to port ${PORT}. Try running with elevated privileges or use a port >= 1024.`);
+  } else if (error.code === 'ENOTFOUND') {
+    console.error(`Unable to bind to address 0.0.0.0. Check network configuration.`);
+  }
   process.exit(1);
 });
 
