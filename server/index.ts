@@ -94,13 +94,16 @@ app.use((req, res, next) => {
 });
 
 // Deployment-ready server configuration
-// Use port 5000 for development, port 80 for production deployment
-const PORT = parseInt(process.env.PORT || (process.env.NODE_ENV === 'production' ? '80' : '5000'), 10);
+// Use port 80 for production deployment (autoscale requirement), port 5000 for development
+const PORT = process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT 
+  ? 80 
+  : parseInt(process.env.PORT || '5000', 10);
 
 console.log(`Starting server on port ${PORT}...`);
 console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
 console.log(`Replit Deployment: ${process.env.REPLIT_DEPLOYMENT || 'false'}`);
 console.log(`Port from env: ${process.env.PORT || 'not set'}`);
+console.log(`Deployment target port: ${process.env.NODE_ENV === 'production' || process.env.REPLIT_DEPLOYMENT ? '80 (autoscale requirement)' : '5000 (development)'}`);
 console.log(`Node version: ${process.version}`);
 console.log(`Available memory: ${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB`);
 
@@ -110,13 +113,29 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 
 server.on('error', (error: any) => {
   console.error('Server error:', error);
+  console.error(`Error details: code=${error.code}, errno=${error.errno}, syscall=${error.syscall}`);
+  
   if (error.code === 'EADDRINUSE') {
     console.error(`Port ${PORT} is already in use. Please use a different port.`);
+    console.error(`For autoscale deployment, ensure the server binds to port 80.`);
   } else if (error.code === 'EACCES') {
-    console.error(`Permission denied to bind to port ${PORT}. Try running with elevated privileges or use a port >= 1024.`);
+    console.error(`Permission denied to bind to port ${PORT}.`);
+    if (PORT < 1024) {
+      console.error(`Port ${PORT} requires elevated privileges. For production deployment, this should be handled by the platform.`);
+    }
   } else if (error.code === 'ENOTFOUND') {
     console.error(`Unable to bind to address 0.0.0.0. Check network configuration.`);
+  } else {
+    console.error(`Unexpected server error: ${error.message}`);
   }
+  
+  // Log environment context for debugging
+  console.error(`Environment context:`);
+  console.error(`- NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
+  console.error(`- REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT || 'not set'}`);
+  console.error(`- PORT: ${process.env.PORT || 'not set'}`);
+  console.error(`- Calculated PORT: ${PORT}`);
+  
   process.exit(1);
 });
 
