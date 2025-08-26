@@ -17,11 +17,12 @@ Preferred communication style: Simple, everyday language.
 ## Frontend Architecture
 The frontend is built with React 18 and TypeScript, employing a component-based architecture. It uses Tailwind CSS with a custom design system for styling, Radix UI primitives and custom shadcn/ui components for consistent and accessible UI elements, and Wouter for client-side routing. State management relies on native React state with the Fetch API for data interactions. Vite is used for fast development and optimized production builds. The design features a three-column layout (left sidebar for navigation, main content for Q&A, right sidebar for user stats) with mobile responsiveness handled via a bottom navigation bar and responsive grids. Custom UI components such as a date picker and country code selector are implemented to match precise design specifications.
 
-### Deployment Portability
-**CRITICAL UPDATE (2025-01-24)**: The application is now fully deployment-portable across different domains. All hardcoded API URLs have been replaced with:
-- **User APIs**: Environment-configurable URLs that default to `window.location.origin`
-- **Geo APIs**: Direct calls to external geo API service (much simpler than proxy approach)
-This ensures the app works on any domain without code changes.
+### Deployment Portability & Direct API Integration
+**UPDATED (2025-01-26)**: The application now calls external APIs directly for optimal performance:
+- **User APIs**: Direct calls to `https://cp-backend-service-test-972540571952.asia-south1.run.app` 
+- **Geo APIs**: Direct calls to `https://geo-api-230500065838.asia-south1.run.app`
+- **Environment Override**: Still configurable via `VITE_API_BASE_URL` for different environments
+This eliminates proxy overhead and provides faster API responses.
 
 ## Backend Architecture
 The backend uses Node.js with the Express.js framework, written in TypeScript. It follows a RESTful API pattern for managing users, security assessments, recommendations, and metrics. It includes centralized error handling. Currently, it utilizes an in-memory storage system with sample data, abstracted via an `IStorage` interface. The system is designed for easy migration to a persistent database.
@@ -30,10 +31,11 @@ The backend uses Node.js with the Express.js framework, written in TypeScript. I
 Currently, an in-memory storage system is used with realistic sample data. It employs a repository pattern with the `IStorage` interface and uses strong TypeScript typing for entities like `User`, `SecurityAssessment`, `SecurityRecommendation`, and `SecurityMetric`. Zod schemas are used for runtime validation of API inputs. The architecture is prepared for a PostgreSQL migration using Drizzle ORM.
 
 ## API Configuration
-The application uses a hybrid approach for maximum deployment flexibility:
-- `VITE_API_BASE_URL`: Main backend API (defaults to current domain)
-- **Geo APIs**: Direct calls to `https://geo-api-230500065838.asia-south1.run.app` (no configuration needed)
-- This approach eliminates the need for backend proxy services for geo data while maintaining flexibility for user APIs.
+The application now uses direct external API calls for optimal performance:
+- **User/Backend APIs**: Direct calls to `https://cp-backend-service-test-972540571952.asia-south1.run.app`
+- **Geo APIs**: Direct calls to `https://geo-api-230500065838.asia-south1.run.app`
+- **Environment Override**: Both can be overridden via `VITE_API_BASE_URL` for different environments
+- This approach eliminates proxy overhead and provides faster, more reliable API responses.
 
 # External Dependencies
 
