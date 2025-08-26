@@ -37,7 +37,8 @@ import {
   Experience,
   Project,
 } from "../lib/userApi";
-import { apiClient } from "../lib/apiClient";
+// Direct geo API calls
+const GEO_API_BASE_URL = 'https://geo-api-230500065838.asia-south1.run.app';
 import { useCreateConversation } from "../hooks/useChat";
 import { useLocation } from "wouter";
 import { useToast } from "../hooks/use-toast";
@@ -1070,7 +1071,7 @@ export default function ProfilePage() {
   const loadCountries = async () => {
     try {
       setLoadingLocations(true);
-      const response = await apiClient.smartFetch('/api/countries');
+      const response = await fetch(`${GEO_API_BASE_URL}/countries`);
       
       if (response.ok) {
         const data = await response.json();
@@ -1093,7 +1094,7 @@ export default function ProfilePage() {
   const loadStates = async (countryCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await apiClient.smartFetch(`/api/states?country_code=${countryCode}`);
+      const response = await fetch(`${GEO_API_BASE_URL}/states?country_code=${countryCode}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -1117,7 +1118,7 @@ export default function ProfilePage() {
   const loadCities = async (countryCode: string, stateCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await apiClient.smartFetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
+      const response = await fetch(`${GEO_API_BASE_URL}/cities?country_code=${countryCode}&state_code=${stateCode}`);
       
       if (response.ok) {
         const data = await response.json();

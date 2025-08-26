@@ -27,25 +27,19 @@ This application is designed to be deployed to any domain without code changes. 
 - `VITE_API_BASE_URL`: Backend API base URL (defaults to current domain origin)
 - `VITE_GEO_API_BASE_URL`: Geo API base URL (defaults to current domain origin)
 
-## Smart API Detection (NEW)
+## Direct API Calls (SIMPLIFIED)
 
-The application now includes **smart API detection** that automatically handles deployment scenarios:
+The application now calls external APIs directly, eliminating deployment complexity:
 
-### Backend Available (Development/Full Deployment)
-- Detects backend server via `/api/health` endpoint
-- Uses local backend APIs: `/api/countries`, `/api/states`, `/api/cities`
-- Backend proxies requests to external APIs
+### Geo Location APIs
+- Countries, states, and cities data: `https://geo-api-230500065838.asia-south1.run.app`
+- No backend proxy needed - frontend calls APIs directly
+- Works on any deployment domain without configuration
 
-### Backend Not Available (Frontend-Only Deployment)
-- Automatically detects missing backend server
-- Falls back to direct external API calls
-- Calls `https://geo-api-230500065838.asia-south1.run.app` directly
-
-### Default Behavior
-If environment variables are not set:
-- **User API calls** will use `window.location.origin` (current domain)
-- **Geo API calls** will automatically detect and use appropriate endpoints
-- **Zero configuration needed** for most deployments
+### User APIs  
+- User authentication and profile data uses configurable base URL
+- Defaults to current domain origin if not configured
+- Set `VITE_API_BASE_URL` for external user APIs
 
 ## Deployment Examples
 
@@ -85,6 +79,6 @@ VITE_API_BASE_URL=https://external-api.com
 ## Files Changed
 - `client/src/lib/firebase.ts` - Now uses `VITE_API_BASE_URL` or current domain  
 - `client/src/lib/userApi.ts` - Now uses `VITE_API_BASE_URL` or current domain  
-- `client/src/lib/apiClient.ts` - **NEW**: Smart API detection and fallback logic
-- `client/src/pages/basic-info.tsx` - Now uses smart API client
-- `client/src/pages/profile.tsx` - Now uses smart API client
+- `client/src/pages/basic-info.tsx` - Now calls geo APIs directly
+- `client/src/pages/profile.tsx` - Now calls geo APIs directly
+- Removed complex API detection logic - **simple direct calls work better**
