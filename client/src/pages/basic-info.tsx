@@ -20,6 +20,7 @@ import { userApiService } from '../lib/userApi';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult, PhoneAuthProvider, linkWithCredential } from 'firebase/auth';
+import { apiClient } from '../lib/apiClient';
 
 // Geo API base URL - configurable via environment variables
 const GEO_API_BASE_URL = import.meta.env.VITE_GEO_API_BASE_URL || window.location.origin;
@@ -395,7 +396,7 @@ export function BasicInfoPage() {
   const loadCountries = async () => {
     try {
       setLoadingLocations(true);
-      const response = await fetch('/api/countries');
+      const response = await apiClient.smartFetch('/api/countries');
       
       if (response.ok) {
         const data = await response.json();
@@ -418,7 +419,7 @@ export function BasicInfoPage() {
   const loadStates = async (countryCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await fetch(`/api/states?country_code=${countryCode}`);
+      const response = await apiClient.smartFetch(`/api/states?country_code=${countryCode}`);
       
       if (response.ok) {
         const data = await response.json();
@@ -442,7 +443,7 @@ export function BasicInfoPage() {
   const loadCities = async (countryCode: string, stateCode: string) => {
     try {
       setLoadingLocations(true);
-      const response = await fetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
+      const response = await apiClient.smartFetch(`/api/cities?country_code=${countryCode}&state_code=${stateCode}`);
       
       if (response.ok) {
         const data = await response.json();

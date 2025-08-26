@@ -27,12 +27,25 @@ This application is designed to be deployed to any domain without code changes. 
 - `VITE_API_BASE_URL`: Backend API base URL (defaults to current domain origin)
 - `VITE_GEO_API_BASE_URL`: Geo API base URL (defaults to current domain origin)
 
-## Default Behavior
+## Smart API Detection (NEW)
 
+The application now includes **smart API detection** that automatically handles deployment scenarios:
+
+### Backend Available (Development/Full Deployment)
+- Detects backend server via `/api/health` endpoint
+- Uses local backend APIs: `/api/countries`, `/api/states`, `/api/cities`
+- Backend proxies requests to external APIs
+
+### Backend Not Available (Frontend-Only Deployment)
+- Automatically detects missing backend server
+- Falls back to direct external API calls
+- Calls `https://geo-api-230500065838.asia-south1.run.app` directly
+
+### Default Behavior
 If environment variables are not set:
-- **API calls** will use `window.location.origin` (current domain)
-- **Relative API calls** (like `/api/countries`) will work on any domain
-- **External API calls** will also default to the current domain
+- **User API calls** will use `window.location.origin` (current domain)
+- **Geo API calls** will automatically detect and use appropriate endpoints
+- **Zero configuration needed** for most deployments
 
 ## Deployment Examples
 
@@ -63,7 +76,15 @@ VITE_API_BASE_URL=https://external-api.com
 ### Issue: Firebase authentication not working  
 **Solution**: Verify Firebase environment variables are set correctly and Firebase project allows your domain.
 
-## Previous Hardcoded URLs (Now Fixed)
-✅ `client/src/lib/firebase.ts` - Now uses `VITE_API_BASE_URL` or current domain  
-✅ `client/src/lib/userApi.ts` - Now uses `VITE_API_BASE_URL` or current domain  
-✅ `client/src/pages/basic-info.tsx` - Now uses `VITE_GEO_API_BASE_URL` or current domain
+## Previous Issues (Now Fixed)
+✅ **Hardcoded API URLs** - All external URLs now configurable via environment variables  
+✅ **Smart API Detection** - App automatically detects backend availability and chooses appropriate endpoints  
+✅ **Deployment Portability** - Works on any domain without code changes  
+✅ **Zero Configuration** - Frontend-only deployments work out of the box
+
+## Files Changed
+- `client/src/lib/firebase.ts` - Now uses `VITE_API_BASE_URL` or current domain  
+- `client/src/lib/userApi.ts` - Now uses `VITE_API_BASE_URL` or current domain  
+- `client/src/lib/apiClient.ts` - **NEW**: Smart API detection and fallback logic
+- `client/src/pages/basic-info.tsx` - Now uses smart API client
+- `client/src/pages/profile.tsx` - Now uses smart API client
