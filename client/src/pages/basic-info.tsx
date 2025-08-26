@@ -21,7 +21,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult, PhoneAuthProvider, linkWithCredential } from 'firebase/auth';
 
-const GEO_API_BASE_URL = 'https://geo-api-230500065838.asia-south1.run.app';
+// Geo API base URL - configurable via environment variables
+const GEO_API_BASE_URL = import.meta.env.VITE_GEO_API_BASE_URL || window.location.origin;
 
 const JOB_TITLES = [
   'Architect',

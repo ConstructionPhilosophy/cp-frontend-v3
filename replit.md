@@ -17,11 +17,20 @@ Preferred communication style: Simple, everyday language.
 ## Frontend Architecture
 The frontend is built with React 18 and TypeScript, employing a component-based architecture. It uses Tailwind CSS with a custom design system for styling, Radix UI primitives and custom shadcn/ui components for consistent and accessible UI elements, and Wouter for client-side routing. State management relies on native React state with the Fetch API for data interactions. Vite is used for fast development and optimized production builds. The design features a three-column layout (left sidebar for navigation, main content for Q&A, right sidebar for user stats) with mobile responsiveness handled via a bottom navigation bar and responsive grids. Custom UI components such as a date picker and country code selector are implemented to match precise design specifications.
 
+### Deployment Portability
+**CRITICAL UPDATE (2025-01-24)**: The application is now fully deployment-portable across different domains. All hardcoded API URLs have been replaced with environment-configurable URLs that default to `window.location.origin`, ensuring the app works on any domain without code changes.
+
 ## Backend Architecture
 The backend uses Node.js with the Express.js framework, written in TypeScript. It follows a RESTful API pattern for managing users, security assessments, recommendations, and metrics. It includes centralized error handling. Currently, it utilizes an in-memory storage system with sample data, abstracted via an `IStorage` interface. The system is designed for easy migration to a persistent database.
 
 ## Data Storage
 Currently, an in-memory storage system is used with realistic sample data. It employs a repository pattern with the `IStorage` interface and uses strong TypeScript typing for entities like `User`, `SecurityAssessment`, `SecurityRecommendation`, and `SecurityMetric`. Zod schemas are used for runtime validation of API inputs. The architecture is prepared for a PostgreSQL migration using Drizzle ORM.
+
+## API Configuration
+The application uses configurable API endpoints via environment variables:
+- `VITE_API_BASE_URL`: Main backend API (defaults to current domain)
+- `VITE_GEO_API_BASE_URL`: Geolocation API (defaults to current domain)
+- If environment variables are not set, both APIs default to `window.location.origin` for maximum deployment portability.
 
 # External Dependencies
 

@@ -34,8 +34,8 @@ const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope('email');
 googleProvider.addScope('profile');
 
-// External API base URL
-const API_BASE_URL = 'https://cp-backend-service-test-972540571952.asia-south1.run.app';
+// External API base URL - configurable via environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 
 // Call external signup API with FormData
 const callExternalSignupAPI = async (userData: {

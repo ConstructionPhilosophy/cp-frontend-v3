@@ -1,7 +1,7 @@
 import { auth } from "./firebase";
 
-const API_BASE_URL =
-  "https://cp-backend-service-test-972540571952.asia-south1.run.app";
+// API base URL - configurable via environment variables
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || window.location.origin;
 
 export interface UserProfile {
   uid: string;
