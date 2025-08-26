@@ -93,56 +93,27 @@ app.use((req, res, next) => {
   });
 });
 
-// Deployment-ready server configuration
-// Force port 80 for production deployment (autoscale requirement), ignore PORT env var in production
+// Simplified deployment-ready server configuration
+// Let autoscale manage the PORT automatically, only override for development
 const isProduction = process.env.NODE_ENV === 'production';
-const isDeployment = process.env.REPLIT_DEPLOYMENT === 'true';
-const PORT = isProduction || isDeployment 
-  ? 80 
-  : parseInt(process.env.PORT || '5000', 10);
+const isDeployment = process.env.REPLIT_DEPLOYMENT === '1';
+const PORT = parseInt(process.env.PORT || (isProduction || isDeployment ? '80' : '5000'), 10);
 
-console.log(`Starting server on port ${PORT}...`);
-console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-console.log(`Replit Deployment: ${process.env.REPLIT_DEPLOYMENT || 'false'}`);
-console.log(`Port from env: ${process.env.PORT || 'not set'}`);
-console.log(`Is Production: ${isProduction}`);
-console.log(`Is Deployment: ${isDeployment}`);
-if ((isProduction || isDeployment) && process.env.PORT && process.env.PORT !== '80') {
-  console.log(`🔧 Overriding PORT env var (${process.env.PORT}) with port 80 for autoscale deployment`);
-}
-console.log(`Final PORT: ${PORT} ${isProduction || isDeployment ? '(autoscale requirement)' : '(development)'}`);
-console.log(`Node version: ${process.version}`);
-console.log(`Available memory: ${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB`);
+console.log(`Server starting on port ${PORT} [${process.env.NODE_ENV || 'development'}]`);
+if (isDeployment) console.log(`Autoscale deployment detected (REPLIT_DEPLOYMENT=${process.env.REPLIT_DEPLOYMENT})`);
+if (isProduction) console.log(`Production environment detected`);
 
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on 0.0.0.0:${PORT}`);
 });
 
 server.on('error', (error: any) => {
-  console.error('Server error:', error);
-  console.error(`Error details: code=${error.code}, errno=${error.errno}, syscall=${error.syscall}`);
-  
+  console.error(`Server failed to start on port ${PORT}: ${error.code || error.message}`);
   if (error.code === 'EADDRINUSE') {
-    console.error(`Port ${PORT} is already in use. Please use a different port.`);
-    console.error(`For autoscale deployment, ensure the server binds to port 80.`);
+    console.error(`Port ${PORT} already in use`);
   } else if (error.code === 'EACCES') {
-    console.error(`Permission denied to bind to port ${PORT}.`);
-    if (PORT < 1024) {
-      console.error(`Port ${PORT} requires elevated privileges. For production deployment, this should be handled by the platform.`);
-    }
-  } else if (error.code === 'ENOTFOUND') {
-    console.error(`Unable to bind to address 0.0.0.0. Check network configuration.`);
-  } else {
-    console.error(`Unexpected server error: ${error.message}`);
+    console.error(`Permission denied for port ${PORT}`);
   }
-  
-  // Log environment context for debugging
-  console.error(`Environment context:`);
-  console.error(`- NODE_ENV: ${process.env.NODE_ENV || 'not set'}`);
-  console.error(`- REPLIT_DEPLOYMENT: ${process.env.REPLIT_DEPLOYMENT || 'not set'}`);
-  console.error(`- PORT: ${process.env.PORT || 'not set'}`);
-  console.error(`- Calculated PORT: ${PORT}`);
-  
   process.exit(1);
 });
 
