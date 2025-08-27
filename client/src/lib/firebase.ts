@@ -19,10 +19,15 @@ import { getStorage } from "firebase/storage";
 // Debug Firebase configuration (remove these console.logs in production)
 if (import.meta.env.DEV) {
   console.log('🔥 Firebase Configuration Debug:');
-  console.log('API Key:', import.meta.env.VITE_FIREBASE_API_KEY ? '✅ Set' : '❌ Missing');
+  console.log('API Key:', import.meta.env.VITE_FIREBASE_API_KEY ? 
+    `✅ Set (${import.meta.env.VITE_FIREBASE_API_KEY.substring(0, 10)}...)` : 
+    '❌ Missing');
   console.log('Project ID:', import.meta.env.VITE_FIREBASE_PROJECT_ID || '❌ Missing');
-  console.log('App ID:', import.meta.env.VITE_FIREBASE_APP_ID ? '✅ Set' : '❌ Missing');
+  console.log('App ID:', import.meta.env.VITE_FIREBASE_APP_ID ? 
+    `✅ Set (${import.meta.env.VITE_FIREBASE_APP_ID.substring(0, 15)}...)` : 
+    '❌ Missing');
   console.log('Auth Domain:', `${import.meta.env.VITE_FIREBASE_PROJECT_ID || 'MISSING'}.firebaseapp.com`);
+  console.log('Full Config:', firebaseConfig);
 }
 
 const firebaseConfig = {
