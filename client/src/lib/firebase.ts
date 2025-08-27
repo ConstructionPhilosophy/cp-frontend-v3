@@ -16,6 +16,15 @@ import {
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app`,
+  messagingSenderId: '972540571952',
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+};
+
 // Debug Firebase configuration (remove these console.logs in production)
 if (import.meta.env.DEV) {
   console.log('🔥 Firebase Configuration Debug:');
@@ -29,15 +38,6 @@ if (import.meta.env.DEV) {
   console.log('Auth Domain:', `${import.meta.env.VITE_FIREBASE_PROJECT_ID || 'MISSING'}.firebaseapp.com`);
   console.log('Full Config:', firebaseConfig);
 }
-
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app`,
-  messagingSenderId: '972540571952',
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-};
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
