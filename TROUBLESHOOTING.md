@@ -2,6 +2,9 @@
 
 ## Firebase Configuration Issues
 
+### Important: Replit vs Local Development
+**Key Difference**: Replit uses "Secrets" (environment variables set in the platform), while local development uses `.env` files. The debugging you saw was from the Replit environment, not your local setup.
+
 ### 1. Environment Variables Not Loading
 **Problem**: Your .env changes aren't reflecting, or you're getting "invalid key" errors.
 
@@ -26,6 +29,11 @@ VITE_API_BASE_URL=https://cp-backend-service-test-972540571952.asia-south1.run.a
   1. Stop the dev server (Ctrl+C)
   2. Run `npm run dev` again
   3. Vite must be restarted to pick up new environment variables
+
+#### D. Vite Environment Variable Loading
+- **Critical**: Vite only loads .env files from the project root during startup
+- **Check**: Make sure you're running `npm run dev` from the same directory as your .env file
+- **Verify**: Add `console.log('ENV CHECK:', import.meta.env.VITE_FIREBASE_API_KEY)` temporarily to see if variables load
 
 #### D. Common Firebase Configuration Mistakes
 1. **Missing quotes**: Don't wrap values in quotes in .env file
