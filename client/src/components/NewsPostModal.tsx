@@ -7,11 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { 
   X, 
   Image as ImageIcon, 
-  Calendar,
-  FileText,
-  Plus,
-  Smile,
-  Sparkles
+  Smile
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useToast } from "../hooks/use-toast";
@@ -126,22 +122,23 @@ export default function NewsPostModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-hidden p-0">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-hidden p-0" aria-describedby="news-post-modal">
         {/* Header */}
-        <DialogHeader className="px-6 py-4 border-b">
+        <DialogHeader className="px-4 py-3 border-b">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Avatar className="w-10 h-10">
                 <AvatarImage src={user?.photoURL || ""} />
                 <AvatarFallback>
-                  {user?.displayName?.charAt(0) || user?.email?.charAt(0) || "U"}
+                  {user?.displayName?.split(' ').map(n => n[0]).join('') || 
+                   user?.email?.charAt(0)?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <DialogTitle className="text-base font-semibold">
-                  {user?.displayName || user?.email || "User"}
+                <DialogTitle className="text-sm font-medium">
+                  {user?.displayName || "User"}
                 </DialogTitle>
-                <p className="text-sm text-gray-600">Post to Anyone</p>
+                <p className="text-xs text-gray-600">Post to Anyone</p>
               </div>
             </div>
             <Button
@@ -149,7 +146,7 @@ export default function NewsPostModal({
               size="sm"
               onClick={handleClose}
               disabled={isPosting}
-              className="h-8 w-8 p-0"
+              className="h-6 w-6 p-0"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -157,14 +154,14 @@ export default function NewsPostModal({
         </DialogHeader>
 
         {/* Content */}
-        <div className="px-6 py-4 flex-1 overflow-y-auto">
-          <div className="space-y-4">
+        <div className="px-4 py-3 flex-1 overflow-y-auto">
+          <div className="space-y-3">
             {/* Headline */}
             <Input
               placeholder="Add a headline..."
               value={headline}
               onChange={(e) => setHeadline(e.target.value)}
-              className="text-lg font-medium border-none px-0 shadow-none focus-visible:ring-0"
+              className="text-sm font-medium border-none px-0 shadow-none focus-visible:ring-0 placeholder:text-sm"
               disabled={isPosting}
               data-testid="input-modal-headline"
             />
@@ -174,7 +171,7 @@ export default function NewsPostModal({
               placeholder="What do you want to talk about?"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="min-h-[120px] resize-none border-none px-0 shadow-none focus-visible:ring-0 text-base"
+              className="min-h-[120px] resize-none border-none px-0 shadow-none focus-visible:ring-0 text-sm placeholder:text-sm"
               disabled={isPosting}
               data-testid="textarea-modal-content"
             />
@@ -207,18 +204,18 @@ export default function NewsPostModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t">
+        <div className="px-4 py-3 border-t">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-gray-600 hover:text-gray-800 p-2"
+                className="text-gray-600 hover:text-gray-800 p-1.5"
                 disabled={isPosting}
                 onClick={() => document.getElementById('image-upload')?.click()}
                 data-testid="button-add-images"
               >
-                <ImageIcon className="w-5 h-5" />
+                <ImageIcon className="w-4 h-4" />
               </Button>
               <input
                 id="image-upload"
@@ -229,46 +226,22 @@ export default function NewsPostModal({
                 className="hidden"
                 disabled={isPosting}
               />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-gray-800 p-2"
-                disabled={isPosting}
-              >
-                <Calendar className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-gray-800 p-2"
-                disabled={isPosting}
-              >
-                <FileText className="w-5 h-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-600 hover:text-gray-800 p-2"
-                disabled={isPosting}
-              >
-                <Plus className="w-5 h-5" />
-              </Button>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-gray-600 hover:text-gray-800 p-2"
+                className="text-gray-600 hover:text-gray-800 p-1.5"
                 disabled={isPosting}
               >
-                <Smile className="w-5 h-5" />
+                <Smile className="w-4 h-4" />
               </Button>
               <Button
                 onClick={handlePost}
                 disabled={!headline.trim() || !content.trim() || isPosting}
                 size="sm"
-                className="px-4"
+                className="px-3 py-1.5 text-sm"
                 data-testid="button-modal-post"
               >
                 {isPosting ? "Posting..." : "Post"}
