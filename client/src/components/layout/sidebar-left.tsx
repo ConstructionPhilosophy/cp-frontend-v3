@@ -1,8 +1,9 @@
 import React from "react";
-import { Search, Plus } from "lucide-react";
+import { Search, Plus, TrendingUp } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
+import { Link } from "wouter";
 
 export default function SidebarLeft() {
   return (
@@ -48,6 +49,25 @@ export default function SidebarLeft() {
           <Button variant="link" className="w-full justify-start text-cmo-primary hover:underline p-0">
             Ask Question
           </Button>
+        </div>
+      </div>
+
+      {/* Employer Dashboard Section */}
+      <div className="bg-cmo-card rounded-lg border border-cmo-border p-6">
+        <h3 className="font-semibold text-cmo-text-primary mb-4">For Employers</h3>
+        <div className="space-y-3">
+          <Link href="/employer-dashboard">
+            <Button variant="ghost" className="w-full justify-start py-2 h-auto">
+              <TrendingUp className="h-4 w-4 text-cmo-primary mr-3" />
+              <span>Employer Dashboard</span>
+            </Button>
+          </Link>
+          <Link href="/post-job">
+            <Button variant="ghost" className="w-full justify-start py-2 h-auto">
+              <Plus className="h-4 w-4 text-cmo-primary mr-3" />
+              <span>Post a Job</span>
+            </Button>
+          </Link>
         </div>
       </div>
 
