@@ -187,11 +187,11 @@ This innovation represents a significant step forward in sustainable constructio
           {/* Left Side - News Content (60%) */}
           <div className={`${isMobile ? 'col-span-1' : 'col-span-6'}`}>
             <Card>
-              <CardContent className="p-6">
+              <CardContent className="p-4">
                 {/* Author Header */}
-                <div className="flex items-start justify-between mb-6">
+                <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3">
-                    <Avatar className="w-12 h-12">
+                    <Avatar className="w-10 h-10">
                       <AvatarImage src={newsPost.authorProfilePic} />
                       <AvatarFallback className="bg-cmo-primary text-white">
                         {newsPost.authorName?.split(' ').map(n => n[0]).join('') || 
@@ -199,16 +199,16 @@ This innovation represents a significant step forward in sustainable constructio
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-semibold text-cmo-text-primary">
+                      <h3 className="font-medium text-sm text-cmo-text-primary">
                         {newsPost.authorName || "News Reporter"}
                       </h3>
                       {newsPost.authorTitle && (
-                        <p className="text-sm text-cmo-text-secondary">
+                        <p className="text-xs text-cmo-text-secondary">
                           {newsPost.authorTitle}
                         </p>
                       )}
-                      <div className="flex items-center text-sm text-cmo-text-secondary mt-1">
-                        <Calendar className="w-4 h-4 mr-1" />
+                      <div className="flex items-center text-xs text-cmo-text-secondary mt-1">
+                        <Calendar className="w-3 h-3 mr-1" />
                         {formatTimeAgo(newsPost.createdTime)}
                       </div>
                     </div>
@@ -233,22 +233,22 @@ This innovation represents a significant step forward in sustainable constructio
                 </div>
 
                 {/* Headline */}
-                <h1 className="text-2xl font-bold text-cmo-text-primary mb-4">
+                <h1 className="text-lg font-semibold text-cmo-text-primary mb-4">
                   {newsPost.headline}
                 </h1>
 
                 {/* Images */}
                 {(newsPost.imageUrls || newsPost.imageUrl) && (
-                  <div className="mb-6">
+                  <div className="mb-4">
                     {newsPost.imageUrls && newsPost.imageUrls.length > 1 ? (
-                      <div className="grid grid-cols-2 gap-2 rounded-lg overflow-hidden">
+                      <div className="grid grid-cols-2 gap-1 rounded-lg overflow-hidden">
                         {newsPost.imageUrls.map((imageUrl, index) => (
                           <img
                             key={index}
                             src={imageUrl}
                             alt={`${newsPost.headline} - Image ${index + 1}`}
                             className={`w-full object-cover ${
-                              newsPost.imageUrls!.length === 2 ? 'h-64' : 'h-48'
+                              newsPost.imageUrls!.length === 2 ? 'h-48' : 'h-32'
                             }`}
                             onError={(e) => {
                               e.currentTarget.style.display = "none";
@@ -260,7 +260,7 @@ This innovation represents a significant step forward in sustainable constructio
                       <img
                         src={newsPost.imageUrls?.[0] || newsPost.imageUrl}
                         alt={newsPost.headline}
-                        className="w-full h-80 object-cover rounded-lg"
+                        className="w-full h-64 object-cover rounded-lg"
                         onError={(e) => {
                           e.currentTarget.style.display = "none";
                         }}
@@ -270,68 +270,68 @@ This innovation represents a significant step forward in sustainable constructio
                 )}
 
                 {/* Content */}
-                <div className="prose max-w-none mb-6">
+                <div className="mb-4">
                   {newsPost.content.split('\n').map((paragraph, index) => (
-                    <p key={index} className="text-cmo-text-primary mb-4 leading-relaxed">
+                    <p key={index} className="text-sm text-cmo-text-primary mb-3 leading-relaxed">
                       {paragraph}
                     </p>
                   ))}
                 </div>
 
                 {/* Engagement Stats */}
-                <div className="flex items-center justify-between text-sm text-cmo-text-secondary mb-4">
+                <div className="flex items-center justify-between text-sm text-cmo-text-secondary mb-3">
                   <div className="flex items-center space-x-4">
                     {likeCount > 0 && (
                       <div className="flex items-center">
-                        <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center mr-2">
-                          <ThumbsUp className="w-3 h-3 text-white fill-current" />
+                        <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+                          <ThumbsUp className="w-2 h-2 text-white fill-current" />
                         </div>
-                        <span className="text-sm">{likeCount}</span>
+                        <span className="text-xs">{likeCount}</span>
                       </div>
                     )}
                   </div>
                   {newsPost.commentCount > 0 && (
-                    <span className="text-sm">
+                    <span className="text-xs">
                       {newsPost.commentCount} comment{newsPost.commentCount > 1 ? "s" : ""}
                     </span>
                   )}
                 </div>
 
-                <Separator className="mb-4" />
+                <Separator className="mb-3" />
 
                 {/* Action Buttons */}
                 <div className="flex items-center justify-between">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex-1 hover:bg-gray-50 py-3 ${
+                    className={`flex-1 hover:bg-gray-50 py-2 ${
                       isLiked ? 'text-blue-600' : 'text-cmo-text-secondary'
                     }`}
                     onClick={handleLikePost}
                     data-testid={`button-like-${newsPost.id}`}
                   >
-                    <ThumbsUp className="w-4 h-4 mr-2" />
-                    <span className="text-sm">Like</span>
+                    <ThumbsUp className="w-4 h-4 mr-1" />
+                    <span className="text-xs">Like</span>
                   </Button>
                   
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-1 hover:bg-gray-50 text-cmo-text-secondary py-3"
+                    className="flex-1 hover:bg-gray-50 text-cmo-text-secondary py-2"
                     data-testid={`button-share-${newsPost.id}`}
                   >
-                    <Share2 className="w-4 h-4 mr-2" />
-                    <span className="text-sm">Share</span>
+                    <Share2 className="w-4 h-4 mr-1" />
+                    <span className="text-xs">Share</span>
                   </Button>
                   
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex-1 hover:bg-gray-50 text-cmo-text-secondary py-3"
+                    className="flex-1 hover:bg-gray-50 text-cmo-text-secondary py-2"
                     data-testid={`button-save-${newsPost.id}`}
                   >
-                    <Bookmark className="w-4 h-4 mr-2" />
-                    <span className="text-sm">Save</span>
+                    <Bookmark className="w-4 h-4 mr-1" />
+                    <span className="text-xs">Save</span>
                   </Button>
                 </div>
               </CardContent>
@@ -341,8 +341,8 @@ This innovation represents a significant step forward in sustainable constructio
           {/* Right Side - Comments (40%) */}
           <div className={`${isMobile ? 'col-span-1' : 'col-span-4'}`}>
             <Card className="h-full">
-              <CardContent className="p-6 h-full flex flex-col">
-                <h2 className="text-lg font-semibold text-cmo-text-primary mb-4">
+              <CardContent className="p-4 h-full flex flex-col">
+                <h2 className="text-sm font-semibold text-cmo-text-primary mb-4">
                   Comments ({newsPost.commentCount})
                 </h2>
                 
