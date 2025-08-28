@@ -135,7 +135,9 @@ const JobsPage = () => {
     return `${Math.floor(diffDays / 30)} months ago`;
   };
 
-  const getJobTypeColor = (type: string) => {
+  const getJobTypeColor = (type?: string) => {
+    if (!type) return 'bg-green-100 text-green-700 border-green-200'; // Default to full-time styling
+    
     switch (type) {
       case 'full-time': return 'bg-green-100 text-green-700 border-green-200';
       case 'part-time': return 'bg-blue-100 text-blue-700 border-blue-200';
@@ -336,15 +338,15 @@ const JobsPage = () => {
                       <div className="flex flex-wrap items-center gap-4 mb-3 text-sm text-cmo-text-secondary">
                         <div className="flex items-center">
                           <MapPin className="w-4 h-4 mr-1" />
-                          {job.location}
+                          {job.location || 'Location not specified'}
                         </div>
                         <div className="flex items-center">
                           <Clock className="w-4 h-4 mr-1" />
-                          {job.experience}
+                          {job.experience || 'Not specified'}
                         </div>
                         <div className="flex items-center">
                           <Calendar className="w-4 h-4 mr-1" />
-                          {formatDate(job.postedAt)}
+                          {job.postedAt ? formatDate(job.postedAt) : 'Recently posted'}
                         </div>
                       </div>
 
@@ -353,15 +355,15 @@ const JobsPage = () => {
                           variant="outline" 
                           className={getJobTypeColor(job.type)}
                         >
-                          {job.type.replace('-', ' ').toUpperCase()}
+                          {job.type ? job.type.replace('-', ' ').toUpperCase() : 'FULL TIME'}
                         </Badge>
                         <span className="text-lg font-semibold text-cmo-primary">
-                          {job.salaryRange}
+                          {job.salaryRange || 'Salary not disclosed'}
                         </span>
                       </div>
 
                       <p className="text-cmo-text-secondary text-sm mb-3 line-clamp-2">
-                        {job.description}
+                        {job.description || 'No description available'}
                       </p>
 
                       <div className="flex flex-wrap gap-1 mb-3">
@@ -468,7 +470,7 @@ const JobsPage = () => {
                       {selectedJob.salaryRange}
                     </div>
                     <Badge className={getJobTypeColor(selectedJob.type)}>
-                      {selectedJob.type.replace('-', ' ').toUpperCase()}
+                      {selectedJob.type ? selectedJob.type.replace('-', ' ').toUpperCase() : 'FULL TIME'}
                     </Badge>
                   </div>
                 </div>
