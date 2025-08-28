@@ -56,8 +56,10 @@ const JobsPage = () => {
 
   // Fetch jobs from API
   useEffect(() => {
-    fetchJobs();
-  }, []);
+    if (user) {
+      fetchJobs();
+    }
+  }, [user]);
 
   const fetchJobs = async () => {
     try {
@@ -93,19 +95,24 @@ const JobsPage = () => {
 
   // Filter jobs based on search criteria
   useEffect(() => {
+    if (!jobs || !Array.isArray(jobs)) {
+      setFilteredJobs([]);
+      return;
+    }
+
     let filtered = jobs;
 
     if (searchTerm) {
       filtered = filtered.filter(job => 
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        job.company.toLowerCase().includes(searchTerm.toLowerCase())
+        job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.skills && Array.isArray(job.skills) && job.skills.some(skill => skill?.toLowerCase().includes(searchTerm.toLowerCase()))) ||
+        job.company?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (locationFilter) {
       filtered = filtered.filter(job => 
-        job.location.toLowerCase().includes(locationFilter.toLowerCase())
+        job.location?.toLowerCase().includes(locationFilter.toLowerCase())
       );
     }
 
@@ -286,7 +293,7 @@ const JobsPage = () => {
                 {/* Job Results Header */}
                 <div className="mb-4">
                   <h1 className="text-xl font-semibold text-cmo-text-primary">
-                    {filteredJobs.length} Job{filteredJobs.length !== 1 ? 's' : ''} Found
+                    {filteredJobs?.length || 0} Job{(filteredJobs?.length || 0) !== 1 ? 's' : ''} Found
                   </h1>
                   <p className="text-sm text-cmo-text-secondary">
                     Showing results for construction industry professionals
@@ -295,7 +302,7 @@ const JobsPage = () => {
 
                 {/* Jobs List */}
                 <div className="space-y-4">
-                  {filteredJobs.map((job) => (
+                  {filteredJobs && filteredJobs.length > 0 ? filteredJobs.map((job) => (
                     <div 
                       key={job.jobId}
                       className="bg-white rounded-lg border border-cmo-border p-4 hover:border-cmo-primary transition-colors cursor-pointer"
@@ -358,12 +365,12 @@ const JobsPage = () => {
                       </p>
 
                       <div className="flex flex-wrap gap-1 mb-3">
-                        {job.skills.slice(0, 4).map((skill) => (
+                        {job.skills && Array.isArray(job.skills) && job.skills.slice(0, 4).map((skill) => (
                           <Badge key={skill} variant="secondary" className="text-xs">
                             {skill}
                           </Badge>
                         ))}
-                        {job.skills.length > 4 && (
+                        {job.skills && job.skills.length > 4 && (
                           <Badge variant="secondary" className="text-xs">
                             +{job.skills.length - 4} more
                           </Badge>
@@ -374,11 +381,11 @@ const JobsPage = () => {
                         <div className="flex items-center space-x-4 text-xs text-cmo-text-secondary">
                           <div className="flex items-center">
                             <Eye className="w-3 h-3 mr-1" />
-                            {job.totalViews} views
+                            {job.totalViews || 0} views
                           </div>
                           <div className="flex items-center">
                             <Users className="w-3 h-3 mr-1" />
-                            {job.totalApplications} applications
+                            {job.totalApplications || 0} applications
                           </div>
                         </div>
                         {job.alreadyApplied ? (
@@ -399,18 +406,23 @@ const JobsPage = () => {
                         )}
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="text-center py-12">
+                      <Briefcase className="w-16 h-16 text-cmo-text-secondary mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-cmo-text-primary mb-2">
+                        No Jobs Found
+                      </h3>
+                      <p className="text-cmo-text-secondary">
+                        Try adjusting your search criteria or filters
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                {filteredJobs.length === 0 && (
+                {loading && (
                   <div className="text-center py-12">
-                    <Briefcase className="w-16 h-16 text-cmo-text-secondary mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-cmo-text-primary mb-2">
-                      No Jobs Found
-                    </h3>
-                    <p className="text-cmo-text-secondary">
-                      Try adjusting your search criteria or filters
-                    </p>
+                    <div className="animate-spin w-8 h-8 border-4 border-cmo-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+                    <p className="text-cmo-text-secondary">Loading jobs...</p>
                   </div>
                 )}
               </div>
