@@ -74,38 +74,54 @@ export default function Header() {
 
           {/* Navigation Menu with Icons */}
           <nav className="hidden lg:flex items-center space-x-6">
-            <a href="/" className="flex flex-col items-center text-cmo-primary">
-              <Home className="w-5 h-5" />
-              <span className="text-xs mt-1">Home</span>
-            </a>
-            <a href="/news" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-              <FileText className="w-5 h-5" />
-              <span className="text-xs mt-1">News</span>
-            </a>
-            <a href="/articles" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-              <FileText className="w-5 h-5" />
-              <span className="text-xs mt-1">Articles</span>
-            </a>
-            <a href="/jobs" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-              <Briefcase className="w-5 h-5" />
-              <span className="text-xs mt-1">Jobs</span>
-            </a>
-            <a href="/employer-dashboard" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-              <TrendingUp className="w-5 h-5" />
-              <span className="text-xs mt-1">Dashboard</span>
-            </a>
-            <a href="/forum" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-              <Users className="w-5 h-5" />
-              <span className="text-xs mt-1">Forum</span>
-            </a>
-            <a href="/messages" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-              <MessageSquare className="w-5 h-5" />
-              <span className="text-xs mt-1">Messages</span>
-            </a>
-            <a href="/updates" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-              <RefreshCw className="w-5 h-5" />
-              <span className="text-xs mt-1">Updates</span>
-            </a>
+            <Link href="/">
+              <a className="flex flex-col items-center text-cmo-primary">
+                <Home className="w-5 h-5" />
+                <span className="text-xs mt-1">Home</span>
+              </a>
+            </Link>
+            <Link href="/news">
+              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+                <FileText className="w-5 h-5" />
+                <span className="text-xs mt-1">News</span>
+              </a>
+            </Link>
+            <Link href="/articles">
+              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+                <FileText className="w-5 h-5" />
+                <span className="text-xs mt-1">Articles</span>
+              </a>
+            </Link>
+            <Link href="/jobs">
+              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+                <Briefcase className="w-5 h-5" />
+                <span className="text-xs mt-1">Jobs</span>
+              </a>
+            </Link>
+            <Link href="/employer-dashboard">
+              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+                <TrendingUp className="w-5 h-5" />
+                <span className="text-xs mt-1">Dashboard</span>
+              </a>
+            </Link>
+            <Link href="/forum">
+              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+                <Users className="w-5 h-5" />
+                <span className="text-xs mt-1">Forum</span>
+              </a>
+            </Link>
+            <Link href="/messages">
+              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+                <MessageSquare className="w-5 h-5" />
+                <span className="text-xs mt-1">Messages</span>
+              </a>
+            </Link>
+            <Link href="/updates">
+              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+                <RefreshCw className="w-5 h-5" />
+                <span className="text-xs mt-1">Updates</span>
+              </a>
+            </Link>
 
           </nav>
 
