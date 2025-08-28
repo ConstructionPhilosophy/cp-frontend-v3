@@ -269,6 +269,7 @@ export const useBlockUser = () => {
   const blockUser = useCallback(async (targetUid: string): Promise<void> => {
     if (!auth.currentUser) throw new Error('Not authenticated');
     
+    if (!auth.currentUser?.uid) throw new Error('User not authenticated');
     await setDoc(doc(firestore, 'users', auth.currentUser.uid, 'blockedUsers', targetUid), {
       blockedAt: serverTimestamp()
     });
@@ -277,6 +278,7 @@ export const useBlockUser = () => {
   const unblockUser = useCallback(async (targetUid: string): Promise<void> => {
     if (!auth.currentUser) throw new Error('Not authenticated');
     
+    if (!auth.currentUser?.uid) throw new Error('User not authenticated');
     await deleteDoc(doc(firestore, 'users', auth.currentUser.uid, 'blockedUsers', targetUid));
   }, []);
 
@@ -290,7 +292,7 @@ export const useBlockingStatus = (otherUserId?: string) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth.currentUser || !otherUserId) {
+    if (!auth.currentUser?.uid || !otherUserId) {
       setLoading(false);
       return;
     }

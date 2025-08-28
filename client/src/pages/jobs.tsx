@@ -278,6 +278,11 @@ const JobsPage = () => {
 
   const handleJobClick = async (jobId: string) => {
     console.log('Job clicked:', jobId, 'Should open modal');
+    // Set selectedJob first to open modal immediately
+    const jobFromList = jobs.find(j => j.jobId === jobId);
+    if (jobFromList) {
+      setSelectedJob(jobFromList);
+    }
     console.log('Fetching job details...');
     await fetchJobDetails(jobId);
     console.log('Job details fetched, modal should be open');
@@ -629,12 +634,12 @@ const JobsPage = () => {
                     </h3>
                     <div className="flex items-center text-cmo-text-secondary text-sm mt-1">
                       <MapPin className="w-4 h-4 mr-1" />
-                      {selectedJobDetails.location}
+                      {selectedJobDetails.location || 'Location not specified'}
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-xl font-bold text-cmo-primary">
-                      {selectedJobDetails.salaryRange}
+                      {selectedJobDetails.salaryRange || 'Salary not disclosed'}
                     </div>
                     <Badge className={getJobTypeColor(selectedJobDetails.type)}>
                       {(selectedJobDetails?.type || "full-time")
@@ -652,7 +657,7 @@ const JobsPage = () => {
                       Experience Required
                     </h4>
                     <p className="text-cmo-text-secondary">
-                      {selectedJobDetails.experience}
+                      {selectedJobDetails.experience || 'Not specified'}
                     </p>
                   </div>
                   <div>
@@ -660,7 +665,7 @@ const JobsPage = () => {
                       Qualifications
                     </h4>
                     <p className="text-cmo-text-secondary">
-                      {selectedJobDetails.qualifications}
+                      {selectedJobDetails.qualifications || 'Not specified'}
                     </p>
                   </div>
                   <div>
@@ -668,8 +673,8 @@ const JobsPage = () => {
                       Vacancies
                     </h4>
                     <p className="text-cmo-text-secondary">
-                      {selectedJobDetails.numberOfVacancies} position
-                      {selectedJobDetails.numberOfVacancies > 1 ? "s" : ""}
+                      {selectedJobDetails.numberOfVacancies || 1} position
+                      {(selectedJobDetails.numberOfVacancies || 1) > 1 ? "s" : ""}
                     </p>
                   </div>
                   <div>
@@ -677,9 +682,10 @@ const JobsPage = () => {
                       Application Deadline
                     </h4>
                     <p className="text-cmo-text-secondary">
-                      {new Date(selectedJobDetails.deadline).toLocaleDateString(
-                        "en-IN",
-                      )}
+                      {selectedJobDetails.deadline ? 
+                        new Date(selectedJobDetails.deadline).toLocaleDateString("en-IN") : 
+                        'Not specified'
+                      }
                     </p>
                   </div>
                 </div>
@@ -689,7 +695,7 @@ const JobsPage = () => {
                     Required Skills
                   </h4>
                   <div className="flex flex-wrap gap-1">
-                    {selectedJobDetails.skills.map((skill) => (
+                    {(selectedJobDetails.skills || []).map((skill) => (
                       <Badge key={skill} variant="secondary">
                         {skill}
                       </Badge>
@@ -702,7 +708,7 @@ const JobsPage = () => {
                     Job Description
                   </h4>
                   <p className="text-cmo-text-secondary leading-relaxed">
-                    {selectedJobDetails.description}
+                    {selectedJobDetails.description || 'No description available'}
                   </p>
                 </div>
 
@@ -710,11 +716,11 @@ const JobsPage = () => {
                   <div className="flex space-x-4 text-sm text-cmo-text-secondary">
                     <div className="flex items-center">
                       <Eye className="w-4 h-4 mr-1" />
-                      {selectedJobDetails.totalViews} views
+                      {selectedJobDetails.totalViews || 0} views
                     </div>
                     <div className="flex items-center">
                       <Users className="w-4 h-4 mr-1" />
-                      {selectedJobDetails.totalApplications} applications
+                      {selectedJobDetails.totalApplications || 0} applications
                     </div>
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />

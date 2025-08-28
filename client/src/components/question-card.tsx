@@ -16,26 +16,26 @@ export default function QuestionCard({ question, author }: QuestionCardProps) {
       <div className="flex items-start space-x-4">
         <Avatar className="w-10 h-10 flex-shrink-0">
           <AvatarImage src={author.avatar || ""} />
-          <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
+          <AvatarFallback>{author?.name?.charAt(0) || 'U'}</AvatarFallback>
         </Avatar>
         <div className="flex-1">
           <div className="flex items-center space-x-2 mb-2">
-            <h3 className="font-medium text-sm text-cmo-text-primary">{author.name}</h3>
-            <span className="text-cmo-text-secondary text-sm">{author.title}</span>
+            <h3 className="font-medium text-sm text-cmo-text-primary">{author?.name || 'Unknown User'}</h3>
+            <span className="text-cmo-text-secondary text-sm">{author?.title || ''}</span>
             <span className="text-cmo-text-secondary text-sm">
               • {formatDistanceToNow(question.createdAt, { addSuffix: true })}
             </span>
           </div>
           <p className="text-cmo-text-secondary text-sm mb-3">
-            Asked a question • {question.category} {question.tags?.map(tag => `#${tag}`).join(' ')}
+            Asked a question • {question?.category || ''} {question?.tags?.map(tag => `#${tag}`)?.join(' ') || ''}
           </p>
           
           <h2 className="text-sm font-semibold text-cmo-text-primary mb-4">
-            {question.title}
+            {question?.title || 'Untitled Question'}
           </h2>
           
           <p className="text-xs text-cmo-text-primary mb-4">
-            {question.content}
+            {question?.content || 'No content available'}
           </p>
           
           {/* Question illustration */}
