@@ -17,6 +17,8 @@ import { MessagesPage } from "./pages/messages";
 import { ChatPage } from "./pages/chat";
 import UserProfilePage from "./pages/user-profile";
 import JobsPage from "./pages/jobs";
+import PostJobPage from "./pages/post-job";
+import JobDetailsPage from "./pages/job-details";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
@@ -128,6 +130,22 @@ function App() {
             component={() => (
               <ProtectedRoute>
                 <JobsPage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/post-job"
+            component={() => (
+              <ProtectedRoute>
+                <PostJobPage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/job/:jobId"
+            component={() => (
+              <ProtectedRoute>
+                <JobDetailsPage />
               </ProtectedRoute>
             )}
           />

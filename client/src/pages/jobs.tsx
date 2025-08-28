@@ -10,6 +10,8 @@ import Header from '../components/layout/header';
 import SidebarRight from '../components/layout/sidebar-right';
 import MobileNavigation from '../components/mobile-navigation';
 import { useIsMobile } from '../hooks/use-mobile';
+import { useAuth } from '../hooks/useAuth';
+import { useLocation } from 'wouter';
 
 interface Job {
   jobId: string;
@@ -49,82 +51,45 @@ const JobsPage = () => {
   const [typeFilter, setTypeFilter] = useState('all');
 
   const isMobile = useIsMobile();
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
 
-  // Sample data - replace with API call
+  // Fetch jobs from API
   useEffect(() => {
-    const sampleJobs: Job[] = [
-      {
-        jobId: "abc123def456",
-        title: "Senior Civil Engineer",
-        company: "BuildSmart Pvt Ltd",
-        postedBy: "userUID123",
-        description: "We are looking for an experienced civil engineer to lead major construction projects. The ideal candidate will have strong project management skills and expertise in structural design.",
-        location: "Chennai",
-        type: "full-time",
-        salaryRange: "₹8L - ₹12L",
-        skills: ["AutoCAD", "Site Management", "Project Management", "Structural Design"],
-        experience: "5+ years",
-        industry: "Construction",
-        postedAt: "2025-01-28T08:00:00Z",
-        deadline: "2025-02-28T00:00:00Z",
-        qualifications: "B.E/B.Tech in Civil Engineering",
-        numberOfVacancies: 2,
-        isOwner: false,
-        alreadyApplied: false,
-        applicationStatus: 'applied',
-        totalViews: 14,
-        totalApplications: 5
-      },
-      {
-        jobId: "xyz789abc123",
-        title: "Construction Project Manager",
-        company: "Metro Infrastructure",
-        postedBy: "userUID456",
-        description: "Leading construction company seeks experienced project manager for high-rise residential projects. Must have expertise in planning, scheduling, and team coordination.",
-        location: "Bangalore",
-        type: "full-time",
-        salaryRange: "₹12L - ₹18L",
-        skills: ["Project Management", "MS Project", "Team Leadership", "Budget Management"],
-        experience: "7+ years",
-        industry: "Construction",
-        postedAt: "2025-01-27T10:30:00Z",
-        deadline: "2025-03-15T00:00:00Z",
-        qualifications: "B.E/B.Tech with PMP certification preferred",
-        numberOfVacancies: 1,
-        isOwner: false,
-        alreadyApplied: true,
-        applicationId: "app789xyz321",
-        applicationStatus: 'applied',
-        totalViews: 28,
-        totalApplications: 12
-      },
-      {
-        jobId: "def456ghi789",
-        title: "Structural Design Engineer",
-        company: "TechBuild Solutions",
-        postedBy: "userUID789",
-        description: "Join our dynamic team as a structural design engineer. Work on innovative projects including commercial buildings, bridges, and infrastructure development.",
-        location: "Chennai",
-        type: "full-time",
-        salaryRange: "₹6L - ₹10L",
-        skills: ["STAAD Pro", "AutoCAD", "Structural Analysis", "Design Codes"],
-        experience: "3+ years",
-        industry: "Construction",
-        postedAt: "2025-01-26T14:15:00Z",
-        deadline: "2025-02-20T00:00:00Z",
-        qualifications: "B.E/B.Tech in Civil/Structural Engineering",
-        numberOfVacancies: 3,
-        isOwner: false,
-        alreadyApplied: false,
-        totalViews: 42,
-        totalApplications: 18
-      }
-    ];
-    
-    setJobs(sampleJobs);
-    setFilteredJobs(sampleJobs);
-    setLoading(false);
+    fetchJobs();
   }, []);
+
+  const fetchJobs = async () => {
+    try {
+      setLoading(true);
+      const token = await user?.getIdToken();
+      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://cp-backend-service-test-972540571952.asia-south1.run.app';
+      
+      const headers: HeadersInit = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${apiBaseUrl}/jobs`, {
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch jobs: ${response.status}`);
+      }
+
+      const jobsData = await response.json();
+      setJobs(jobsData);
+      setFilteredJobs(jobsData);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+      // For now, show empty list if API fails
+      setJobs([]);
+      setFilteredJobs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Filter jobs based on search criteria
   useEffect(() => {
@@ -215,6 +180,7 @@ const JobsPage = () => {
                     <Button 
                       className="w-full justify-start" 
                       variant="default"
+                      onClick={() => setLocation('/post-job')}
                       data-testid="button-post-job"
                     >
                       <Plus className="w-4 h-4 mr-2" />
@@ -333,7 +299,7 @@ const JobsPage = () => {
                     <div 
                       key={job.jobId}
                       className="bg-white rounded-lg border border-cmo-border p-4 hover:border-cmo-primary transition-colors cursor-pointer"
-                      onClick={() => setSelectedJob(job)}
+                      onClick={() => setLocation(`/job/${job.jobId}`)}
                       data-testid={`card-job-${job.jobId}`}
                     >
                       <div className="flex justify-between items-start mb-3">
