@@ -277,6 +277,7 @@ const JobsPage = () => {
   };
 
   const handleJobClick = async (jobId: string) => {
+    console.log('Job clicked:', jobId, 'Should open modal');
     await fetchJobDetails(jobId);
   };
 
