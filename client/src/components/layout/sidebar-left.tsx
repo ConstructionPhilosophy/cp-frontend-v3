@@ -57,16 +57,20 @@ export default function SidebarLeft() {
         <h3 className="font-semibold text-cmo-text-primary mb-4">For Employers</h3>
         <div className="space-y-3">
           <Link href="/employer-dashboard">
-            <Button variant="ghost" className="w-full justify-start py-2 h-auto">
-              <TrendingUp className="h-4 w-4 text-cmo-primary mr-3" />
-              <span>Employer Dashboard</span>
-            </Button>
+            <a>
+              <Button variant="ghost" className="w-full justify-start py-2 h-auto">
+                <TrendingUp className="h-4 w-4 text-cmo-primary mr-3" />
+                <span>Employer Dashboard</span>
+              </Button>
+            </a>
           </Link>
           <Link href="/post-job">
-            <Button variant="ghost" className="w-full justify-start py-2 h-auto">
-              <Plus className="h-4 w-4 text-cmo-primary mr-3" />
-              <span>Post a Job</span>
-            </Button>
+            <a>
+              <Button variant="ghost" className="w-full justify-start py-2 h-auto">
+                <Plus className="h-4 w-4 text-cmo-primary mr-3" />
+                <span>Post a Job</span>
+              </Button>
+            </a>
           </Link>
         </div>
       </div>

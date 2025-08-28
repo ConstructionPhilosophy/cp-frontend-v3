@@ -35,6 +35,7 @@ import MobileNavigation from "../components/mobile-navigation";
 import { useIsMobile } from "../hooks/use-mobile";
 import { useAuth } from "../hooks/useAuth";
 import { useLocation } from "wouter";
+import JobApplicationModal from "../components/JobApplicationModal";
 
 interface Job {
   jobId: string;
@@ -288,9 +289,29 @@ const JobsPage = () => {
     console.log('Job details fetched, modal should be open');
   };
 
+  // Application Modal State
+  const [applicationModal, setApplicationModal] = useState<{
+    isOpen: boolean;
+    jobId: string;
+    jobTitle: string;
+  }>({
+    isOpen: false,
+    jobId: "",
+    jobTitle: "",
+  });
+
   const handleApplyJob = (jobId: string) => {
-    // Implement apply job logic
-    console.log("Apply to job:", jobId);
+    const job = jobs.find(j => j.jobId === jobId);
+    setApplicationModal({
+      isOpen: true,
+      jobId,
+      jobTitle: job?.title || "Unknown Job",
+    });
+  };
+
+  const handleApplicationSubmitted = () => {
+    // Refresh jobs list to update application status
+    fetchJobs();
   };
 
   const handleSaveJob = (jobId: string) => {
@@ -757,6 +778,15 @@ const JobsPage = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Job Application Modal */}
+      <JobApplicationModal
+        isOpen={applicationModal.isOpen}
+        onClose={() => setApplicationModal(prev => ({ ...prev, isOpen: false }))}
+        jobId={applicationModal.jobId}
+        jobTitle={applicationModal.jobTitle}
+        onApplicationSubmitted={handleApplicationSubmitted}
+      />
     </div>
   );
 };
