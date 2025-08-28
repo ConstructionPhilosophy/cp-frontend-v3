@@ -278,7 +278,9 @@ const JobsPage = () => {
 
   const handleJobClick = async (jobId: string) => {
     console.log('Job clicked:', jobId, 'Should open modal');
+    console.log('Fetching job details...');
     await fetchJobDetails(jobId);
+    console.log('Job details fetched, modal should be open');
   };
 
   const handleApplyJob = (jobId: string) => {
@@ -447,7 +449,11 @@ const JobsPage = () => {
                       <div
                         key={job.jobId}
                         className="bg-white rounded-lg border border-cmo-border p-4 hover:border-cmo-primary transition-colors cursor-pointer"
-                        onClick={() => handleJobClick(job.jobId)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleJobClick(job.jobId);
+                        }}
                         data-testid={`card-job-${job.jobId}`}
                       >
                         <div className="flex justify-between items-start mb-3">
