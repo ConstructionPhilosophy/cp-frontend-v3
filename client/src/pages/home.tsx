@@ -15,10 +15,13 @@ import {
   Eye,
   Flag
 } from "lucide-react";
+import Header from "../components/layout/header";
 import SidebarLeft from "../components/layout/sidebar-left";
 import SidebarRight from "../components/layout/sidebar-right";
+import MobileNavigation from "../components/mobile-navigation";
 import { useAuth } from "../contexts/AuthContext";
 import { useLocation } from "wouter";
+import { useIsMobile } from "../hooks/use-mobile";
 import NewsPostModal from "../components/NewsPostModal";
 import CommentSection from "../components/CommentSection";
 
@@ -89,6 +92,7 @@ export default function HomePage() {
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
   const { user } = useAuth();
   const [, navigate] = useLocation();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // Simulate API call - replace with actual API integration
@@ -169,6 +173,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-cmo-background">
+      <Header />
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar */}
@@ -392,6 +397,9 @@ export default function HomePage() {
         title="Create Post"
         submitButtonText="Post"
       />
+      
+      {/* Mobile Navigation */}
+      {isMobile && <MobileNavigation />}
     </div>
   );
 }
