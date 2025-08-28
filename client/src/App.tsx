@@ -141,14 +141,6 @@ function App() {
               </ProtectedRoute>
             )}
           />
-          <Route
-            path="/job/:jobId"
-            component={() => (
-              <ProtectedRoute>
-                <JobDetailsPage />
-              </ProtectedRoute>
-            )}
-          />
 
           {/* 404 fallback - must be last */}
           <Route path="*" component={NotFoundPage} />
