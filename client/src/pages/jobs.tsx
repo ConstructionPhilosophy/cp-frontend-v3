@@ -65,6 +65,8 @@ const JobsPage = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<Job[]>([]);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [selectedJobDetails, setSelectedJobDetails] = useState<Job | null>(null);
+  const [loadingJobDetails, setLoadingJobDetails] = useState(false);
   const [loading, setLoading] = useState(true);
   const [openToWork, setOpenToWork] = useState(false);
 
@@ -209,6 +211,73 @@ const JobsPage = () => {
       default:
         return "bg-gray-100 text-gray-700 border-gray-200";
     }
+  };
+
+  const fetchJobDetails = async (jobId: string) => {
+    try {
+      setLoadingJobDetails(true);
+      const token = await user?.getIdToken();
+      const apiBaseUrl =
+        import.meta.env.VITE_API_BASE_URL ||
+        "https://cp-backend-service-test-972540571952.asia-south1.run.app";
+
+      const headers: HeadersInit = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${apiBaseUrl}/job?id=${jobId}`, {
+        headers,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch job details: ${response.status}`);
+      }
+
+      const jobData = await response.json();
+
+      // Transform API response to match our interface
+      const transformedJob = {
+        jobId: jobData.JobID,
+        title: jobData.Title,
+        company: jobData.Company,
+        location: jobData.Location,
+        type: jobData.Type,
+        skills: jobData.Skills || [],
+        experience: jobData.Experience,
+        salaryRange: jobData.SalaryRange,
+        description: jobData.Description,
+        qualifications: jobData.Qualifications,
+        postedAt: jobData.PostedAt,
+        deadline: jobData.Deadline,
+        numberOfVacancies: jobData.Vacancies || 1,
+        industry: jobData.Industry,
+        postedBy: jobData.PostedBy,
+        alreadyApplied: jobData.AlreadyApplied || false,
+        applicationStatus: jobData.ApplicationStatus,
+        applicationId: jobData.ApplicationId,
+        isOwner: jobData.IsOwner || false,
+        totalViews: jobData.TotalViews || 0,
+        totalApplications: jobData.TotalApplications || 0,
+      };
+
+      setSelectedJobDetails(transformedJob);
+      setSelectedJob(transformedJob);
+    } catch (error) {
+      console.error("Error fetching job details:", error);
+      // For now, just use the basic job data from the list
+      const jobFromList = jobs.find(j => j.jobId === jobId);
+      if (jobFromList) {
+        setSelectedJobDetails(jobFromList);
+        setSelectedJob(jobFromList);
+      }
+    } finally {
+      setLoadingJobDetails(false);
+    }
+  };
+
+  const handleJobClick = async (jobId: string) => {
+    await fetchJobDetails(jobId);
   };
 
   const handleApplyJob = (jobId: string) => {
@@ -377,7 +446,7 @@ const JobsPage = () => {
                       <div
                         key={job.jobId}
                         className="bg-white rounded-lg border border-cmo-border p-4 hover:border-cmo-primary transition-colors cursor-pointer"
-                        onClick={() => setLocation(`/job/${job.jobId}`)}
+                        onClick={() => handleJobClick(job.jobId)}
                         data-testid={`card-job-${job.jobId}`}
                       >
                         <div className="flex justify-between items-start mb-3">
@@ -527,13 +596,21 @@ const JobsPage = () => {
       {isMobile && <MobileNavigation />}
 
       {/* Job Detail Modal */}
-      <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
+      <Dialog open={!!selectedJob} onOpenChange={() => {
+        setSelectedJob(null);
+        setSelectedJobDetails(null);
+      }}>
         <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          {selectedJob && (
+          {loadingJobDetails ? (
+            <div className="flex items-center justify-center p-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cmo-primary"></div>
+              <p className="ml-4 text-cmo-text-secondary">Loading job details...</p>
+            </div>
+          ) : selectedJobDetails && (
             <>
               <DialogHeader>
                 <DialogTitle className="text-xl font-semibold">
-                  {selectedJob.title}
+                  {selectedJobDetails.title}
                 </DialogTitle>
               </DialogHeader>
 
@@ -541,19 +618,19 @@ const JobsPage = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="text-lg font-semibold text-cmo-text-primary">
-                      {selectedJob.company}
+                      {selectedJobDetails.company}
                     </h3>
                     <div className="flex items-center text-cmo-text-secondary text-sm mt-1">
                       <MapPin className="w-4 h-4 mr-1" />
-                      {selectedJob.location}
+                      {selectedJobDetails.location}
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-xl font-bold text-cmo-primary">
-                      {selectedJob.salaryRange}
+                      {selectedJobDetails.salaryRange}
                     </div>
-                    <Badge className={getJobTypeColor(selectedJob.type)}>
-                      {(selectedJob?.type || "full-time")
+                    <Badge className={getJobTypeColor(selectedJobDetails.type)}>
+                      {(selectedJobDetails?.type || "full-time")
                         .replace("-", " ")
                         .toUpperCase()}
                     </Badge>
@@ -568,7 +645,7 @@ const JobsPage = () => {
                       Experience Required
                     </h4>
                     <p className="text-cmo-text-secondary">
-                      {selectedJob.experience}
+                      {selectedJobDetails.experience}
                     </p>
                   </div>
                   <div>
@@ -576,7 +653,7 @@ const JobsPage = () => {
                       Qualifications
                     </h4>
                     <p className="text-cmo-text-secondary">
-                      {selectedJob.qualifications}
+                      {selectedJobDetails.qualifications}
                     </p>
                   </div>
                   <div>
@@ -584,8 +661,8 @@ const JobsPage = () => {
                       Vacancies
                     </h4>
                     <p className="text-cmo-text-secondary">
-                      {selectedJob.numberOfVacancies} position
-                      {selectedJob.numberOfVacancies > 1 ? "s" : ""}
+                      {selectedJobDetails.numberOfVacancies} position
+                      {selectedJobDetails.numberOfVacancies > 1 ? "s" : ""}
                     </p>
                   </div>
                   <div>
@@ -593,7 +670,7 @@ const JobsPage = () => {
                       Application Deadline
                     </h4>
                     <p className="text-cmo-text-secondary">
-                      {new Date(selectedJob.deadline).toLocaleDateString(
+                      {new Date(selectedJobDetails.deadline).toLocaleDateString(
                         "en-IN",
                       )}
                     </p>
@@ -605,7 +682,7 @@ const JobsPage = () => {
                     Required Skills
                   </h4>
                   <div className="flex flex-wrap gap-1">
-                    {selectedJob.skills.map((skill) => (
+                    {selectedJobDetails.skills.map((skill) => (
                       <Badge key={skill} variant="secondary">
                         {skill}
                       </Badge>
@@ -618,7 +695,7 @@ const JobsPage = () => {
                     Job Description
                   </h4>
                   <p className="text-cmo-text-secondary leading-relaxed">
-                    {selectedJob.description}
+                    {selectedJobDetails.description}
                   </p>
                 </div>
 
@@ -626,28 +703,28 @@ const JobsPage = () => {
                   <div className="flex space-x-4 text-sm text-cmo-text-secondary">
                     <div className="flex items-center">
                       <Eye className="w-4 h-4 mr-1" />
-                      {selectedJob.totalViews} views
+                      {selectedJobDetails.totalViews} views
                     </div>
                     <div className="flex items-center">
                       <Users className="w-4 h-4 mr-1" />
-                      {selectedJob.totalApplications} applications
+                      {selectedJobDetails.totalApplications} applications
                     </div>
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
-                      Posted {formatDate(selectedJob.postedAt)}
+                      Posted {formatDate(selectedJobDetails.postedAt)}
                     </div>
                   </div>
                 </div>
 
                 <div className="flex space-x-3">
-                  {selectedJob.alreadyApplied ? (
+                  {selectedJobDetails.alreadyApplied ? (
                     <Button disabled className="flex-1">
                       Already Applied
                     </Button>
                   ) : (
                     <Button
                       className="flex-1"
-                      onClick={() => handleApplyJob(selectedJob.jobId)}
+                      onClick={() => handleApplyJob(selectedJobDetails.jobId)}
                       data-testid="button-apply-modal"
                     >
                       Apply for this Job
@@ -655,7 +732,7 @@ const JobsPage = () => {
                   )}
                   <Button
                     variant="outline"
-                    onClick={() => handleSaveJob(selectedJob.jobId)}
+                    onClick={() => handleSaveJob(selectedJobDetails.jobId)}
                     data-testid="button-save-modal"
                   >
                     <Bookmark className="w-4 h-4 mr-2" />
