@@ -28,6 +28,8 @@ import MobileNavigation from "../components/mobile-navigation";
 import NewsPostModal from "../components/NewsPostModal";
 import { useIsMobile } from "../hooks/use-mobile";
 import { useAuth } from "../contexts/AuthContext";
+import CommentSection from "../components/CommentSection";
+import { useLocation } from "wouter";
 
 interface NewsPost {
   id: string;
@@ -50,9 +52,11 @@ const NewsPage = () => {
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
 
   const isMobile = useIsMobile();
   const { user, userProfile } = useAuth();
+  const [, setLocation] = useLocation();
 
   // Fetch news posts from API
   useEffect(() => {
@@ -216,6 +220,22 @@ const NewsPage = () => {
     }
   };
 
+  const handleToggleComments = (postId: string) => {
+    setExpandedComments(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  const handlePostClick = (postId: string) => {
+    setLocation(`/news/${postId}`);
+  };
+
   return (
     <div className="min-h-screen bg-cmo-background">
       <Header />
@@ -310,13 +330,17 @@ const NewsPage = () => {
                         </DropdownMenu>
                       </div>
 
-                      {/* Post Content */}
-                      <div className="mb-3">
+                      {/* Post Content - Clickable */}
+                      <div 
+                        className="mb-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+                        onClick={() => handlePostClick(post.id)}
+                        data-testid={`post-content-${post.id}`}
+                      >
                         <h3 className="font-semibold text-sm text-cmo-text-primary mb-2">
                           {post.headline}
                         </h3>
                         <p className="text-sm text-cmo-text-secondary leading-relaxed">
-                          {post.content}
+                          {post.content.length > 200 ? `${post.content.substring(0, 200)}...` : post.content}
                         </p>
                       </div>
 
@@ -449,15 +473,12 @@ const NewsPage = () => {
                           <ThumbsUp className="w-4 h-4 mr-1" />
                           <span className="text-xs">Like</span>
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="flex-1 hover:bg-gray-50 text-cmo-text-secondary py-2"
-                          data-testid={`button-comment-${post.id}`}
-                        >
-                          <MessageCircle className="w-4 h-4 mr-1" />
-                          <span className="text-xs">Comment</span>
-                        </Button>
+                        <CommentSection
+                          postId={post.id}
+                          commentCount={post.commentCount}
+                          isExpanded={expandedComments.has(post.id)}
+                          onToggleExpand={() => handleToggleComments(post.id)}
+                        />
                         <Button
                           variant="ghost"
                           size="sm"
@@ -477,6 +498,18 @@ const NewsPage = () => {
                           <span className="text-xs">Save</span>
                         </Button>
                       </div>
+
+                      {/* Comments Section */}
+                      {expandedComments.has(post.id) && (
+                        <div className="mt-4">
+                          <CommentSection
+                            postId={post.id}
+                            commentCount={post.commentCount}
+                            isExpanded={true}
+                            onToggleExpand={() => handleToggleComments(post.id)}
+                          />
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))

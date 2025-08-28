@@ -16,6 +16,7 @@ import { SecurityDashboard } from "./pages/security-dashboard-simple";
 import { MessagesPage } from "./pages/messages";
 import { ChatPage } from "./pages/chat";
 import NewsPage from "./pages/news";
+import NewsDetail from "./pages/news-detail";
 import UserProfilePage from "./pages/user-profile";
 import JobsPage from "./pages/jobs";
 import PostJobPage from "./pages/post-job";
@@ -140,6 +141,14 @@ function App() {
             component={() => (
               <ProtectedRoute>
                 <NewsPage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/news/:id"
+            component={() => (
+              <ProtectedRoute>
+                <NewsDetail />
               </ProtectedRoute>
             )}
           />
