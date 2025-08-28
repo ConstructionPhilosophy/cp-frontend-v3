@@ -126,8 +126,12 @@ const JobDetailsPage = () => {
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Recently posted';
+    
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Recently posted';
+    
     return date.toLocaleDateString('en-IN', {
       year: 'numeric',
       month: 'long',
@@ -135,7 +139,9 @@ const JobDetailsPage = () => {
     });
   };
 
-  const getJobTypeColor = (type: string) => {
+  const getJobTypeColor = (type?: string) => {
+    if (!type) return 'bg-green-100 text-green-700 border-green-200'; // Default to full-time styling
+    
     switch (type) {
       case 'full-time': return 'bg-green-100 text-green-700 border-green-200';
       case 'part-time': return 'bg-blue-100 text-blue-700 border-blue-200';
@@ -220,22 +226,22 @@ const JobDetailsPage = () => {
                     </div>
                   </div>
                   <Badge variant="outline" className={getJobTypeColor(job.type)}>
-                    {job.type.replace('-', ' ').toUpperCase()}
+                    {job.type ? job.type.replace('-', ' ').toUpperCase() : 'FULL TIME'}
                   </Badge>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-cmo-text-secondary">
                   <div className="flex items-center">
                     <MapPin className="w-4 h-4 mr-2" />
-                    {job.location}
+                    {job.location || 'Location not specified'}
                   </div>
                   <div className="flex items-center">
                     <Clock className="w-4 h-4 mr-2" />
-                    {job.experience}
+                    {job.experience || 'Not specified'}
                   </div>
                   <div className="flex items-center">
                     <Users className="w-4 h-4 mr-2" />
-                    {job.numberOfVacancies} position{job.numberOfVacancies > 1 ? 's' : ''}
+                    {job.numberOfVacancies || 1} position{(job.numberOfVacancies || 1) > 1 ? 's' : ''}
                   </div>
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 mr-2" />
@@ -252,7 +258,7 @@ const JobDetailsPage = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-cmo-text-secondary whitespace-pre-line">
-                  {job.description}
+                  {job.description || 'No description available'}
                 </p>
               </CardContent>
             </Card>
@@ -266,7 +272,7 @@ const JobDetailsPage = () => {
                 <div>
                   <h4 className="font-semibold text-cmo-text-primary mb-2">Required Skills</h4>
                   <div className="flex flex-wrap gap-2">
-                    {job.skills.map((skill, index) => (
+                    {job.skills && Array.isArray(job.skills) && job.skills.map((skill, index) => (
                       <Badge key={index} variant="secondary">
                         {skill}
                       </Badge>

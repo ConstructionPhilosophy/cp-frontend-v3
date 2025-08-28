@@ -123,8 +123,12 @@ const JobsPage = () => {
     setFilteredJobs(filtered);
   }, [jobs, searchTerm, locationFilter, typeFilter]);
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Recently posted';
+    
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'Recently posted';
+    
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
