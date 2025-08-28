@@ -9,7 +9,7 @@ import {
   Image as ImageIcon, 
   Smile
 } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../hooks/use-toast";
 
 interface NewsPostModalProps {
@@ -27,7 +27,7 @@ export default function NewsPostModal({
   const [content, setContent] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [isPosting, setIsPosting] = useState(false);
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const { toast } = useToast();
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,15 +128,17 @@ export default function NewsPostModal({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <Avatar className="w-10 h-10">
-                <AvatarImage src={user?.photoURL || ""} />
+                <AvatarImage src={userProfile?.profilePic || userProfile?.photoUrl || user?.photoURL || ""} />
                 <AvatarFallback>
-                  {user?.displayName?.split(' ').map(n => n[0]).join('') || 
-                   user?.email?.charAt(0)?.toUpperCase() || "U"}
+                  {userProfile?.firstName?.charAt(0) || user?.displayName?.charAt(0) || user?.email?.charAt(0) || "U"}
+                  {userProfile?.lastName?.charAt(0) || ""}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <DialogTitle className="text-sm font-medium">
-                  {user?.displayName || "User"}
+                  {userProfile?.firstName && userProfile?.lastName 
+                    ? `${userProfile.firstName} ${userProfile.lastName}`
+                    : user?.displayName || "User"}
                 </DialogTitle>
                 <p className="text-xs text-gray-600">Post to Anyone</p>
               </div>
