@@ -1,17 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { Search, MapPin, Clock, Briefcase, Bookmark, Plus, ToggleLeft, ToggleRight, Eye, Users, Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import Header from '../components/layout/header';
-import SidebarRight from '../components/layout/sidebar-right';
-import MobileNavigation from '../components/mobile-navigation';
-import { useIsMobile } from '../hooks/use-mobile';
-import { useAuth } from '../hooks/useAuth';
-import { useLocation } from 'wouter';
+import React, { useState, useEffect } from "react";
+import {
+  Search,
+  MapPin,
+  Clock,
+  Briefcase,
+  Bookmark,
+  Plus,
+  ToggleLeft,
+  ToggleRight,
+  Eye,
+  Users,
+  Calendar,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import Header from "../components/layout/header";
+import SidebarRight from "../components/layout/sidebar-right";
+import MobileNavigation from "../components/mobile-navigation";
+import { useIsMobile } from "../hooks/use-mobile";
+import { useAuth } from "../hooks/useAuth";
+import { useLocation } from "wouter";
 
 interface Job {
   jobId: string;
@@ -20,7 +43,7 @@ interface Job {
   postedBy: string;
   description: string;
   location: string;
-  type: 'full-time' | 'part-time' | 'contract' | 'freelance';
+  type: "full-time" | "part-time" | "contract" | "freelance";
   salaryRange: string;
   skills: string[];
   experience: string;
@@ -33,7 +56,7 @@ interface Job {
   isOwner?: boolean;
   alreadyApplied?: boolean;
   applicationId?: string;
-  applicationStatus?: 'applied' | 'shortlisted' | 'rejected' | 'hired';
+  applicationStatus?: "applied" | "shortlisted" | "rejected" | "hired";
   totalViews?: number;
   totalApplications?: number;
 }
@@ -44,11 +67,11 @@ const JobsPage = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [openToWork, setOpenToWork] = useState(false);
-  
+
   // Search and filter states
-  const [searchTerm, setSearchTerm] = useState('');
-  const [locationFilter, setLocationFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
 
   const isMobile = useIsMobile();
   const { user } = useAuth();
@@ -65,11 +88,13 @@ const JobsPage = () => {
     try {
       setLoading(true);
       const token = await user?.getIdToken();
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 'https://cp-backend-service-test-972540571952.asia-south1.run.app';
-      
+      const apiBaseUrl =
+        import.meta.env.VITE_API_BASE_URL ||
+        "https://cp-backend-service-test-972540571952.asia-south1.run.app";
+
       const headers: HeadersInit = {};
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers["Authorization"] = `Bearer ${token}`;
       }
 
       const response = await fetch(`${apiBaseUrl}/jobs`, {
@@ -81,7 +106,7 @@ const JobsPage = () => {
       }
 
       const jobsData = await response.json();
-      
+
       // Transform API response to match our interface
       const transformedJobs = jobsData.map((job: any) => ({
         jobId: job.JobID,
@@ -98,13 +123,13 @@ const JobsPage = () => {
         deadline: job.Deadline,
         numberOfVacancies: job.Vacancies || 1,
         industry: job.Industry,
-        postedBy: job.PostedBy
+        postedBy: job.PostedBy,
       }));
-      
+
       setJobs(transformedJobs);
       setFilteredJobs(transformedJobs);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
+      console.error("Error fetching jobs:", error);
       // For now, show empty list if API fails
       setJobs([]);
       setFilteredJobs([]);
@@ -123,62 +148,77 @@ const JobsPage = () => {
     let filtered = jobs;
 
     if (searchTerm) {
-      filtered = filtered.filter(job => 
-        (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (job.skills && Array.isArray(job.skills) && job.skills.some(skill => skill && skill.toLowerCase().includes(searchTerm.toLowerCase()))) ||
-        (job.company && job.company.toLowerCase().includes(searchTerm.toLowerCase()))
+      filtered = filtered.filter(
+        (job) =>
+          (job.title &&
+            job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (job.skills &&
+            Array.isArray(job.skills) &&
+            job.skills.some(
+              (skill) =>
+                skill && skill.toLowerCase().includes(searchTerm.toLowerCase()),
+            )) ||
+          (job.company &&
+            job.company.toLowerCase().includes(searchTerm.toLowerCase())),
       );
     }
 
     if (locationFilter) {
-      filtered = filtered.filter(job => 
-        job.location && job.location.toLowerCase().includes(locationFilter.toLowerCase())
+      filtered = filtered.filter(
+        (job) =>
+          job.location &&
+          job.location.toLowerCase().includes(locationFilter.toLowerCase()),
       );
     }
 
-    if (typeFilter && typeFilter !== 'all') {
-      filtered = filtered.filter(job => job.type === typeFilter);
+    if (typeFilter && typeFilter !== "all") {
+      filtered = filtered.filter((job) => job.type === typeFilter);
     }
 
     setFilteredJobs(filtered);
   }, [jobs, searchTerm, locationFilter, typeFilter]);
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Recently posted';
-    
+    if (!dateString) return "Recently posted";
+
     const date = new Date(dateString);
-    if (isNaN(date.getTime())) return 'Recently posted';
-    
+    if (isNaN(date.getTime())) return "Recently posted";
+
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 1) return '1 day ago';
+
+    if (diffDays === 1) return "1 day ago";
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
     return `${Math.floor(diffDays / 30)} months ago`;
   };
 
   const getJobTypeColor = (type?: string) => {
-    if (!type) return 'bg-green-100 text-green-700 border-green-200'; // Default to full-time styling
-    
+    if (!type) return "bg-green-100 text-green-700 border-green-200"; // Default to full-time styling
+
     switch (type) {
-      case 'full-time': return 'bg-green-100 text-green-700 border-green-200';
-      case 'part-time': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'contract': return 'bg-purple-100 text-purple-700 border-purple-200';
-      case 'freelance': return 'bg-orange-100 text-orange-700 border-orange-200';
-      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+      case "full-time":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "part-time":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+      case "contract":
+        return "bg-purple-100 text-purple-700 border-purple-200";
+      case "freelance":
+        return "bg-orange-100 text-orange-700 border-orange-200";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
     }
   };
 
   const handleApplyJob = (jobId: string) => {
     // Implement apply job logic
-    console.log('Apply to job:', jobId);
+    console.log("Apply to job:", jobId);
   };
 
   const handleSaveJob = (jobId: string) => {
     // Implement save job logic
-    console.log('Save job:', jobId);
+    console.log("Save job:", jobId);
   };
 
   if (loading) {
@@ -198,45 +238,46 @@ const JobsPage = () => {
   return (
     <div className="min-h-screen bg-cmo-bg-main">
       <Header />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="lg:grid lg:grid-cols-12 lg:gap-4">
-          
           {/* Main Content Area */}
           <div className="lg:col-span-9">
             <div className="flex gap-6">
               {/* Left Sidebar */}
               <div className="w-64 flex-shrink-0">
                 <div className="bg-white rounded-lg border border-cmo-border p-4 mb-4">
-                  <h2 className="text-lg font-semibold text-cmo-text-primary mb-4">Job Actions</h2>
+                  <h2 className="text-lg font-semibold text-cmo-text-primary mb-4">
+                    Job Actions
+                  </h2>
                   <div className="space-y-3">
-                    <Button 
-                      className="w-full justify-start" 
+                    <Button
+                      className="w-full justify-start"
                       variant="default"
-                      onClick={() => setLocation('/post-job')}
+                      onClick={() => setLocation("/post-job")}
                       data-testid="button-post-job"
                     >
                       <Plus className="w-4 h-4 mr-2" />
                       Post a Job
                     </Button>
-                    <Button 
-                      className="w-full justify-start" 
+                    <Button
+                      className="w-full justify-start"
                       variant="outline"
                       data-testid="button-saved-jobs"
                     >
                       <Bookmark className="w-4 h-4 mr-2" />
                       Saved Jobs
                     </Button>
-                    <Button 
-                      className="w-full justify-start" 
+                    <Button
+                      className="w-full justify-start"
                       variant="outline"
                       data-testid="button-my-applications"
                     >
                       <Briefcase className="w-4 h-4 mr-2" />
                       My Applications
                     </Button>
-                    <Button 
-                      className="w-full justify-start" 
+                    <Button
+                      className="w-full justify-start"
                       variant="outline"
                       data-testid="button-dashboard"
                     >
@@ -249,7 +290,9 @@ const JobsPage = () => {
                 {/* Open to Work Toggle */}
                 <div className="bg-white rounded-lg border border-cmo-border p-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-cmo-text-primary">Open to Work</span>
+                    <span className="text-sm font-medium text-cmo-text-primary">
+                      Open to Work
+                    </span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -319,7 +362,8 @@ const JobsPage = () => {
                 {/* Job Results Header */}
                 <div className="mb-4">
                   <h1 className="text-xl font-semibold text-cmo-text-primary">
-                    {filteredJobs?.length || 0} Job{(filteredJobs?.length || 0) !== 1 ? 's' : ''} Found
+                    {filteredJobs?.length || 0} Job
+                    {(filteredJobs?.length || 0) !== 1 ? "s" : ""} Found
                   </h1>
                   <p className="text-sm text-cmo-text-secondary">
                     Showing results for construction industry professionals
@@ -328,111 +372,126 @@ const JobsPage = () => {
 
                 {/* Jobs List */}
                 <div className="space-y-4">
-                  {filteredJobs && filteredJobs.length > 0 ? filteredJobs.map((job) => (
-                    <div 
-                      key={job.jobId}
-                      className="bg-white rounded-lg border border-cmo-border p-4 hover:border-cmo-primary transition-colors cursor-pointer"
-                      onClick={() => setLocation(`/job/${job.jobId}`)}
-                      data-testid={`card-job-${job.jobId}`}
-                    >
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-cmo-text-primary mb-1">
-                            {job.title}
-                          </h3>
-                          <p className="text-cmo-text-secondary font-medium">
-                            {job.company}
-                          </p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleSaveJob(job.jobId);
-                            }}
-                            data-testid={`button-save-${job.jobId}`}
-                          >
-                            <Bookmark className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-4 mb-3 text-sm text-cmo-text-secondary">
-                        <div className="flex items-center">
-                          <MapPin className="w-4 h-4 mr-1" />
-                          {job.location || 'Location not specified'}
-                        </div>
-                        <div className="flex items-center">
-                          <Clock className="w-4 h-4 mr-1" />
-                          {job.experience || 'Not specified'}
-                        </div>
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 mr-1" />
-                          {job.postedAt ? formatDate(job.postedAt) : 'Recently posted'}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between mb-3">
-                        <Badge 
-                          variant="outline" 
-                          className={getJobTypeColor(job.type)}
-                        >
-                          {job.type ? job.type.replace('-', ' ').toUpperCase() : 'FULL TIME'}
-                        </Badge>
-                        <span className="text-lg font-semibold text-cmo-primary">
-                          {job.salaryRange || 'Salary not disclosed'}
-                        </span>
-                      </div>
-
-                      <p className="text-cmo-text-secondary text-sm mb-3 line-clamp-2">
-                        {job.description || 'No description available'}
-                      </p>
-
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {job.skills && Array.isArray(job.skills) && job.skills.slice(0, 4).map((skill) => (
-                          <Badge key={skill} variant="secondary" className="text-xs">
-                            {skill}
-                          </Badge>
-                        ))}
-                        {job.skills && job.skills.length > 4 && (
-                          <Badge variant="secondary" className="text-xs">
-                            +{job.skills.length - 4} more
-                          </Badge>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 text-xs text-cmo-text-secondary">
-                          <div className="flex items-center">
-                            <Eye className="w-3 h-3 mr-1" />
-                            {job.totalViews || 0} views
+                  {filteredJobs && filteredJobs.length > 0 ? (
+                    filteredJobs.map((job) => (
+                      <div
+                        key={job.jobId}
+                        className="bg-white rounded-lg border border-cmo-border p-4 hover:border-cmo-primary transition-colors cursor-pointer"
+                        onClick={() => setLocation(`/job/${job.jobId}`)}
+                        data-testid={`card-job-${job.jobId}`}
+                      >
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-cmo-text-primary mb-1">
+                              {job.title}
+                            </h3>
+                            <p className="text-cmo-text-secondary font-medium">
+                              {job.company}
+                            </p>
                           </div>
-                          <div className="flex items-center">
-                            <Users className="w-3 h-3 mr-1" />
-                            {job.totalApplications || 0} applications
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleSaveJob(job.jobId);
+                              }}
+                              data-testid={`button-save-${job.jobId}`}
+                            >
+                              <Bookmark className="w-4 h-4" />
+                            </Button>
                           </div>
                         </div>
-                        {job.alreadyApplied ? (
-                          <Badge variant="outline" className="text-green-700 border-green-200">
-                            Applied
-                          </Badge>
-                        ) : (
-                          <Button
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleApplyJob(job.jobId);
-                            }}
-                            data-testid={`button-apply-${job.jobId}`}
+
+                        <div className="flex flex-wrap items-center gap-4 mb-3 text-sm text-cmo-text-secondary">
+                          <div className="flex items-center">
+                            <MapPin className="w-4 h-4 mr-1" />
+                            {job.location || "Location not specified"}
+                          </div>
+                          <div className="flex items-center">
+                            <Clock className="w-4 h-4 mr-1" />
+                            {job.experience || "Not specified"}
+                          </div>
+                          <div className="flex items-center">
+                            <Calendar className="w-4 h-4 mr-1" />
+                            {job.postedAt
+                              ? formatDate(job.postedAt)
+                              : "Recently posted"}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between mb-3">
+                          <Badge
+                            variant="outline"
+                            className={getJobTypeColor(job.type)}
                           >
-                            Apply Now
-                          </Button>
-                        )}
+                            {(job.type || "full-time")
+                              .replace("-", " ")
+                              .toUpperCase()}
+                          </Badge>
+                          <span className="text-lg font-semibold text-cmo-primary">
+                            {job.salaryRange || "Salary not disclosed"}
+                          </span>
+                        </div>
+
+                        <p className="text-cmo-text-secondary text-sm mb-3 line-clamp-2">
+                          {job.description || "No description available"}
+                        </p>
+
+                        <div className="flex flex-wrap gap-1 mb-3">
+                          {job.skills &&
+                            Array.isArray(job.skills) &&
+                            job.skills.slice(0, 4).map((skill) => (
+                              <Badge
+                                key={skill}
+                                variant="secondary"
+                                className="text-xs"
+                              >
+                                {skill}
+                              </Badge>
+                            ))}
+                          {job.skills && job.skills.length > 4 && (
+                            <Badge variant="secondary" className="text-xs">
+                              +{job.skills.length - 4} more
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-4 text-xs text-cmo-text-secondary">
+                            <div className="flex items-center">
+                              <Eye className="w-3 h-3 mr-1" />
+                              {job.totalViews || 0} views
+                            </div>
+                            <div className="flex items-center">
+                              <Users className="w-3 h-3 mr-1" />
+                              {job.totalApplications || 0} applications
+                            </div>
+                          </div>
+                          {job.alreadyApplied ? (
+                            <Badge
+                              variant="outline"
+                              className="text-green-700 border-green-200"
+                            >
+                              Applied
+                            </Badge>
+                          ) : (
+                            <Button
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleApplyJob(job.jobId);
+                              }}
+                              data-testid={`button-apply-${job.jobId}`}
+                            >
+                              Apply Now
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  )) : (
+                    ))
+                  ) : (
                     <div className="text-center py-12">
                       <Briefcase className="w-16 h-16 text-cmo-text-secondary mx-auto mb-4" />
                       <h3 className="text-lg font-semibold text-cmo-text-primary mb-2">
@@ -454,7 +513,7 @@ const JobsPage = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Right Sidebar - Desktop Only */}
           {!isMobile && (
             <div className="hidden lg:block lg:col-span-3">
@@ -463,7 +522,7 @@ const JobsPage = () => {
           )}
         </div>
       </div>
-      
+
       {/* Mobile Navigation */}
       {isMobile && <MobileNavigation />}
 
@@ -477,7 +536,7 @@ const JobsPage = () => {
                   {selectedJob.title}
                 </DialogTitle>
               </DialogHeader>
-              
+
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -494,7 +553,9 @@ const JobsPage = () => {
                       {selectedJob.salaryRange}
                     </div>
                     <Badge className={getJobTypeColor(selectedJob.type)}>
-                      {selectedJob.type ? selectedJob.type.replace('-', ' ').toUpperCase() : 'FULL TIME'}
+                      {(selectedJob?.type || "full-time")
+                        .replace("-", " ")
+                        .toUpperCase()}
                     </Badge>
                   </div>
                 </div>
@@ -503,27 +564,46 @@ const JobsPage = () => {
 
                 <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <h4 className="font-semibold text-cmo-text-primary mb-2">Experience Required</h4>
-                    <p className="text-cmo-text-secondary">{selectedJob.experience}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-cmo-text-primary mb-2">Qualifications</h4>
-                    <p className="text-cmo-text-secondary">{selectedJob.qualifications}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-cmo-text-primary mb-2">Vacancies</h4>
-                    <p className="text-cmo-text-secondary">{selectedJob.numberOfVacancies} position{selectedJob.numberOfVacancies > 1 ? 's' : ''}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-cmo-text-primary mb-2">Application Deadline</h4>
+                    <h4 className="font-semibold text-cmo-text-primary mb-2">
+                      Experience Required
+                    </h4>
                     <p className="text-cmo-text-secondary">
-                      {new Date(selectedJob.deadline).toLocaleDateString('en-IN')}
+                      {selectedJob.experience}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-cmo-text-primary mb-2">
+                      Qualifications
+                    </h4>
+                    <p className="text-cmo-text-secondary">
+                      {selectedJob.qualifications}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-cmo-text-primary mb-2">
+                      Vacancies
+                    </h4>
+                    <p className="text-cmo-text-secondary">
+                      {selectedJob.numberOfVacancies} position
+                      {selectedJob.numberOfVacancies > 1 ? "s" : ""}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-cmo-text-primary mb-2">
+                      Application Deadline
+                    </h4>
+                    <p className="text-cmo-text-secondary">
+                      {new Date(selectedJob.deadline).toLocaleDateString(
+                        "en-IN",
+                      )}
                     </p>
                   </div>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-cmo-text-primary mb-2">Required Skills</h4>
+                  <h4 className="font-semibold text-cmo-text-primary mb-2">
+                    Required Skills
+                  </h4>
                   <div className="flex flex-wrap gap-1">
                     {selectedJob.skills.map((skill) => (
                       <Badge key={skill} variant="secondary">
@@ -534,7 +614,9 @@ const JobsPage = () => {
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-cmo-text-primary mb-2">Job Description</h4>
+                  <h4 className="font-semibold text-cmo-text-primary mb-2">
+                    Job Description
+                  </h4>
                   <p className="text-cmo-text-secondary leading-relaxed">
                     {selectedJob.description}
                   </p>
@@ -563,7 +645,7 @@ const JobsPage = () => {
                       Already Applied
                     </Button>
                   ) : (
-                    <Button 
+                    <Button
                       className="flex-1"
                       onClick={() => handleApplyJob(selectedJob.jobId)}
                       data-testid="button-apply-modal"
