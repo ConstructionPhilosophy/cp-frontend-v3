@@ -15,13 +15,19 @@ import { useToast } from "../hooks/use-toast";
 interface NewsPostModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onPostCreated: () => void;
+  onPostCreated?: () => void;
+  onSubmit?: (data: { headline: string; content: string; images: File[] }) => Promise<void>;
+  title?: string;
+  submitButtonText?: string;
 }
 
 export default function NewsPostModal({
   isOpen,
   onClose,
   onPostCreated,
+  onSubmit,
+  title = "Share News",
+  submitButtonText = "Post",
 }: NewsPostModalProps) {
   const [headline, setHeadline] = useState("");
   const [content, setContent] = useState("");
@@ -62,6 +68,16 @@ export default function NewsPostModal({
 
     try {
       setIsPosting(true);
+      
+      // If onSubmit is provided, use it (for pages like home and articles)
+      if (onSubmit) {
+        await onSubmit({ headline, content, images });
+        resetForm();
+        onClose();
+        return;
+      }
+
+      // Otherwise use the original API call (for news page)
       const token = await user?.getIdToken();
       const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || 
         'https://cp-backend-service-test-972540571952.asia-south1.run.app';
@@ -96,8 +112,9 @@ export default function NewsPostModal({
       setHeadline("");
       setContent("");
       setImages([]);
+      resetForm();
       onClose();
-      onPostCreated();
+      if (onPostCreated) onPostCreated();
       
     } catch (error) {
       console.error('Error creating post:', error);
@@ -109,6 +126,12 @@ export default function NewsPostModal({
     } finally {
       setIsPosting(false);
     }
+  };
+
+  const resetForm = () => {
+    setHeadline("");
+    setContent("");
+    setImages([]);
   };
 
   const handleClose = () => {
@@ -246,7 +269,7 @@ export default function NewsPostModal({
                 className="px-3 py-1.5 text-sm"
                 data-testid="button-modal-post"
               >
-                {isPosting ? "Posting..." : "Post"}
+                {isPosting ? "Posting..." : submitButtonText}
               </Button>
             </div>
           </div>

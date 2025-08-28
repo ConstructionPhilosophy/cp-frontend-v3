@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Router, Switch } from "wouter";
-import HomePage from "./pages/home";
 import ProfilePage from "./pages/profile";
 import NotFoundPage from "./pages/not-found";
 import { LoginPage } from "./pages/login";
@@ -17,6 +16,8 @@ import { MessagesPage } from "./pages/messages";
 import { ChatPage } from "./pages/chat";
 import NewsPage from "./pages/news";
 import NewsDetail from "./pages/news-detail";
+import HomePage from "./pages/home";
+import ArticlesPage from "./pages/articles";
 import UserProfilePage from "./pages/user-profile";
 import JobsPage from "./pages/jobs";
 import PostJobPage from "./pages/post-job";
@@ -89,6 +90,22 @@ function App() {
             )}
           />
           <Route
+            path="/home"
+            component={() => (
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/articles"
+            component={() => (
+              <ProtectedRoute>
+                <ArticlesPage />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
             path="/profile"
             component={() => (
               <ProtectedRoute>
@@ -146,6 +163,22 @@ function App() {
           />
           <Route
             path="/news/:id"
+            component={() => (
+              <ProtectedRoute>
+                <NewsDetail />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/posts/:id"
+            component={() => (
+              <ProtectedRoute>
+                <NewsDetail />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/articles/:id"
             component={() => (
               <ProtectedRoute>
                 <NewsDetail />

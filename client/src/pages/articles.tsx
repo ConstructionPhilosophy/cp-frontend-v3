@@ -22,7 +22,7 @@ import { useLocation } from "wouter";
 import NewsPostModal from "../components/NewsPostModal";
 import CommentSection from "../components/CommentSection";
 
-interface Post {
+interface Article {
   id: string;
   uid: string;
   headline: string;
@@ -37,62 +37,62 @@ interface Post {
   authorProfilePic?: string;
 }
 
-// Mock posts data
-const mockPosts: Post[] = [
+// Mock articles data
+const mockArticles: Article[] = [
   {
     id: "1",
     uid: "user1",
-    headline: "Revolutionary Construction Technology Transforms Building Process",
-    content: "A groundbreaking new construction method has been unveiled that promises to reduce building time by 40% while maintaining structural integrity. This innovative approach combines advanced materials with AI-powered planning systems.\n\nThe technology has already been successfully implemented in three major projects across different regions, showing consistent results and positive feedback from both contractors and clients.",
+    headline: "The Future of Sustainable Construction: Green Building Practices",
+    content: "As the construction industry evolves, sustainable practices are becoming not just a trend but a necessity. This comprehensive guide explores the latest green building techniques, materials, and certifications that are reshaping how we approach construction projects.\n\nFrom energy-efficient designs to eco-friendly materials, sustainable construction is proving to be both environmentally responsible and economically viable for long-term project success.",
     imageUrls: [
-      "https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=800&h=400&fit=crop",
-      "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&h=400&fit=crop"
+      "https://images.unsplash.com/photo-1518717758536-85ae29035b6d?w=800&h=400&fit=crop",
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=400&fit=crop"
     ],
-    likeCount: 45,
-    commentCount: 12,
-    createdTime: "2024-01-15T10:30:00Z",
-    authorName: "Sarah Chen",
-    authorTitle: "Senior Construction Engineer",
+    likeCount: 87,
+    commentCount: 23,
+    createdTime: "2024-01-15T08:00:00Z",
+    authorName: "Dr. Emily Watson",
+    authorTitle: "Sustainability Expert & Author",
     authorProfilePic: "https://images.unsplash.com/photo-1494790108755-2616b612b8c5?w=150&h=150&fit=crop&crop=face"
   },
   {
     id: "2", 
     uid: "user2",
-    headline: "Sustainable Building Materials Gain Momentum in Industry",
-    content: "The construction industry is experiencing a shift towards eco-friendly materials. Recent studies show that sustainable options not only reduce environmental impact but also provide long-term cost benefits for developers and property owners.",
-    imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=400&fit=crop",
-    likeCount: 32,
-    commentCount: 8,
-    createdTime: "2024-01-14T14:45:00Z",
-    authorName: "Michael Rodriguez",
-    authorTitle: "Sustainability Consultant",
+    headline: "Digital Transformation in Construction: BIM and Beyond",
+    content: "Building Information Modeling (BIM) has revolutionized how construction projects are planned, designed, and executed. This article delves into the latest digital tools and technologies that are streamlining construction processes and improving project outcomes across the industry.",
+    imageUrl: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&h=400&fit=crop",
+    likeCount: 64,
+    commentCount: 18,
+    createdTime: "2024-01-14T12:30:00Z",
+    authorName: "James Mitchell",
+    authorTitle: "Construction Technology Consultant",
     authorProfilePic: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
   },
   {
     id: "3",
     uid: "user3", 
-    headline: "Safety Protocols Updated for High-Rise Construction",
-    content: "New safety guidelines have been implemented following comprehensive industry research. These updates address emerging challenges in modern construction while ensuring worker protection remains the top priority.",
-    likeCount: 28,
-    commentCount: 15,
-    createdTime: "2024-01-13T09:15:00Z",
-    authorName: "Jennifer Park",
-    authorTitle: "Safety Coordinator",
+    headline: "Modern Project Management: Agile Methodologies in Construction",
+    content: "Traditional project management approaches are being enhanced with agile methodologies adapted for construction. Learn how these flexible frameworks are improving project delivery times, stakeholder communication, and overall project success rates in the construction industry.",
+    likeCount: 52,
+    commentCount: 31,
+    createdTime: "2024-01-13T16:45:00Z",
+    authorName: "Maria Garcia",
+    authorTitle: "Senior Project Manager",
     authorProfilePic: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face"
   }
 ];
 
-export default function HomePage() {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
+export default function ArticlesPage() {
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [isArticleModalOpen, setIsArticleModalOpen] = useState(false);
+  const [likedArticles, setLikedArticles] = useState<Set<string>>(new Set());
   const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
   const { user } = useAuth();
   const [, navigate] = useLocation();
 
   useEffect(() => {
     // Simulate API call - replace with actual API integration
-    setPosts(mockPosts);
+    setArticles(mockArticles);
   }, []);
 
   const formatTimeAgo = (dateString: string) => {
@@ -106,55 +106,55 @@ export default function HomePage() {
     return date.toLocaleDateString();
   };
 
-  const handleLikePost = (postId: string) => {
-    const newLikedPosts = new Set(likedPosts);
-    if (likedPosts.has(postId)) {
-      newLikedPosts.delete(postId);
+  const handleLikeArticle = (articleId: string) => {
+    const newLikedArticles = new Set(likedArticles);
+    if (likedArticles.has(articleId)) {
+      newLikedArticles.delete(articleId);
     } else {
-      newLikedPosts.add(postId);
+      newLikedArticles.add(articleId);
     }
-    setLikedPosts(newLikedPosts);
+    setLikedArticles(newLikedArticles);
 
-    // Update post like count
-    setPosts(prevPosts => 
-      prevPosts.map(post => 
-        post.id === postId 
+    // Update article like count
+    setArticles(prevArticles => 
+      prevArticles.map(article => 
+        article.id === articleId 
           ? { 
-              ...post, 
-              likeCount: likedPosts.has(postId) 
-                ? post.likeCount - 1 
-                : post.likeCount + 1 
+              ...article, 
+              likeCount: likedArticles.has(articleId) 
+                ? article.likeCount - 1 
+                : article.likeCount + 1 
             }
-          : post
+          : article
       )
     );
   };
 
-  const handlePostClick = (postId: string) => {
-    navigate(`/posts/${postId}`);
+  const handleArticleClick = (articleId: string) => {
+    navigate(`/articles/${articleId}`);
   };
 
-  const handleToggleComments = (postId: string) => {
+  const handleToggleComments = (articleId: string) => {
     const newExpandedComments = new Set(expandedComments);
-    if (expandedComments.has(postId)) {
-      newExpandedComments.delete(postId);
+    if (expandedComments.has(articleId)) {
+      newExpandedComments.delete(articleId);
     } else {
-      newExpandedComments.add(postId);
+      newExpandedComments.add(articleId);
     }
     setExpandedComments(newExpandedComments);
   };
 
-  const handlePostSubmit = async (postData: { headline: string; content: string; images: File[] }) => {
-    // This would typically make an API call to create the post
-    console.log("Creating post:", postData);
+  const handleArticleSubmit = async (articleData: { headline: string; content: string; images: File[] }) => {
+    // This would typically make an API call to create the article
+    console.log("Creating article:", articleData);
     
     // For now, add to local state (in real app, refetch from API)
-    const newPost: Post = {
+    const newArticle: Article = {
       id: Date.now().toString(),
       uid: user?.uid || "current-user",
-      headline: postData.headline,
-      content: postData.content,
-      imageUrls: postData.images.length > 0 ? ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=400&fit=crop"] : undefined,
+      headline: articleData.headline,
+      content: articleData.content,
+      imageUrls: articleData.images.length > 0 ? ["https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=400&fit=crop"] : undefined,
       likeCount: 0,
       commentCount: 0,
       createdTime: new Date().toISOString(),
@@ -163,8 +163,8 @@ export default function HomePage() {
       authorProfilePic: user?.photoURL || undefined
     };
     
-    setPosts(prevPosts => [newPost, ...prevPosts]);
-    setIsPostModalOpen(false);
+    setArticles(prevArticles => [newArticle, ...prevArticles]);
+    setIsArticleModalOpen(false);
   };
 
   return (
@@ -179,7 +179,7 @@ export default function HomePage() {
           {/* Main Content */}
           <div className="lg:col-span-6">
             <div className="space-y-4">
-              {/* Create Post Section */}
+              {/* Create Article Section */}
               <Card className="bg-cmo-card border-cmo-border">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-3">
@@ -192,43 +192,43 @@ export default function HomePage() {
                     <Button
                       variant="outline"
                       className="flex-1 justify-start text-cmo-text-secondary border-cmo-border hover:bg-gray-50"
-                      onClick={() => setIsPostModalOpen(true)}
-                      data-testid="button-create-post"
+                      onClick={() => setIsArticleModalOpen(true)}
+                      data-testid="button-create-article"
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Share a post...
+                      Write an article...
                     </Button>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Posts Feed */}
-              {posts.map((post) => (
-                <Card key={post.id} className="bg-cmo-card border-cmo-border">
+              {/* Articles Feed */}
+              {articles.map((article) => (
+                <Card key={article.id} className="bg-cmo-card border-cmo-border">
                   <CardContent className="p-4">
                     <div className="space-y-3">
-                      {/* Post Header */}
+                      {/* Article Header */}
                       <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-3">
                           <Avatar className="w-10 h-10">
-                            <AvatarImage src={post.authorProfilePic} />
+                            <AvatarImage src={article.authorProfilePic} />
                             <AvatarFallback className="bg-cmo-primary text-white">
-                              {post.authorName?.split(' ').map(n => n[0]).join('') || 
-                               post.uid?.charAt(0)?.toUpperCase() || "P"}
+                              {article.authorName?.split(' ').map(n => n[0]).join('') || 
+                               article.uid?.charAt(0)?.toUpperCase() || "A"}
                             </AvatarFallback>
                           </Avatar>
                           <div>
                             <h3 className="font-medium text-sm text-cmo-text-primary">
-                              {post.authorName || "Anonymous User"}
+                              {article.authorName || "Anonymous Author"}
                             </h3>
-                            {post.authorTitle && (
+                            {article.authorTitle && (
                               <p className="text-xs text-cmo-text-secondary">
-                                {post.authorTitle}
+                                {article.authorTitle}
                               </p>
                             )}
                             <div className="flex items-center text-xs text-cmo-text-secondary mt-1">
                               <Calendar className="w-3 h-3 mr-1" />
-                              {formatTimeAgo(post.createdTime)}
+                              {formatTimeAgo(article.createdTime)}
                             </div>
                           </div>
                         </div>
@@ -246,38 +246,38 @@ export default function HomePage() {
                             </DropdownMenuItem>
                             <DropdownMenuItem>
                               <Flag className="w-4 h-4 mr-2" />
-                              Report Post
+                              Report Article
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
 
-                      {/* Post Content - Clickable */}
+                      {/* Article Content - Clickable */}
                       <div 
                         className="mb-3 cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
-                        onClick={() => handlePostClick(post.id)}
-                        data-testid={`post-content-${post.id}`}
+                        onClick={() => handleArticleClick(article.id)}
+                        data-testid={`article-content-${article.id}`}
                       >
                         <h3 className="font-semibold text-sm text-cmo-text-primary mb-2">
-                          {post.headline}
+                          {article.headline}
                         </h3>
                         <p className="text-sm text-cmo-text-secondary leading-relaxed">
-                          {post.content.length > 200 ? `${post.content.substring(0, 200)}...` : post.content}
+                          {article.content.length > 200 ? `${article.content.substring(0, 200)}...` : article.content}
                         </p>
                       </div>
 
-                      {/* Post Images */}
-                      {(post.imageUrls || post.imageUrl) && (
+                      {/* Article Images */}
+                      {(article.imageUrls || article.imageUrl) && (
                         <div className="mb-3">
-                          {post.imageUrls && post.imageUrls.length > 1 ? (
+                          {article.imageUrls && article.imageUrls.length > 1 ? (
                             <div className="grid grid-cols-2 gap-1 rounded-lg overflow-hidden">
-                              {post.imageUrls.map((imageUrl, index) => (
+                              {article.imageUrls.map((imageUrl, index) => (
                                 <img
                                   key={index}
                                   src={imageUrl}
-                                  alt={`${post.headline} - Image ${index + 1}`}
+                                  alt={`${article.headline} - Image ${index + 1}`}
                                   className={`w-full object-cover ${
-                                    post.imageUrls!.length === 2 ? 'h-48' : 'h-32'
+                                    article.imageUrls!.length === 2 ? 'h-48' : 'h-32'
                                   }`}
                                   onError={(e) => {
                                     e.currentTarget.style.display = "none";
@@ -287,8 +287,8 @@ export default function HomePage() {
                             </div>
                           ) : (
                             <img
-                              src={post.imageUrls?.[0] || post.imageUrl}
-                              alt={post.headline}
+                              src={article.imageUrls?.[0] || article.imageUrl}
+                              alt={article.headline}
                               className="w-full h-64 object-cover rounded-lg"
                               onError={(e) => {
                                 e.currentTarget.style.display = "none";
@@ -301,18 +301,18 @@ export default function HomePage() {
                       {/* Engagement Stats */}
                       <div className="flex items-center justify-between text-xs text-cmo-text-secondary mb-3">
                         <div className="flex items-center space-x-4">
-                          {post.likeCount > 0 && (
+                          {article.likeCount > 0 && (
                             <div className="flex items-center">
                               <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center mr-2">
                                 <ThumbsUp className="w-2 h-2 text-white fill-current" />
                               </div>
-                              <span>{post.likeCount}</span>
+                              <span>{article.likeCount}</span>
                             </div>
                           )}
                         </div>
-                        {post.commentCount > 0 && (
+                        {article.commentCount > 0 && (
                           <span>
-                            {post.commentCount} comment{post.commentCount > 1 ? "s" : ""}
+                            {article.commentCount} comment{article.commentCount > 1 ? "s" : ""}
                           </span>
                         )}
                       </div>
@@ -325,25 +325,25 @@ export default function HomePage() {
                           variant="ghost"
                           size="sm"
                           className={`flex-1 hover:bg-gray-50 py-2 ${
-                            likedPosts.has(post.id) ? 'text-blue-600' : 'text-cmo-text-secondary'
+                            likedArticles.has(article.id) ? 'text-blue-600' : 'text-cmo-text-secondary'
                           }`}
-                          onClick={() => handleLikePost(post.id)}
-                          data-testid={`button-like-${post.id}`}
+                          onClick={() => handleLikeArticle(article.id)}
+                          data-testid={`button-like-${article.id}`}
                         >
                           <ThumbsUp className="w-4 h-4 mr-1" />
                           <span className="text-xs">Like</span>
                         </Button>
                         <CommentSection
-                          postId={post.id}
-                          commentCount={post.commentCount}
-                          isExpanded={expandedComments.has(post.id)}
-                          onToggleExpand={() => handleToggleComments(post.id)}
+                          postId={article.id}
+                          commentCount={article.commentCount}
+                          isExpanded={expandedComments.has(article.id)}
+                          onToggleExpand={() => handleToggleComments(article.id)}
                         />
                         <Button
                           variant="ghost"
                           size="sm"
                           className="flex-1 hover:bg-gray-50 text-cmo-text-secondary py-2"
-                          data-testid={`button-share-${post.id}`}
+                          data-testid={`button-share-${article.id}`}
                         >
                           <Share2 className="w-4 h-4 mr-1" />
                           <span className="text-xs">Share</span>
@@ -352,7 +352,7 @@ export default function HomePage() {
                           variant="ghost"
                           size="sm"
                           className="flex-1 hover:bg-gray-50 text-cmo-text-secondary py-2"
-                          data-testid={`button-save-${post.id}`}
+                          data-testid={`button-save-${article.id}`}
                         >
                           <Bookmark className="w-4 h-4 mr-1" />
                           <span className="text-xs">Save</span>
@@ -360,13 +360,13 @@ export default function HomePage() {
                       </div>
 
                       {/* Comments Section */}
-                      {expandedComments.has(post.id) && (
+                      {expandedComments.has(article.id) && (
                         <div className="mt-4">
                           <CommentSection
-                            postId={post.id}
-                            commentCount={post.commentCount}
+                            postId={article.id}
+                            commentCount={article.commentCount}
                             isExpanded={true}
-                            onToggleExpand={() => handleToggleComments(post.id)}
+                            onToggleExpand={() => handleToggleComments(article.id)}
                           />
                         </div>
                       )}
@@ -384,13 +384,13 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Post Modal */}
+      {/* Article Modal */}
       <NewsPostModal
-        isOpen={isPostModalOpen}
-        onClose={() => setIsPostModalOpen(false)}
-        onSubmit={handlePostSubmit}
-        title="Create Post"
-        submitButtonText="Post"
+        isOpen={isArticleModalOpen}
+        onClose={() => setIsArticleModalOpen(false)}
+        onSubmit={handleArticleSubmit}
+        title="Write Article"
+        submitButtonText="Publish"
       />
     </div>
   );
