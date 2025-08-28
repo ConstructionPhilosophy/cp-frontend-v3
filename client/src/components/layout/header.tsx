@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, MoreHorizontal, Home, User, Edit, Flag, Share, Settings, FileText, Briefcase, Users, MessageSquare, RefreshCw, LogOut } from "lucide-react";
+import { Search, MoreHorizontal, Home, User, Edit, Flag, Share, Settings, FileText, Briefcase, Users, MessageSquare, RefreshCw, LogOut, TrendingUp } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
@@ -89,6 +89,10 @@ export default function Header() {
             <a href="/jobs" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
               <Briefcase className="w-5 h-5" />
               <span className="text-xs mt-1">Jobs</span>
+            </a>
+            <a href="/employer-dashboard" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
+              <TrendingUp className="w-5 h-5" />
+              <span className="text-xs mt-1">Dashboard</span>
             </a>
             <a href="/forum" className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
               <Users className="w-5 h-5" />

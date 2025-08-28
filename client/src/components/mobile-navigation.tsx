@@ -30,10 +30,10 @@ export default function MobileNavigation() {
             <span className="text-xs mt-1">Profile</span>
           </a>
         </Link>
-        <Link href="/construction">
+        <Link href="/employer-dashboard">
           <a className="flex flex-col items-center p-2 text-cmo-text-secondary">
-            <Building className="h-5 w-5" />
-            <span className="text-xs mt-1">Projects</span>
+            <TrendingUp className="h-5 w-5" />
+            <span className="text-xs mt-1">Dashboard</span>
           </a>
         </Link>
       </div>
