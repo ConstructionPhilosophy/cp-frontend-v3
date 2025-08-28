@@ -37,6 +37,7 @@ export interface Question {
   answersCount?: number;
   isHelpful?: boolean;
   priority?: 'low' | 'medium' | 'high';
+  imageUrl?: string;
 }
 
 export interface Answer {
@@ -62,6 +63,8 @@ export interface Space {
   hashtag?: string;
   color?: string;
   icon?: string;
+  isActive?: boolean;
+  count?: number;
 }
 
 export interface Vendor {
@@ -73,4 +76,6 @@ export interface Vendor {
   category: string;
   location?: string;
   verified?: boolean;
+  color?: string;
+  initials?: string;
 }

@@ -65,6 +65,7 @@ export const mockQuestions: Question[] = [
     title: "Do you have any experience with deploying @Hubspot?",
     content: "We are a series A B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith, Would love your thoughts as well.",
     authorId: "1",
+    author: mockUsers[0],
     category: "Retouch",
     tags: ["content-marketing", "branding"],
     imageUrl: "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400",
@@ -75,9 +76,9 @@ export const mockQuestions: Question[] = [
     title: "Best practices for B2B lead generation?",
     content: "We have used @Hubspot extensively for our business, and are generally very happy with them. We started with a custom solution, and it took us a month to switch, the results have been dramatic, and feel free. See more",
     authorId: "3",
+    author: mockUsers[2],
     category: "Performance Marketing",
     tags: ["lead-generation", "b2b"],
-    imageUrl: undefined,
     createdAt: new Date("2023-11-23"),
   },
   {
@@ -85,9 +86,9 @@ export const mockQuestions: Question[] = [
     title: "Do you have any experience with deploying @Hubspot?",
     content: "We are a series A B2B startup with a custom solution today. We are using @Mixpanel and working with... See more",
     authorId: "2",
+    author: mockUsers[1],
     category: "Retouch",
     tags: ["content-marketing", "branding"],
-    imageUrl: undefined,
     createdAt: new Date("2023-11-20"),
   },
 ];
@@ -162,6 +163,7 @@ export const mockVendors: Vendor[] = [
   {
     id: "1",
     name: "Mixpanel",
+    category: "Analytics",
     location: "San Francisco, CA",
     initials: "MP",
     color: "bg-blue-100 text-blue-600",
@@ -169,6 +171,7 @@ export const mockVendors: Vendor[] = [
   {
     id: "2",
     name: "Hubspot",
+    category: "CRM",
     location: "Boston, MA",
     initials: "H",
     color: "bg-orange-100 text-orange-600",
@@ -176,6 +179,7 @@ export const mockVendors: Vendor[] = [
   {
     id: "3",
     name: "Division of Labor",
+    category: "Consulting",
     location: "San Francisco, CA",
     initials: "DL",
     color: "bg-red-100 text-red-600",
