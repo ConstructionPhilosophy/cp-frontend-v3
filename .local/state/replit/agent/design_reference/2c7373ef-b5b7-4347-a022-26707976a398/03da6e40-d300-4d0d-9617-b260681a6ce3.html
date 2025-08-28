@@ -1,0 +1,611 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CMOlist - Community Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4285F4',
+                        primaryLight: '#E3F2FD',
+                        textPrimary: '#1A1A1A',
+                        textSecondary: '#666666',
+                        bgMain: '#FAFAFA',
+                        bgCard: '#FFFFFF',
+                        border: '#E0E0E0'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-bgMain font-sans">
+    <!-- @COMPONENT: Header Navigation -->
+    <header class="bg-white border-b border-border sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo and Search -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                            <div class="grid grid-cols-2 gap-0.5">
+                                <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                            </div>
+                        </div>
+                        <span class="text-xl font-semibold text-textPrimary">CMOlist</span>
+                    </div>
+                    
+                    <!-- Desktop Search -->
+                    <div class="hidden md:block">
+                        <div class="relative">
+                            <input type="text" placeholder="Search..." 
+                                   class="w-80 pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <i class="fas fa-search absolute left-3 top-3 text-textSecondary"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#" class="flex flex-col items-center text-primary">
+                        <i class="fas fa-home text-lg"></i>
+                        <span class="text-xs mt-1">Home</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center text-textSecondary hover:text-primary">
+                        <i class="fas fa-users text-lg"></i>
+                        <span class="text-xs mt-1">Members</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center text-textSecondary hover:text-primary">
+                        <i class="fas fa-book text-lg"></i>
+                        <span class="text-xs mt-1">Guides</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center text-textSecondary hover:text-primary">
+                        <i class="fas fa-chart-line text-lg"></i>
+                        <span class="text-xs mt-1">Martech</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center text-textSecondary hover:text-primary">
+                        <i class="fas fa-building text-lg"></i>
+                        <span class="text-xs mt-1">Agencies</span>
+                    </a>
+                    <a href="#" class="flex flex-col items-center text-textSecondary hover:text-primary">
+                        <i class="fas fa-handshake text-lg"></i>
+                        <span class="text-xs mt-1">Consultants</span>
+                    </a>
+                </nav>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <!-- @END_COMPONENT: Header Navigation -->
+
+    <!-- @COMPONENT: Main Container -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="lg:grid lg:grid-cols-12 lg:gap-6">
+            
+            <!-- @COMPONENT: Left Sidebar - Desktop Only -->
+            <div class="hidden lg:block lg:col-span-3">
+                <div class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <!-- Mobile Search -->
+                    <div class="mb-6">
+                        <div class="relative">
+                            <input type="text" placeholder="Search..." 
+                                   class="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <i class="fas fa-search absolute left-3 top-3 text-textSecondary"></i>
+                        </div>
+                    </div>
+
+                    <!-- Filter Categories -->
+                    <div class="space-y-2">
+                        <button class="w-full text-left px-4 py-2 bg-primary text-white rounded-lg font-medium">
+                            All (20)
+                        </button>
+                        <button class="w-full text-left px-4 py-2 text-textSecondary hover:bg-gray-50 rounded-lg">
+                            My Peers (18)
+                        </button>
+                        <button class="w-full text-left px-4 py-2 text-textSecondary hover:bg-gray-50 rounded-lg">
+                            My Experts
+                        </button>
+                    </div>
+                </div>
+
+                <!-- My Network Section -->
+                <div class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <h3 class="font-semibold text-textPrimary mb-4">My Network</h3>
+                    <div class="space-y-3">
+                        <button class="w-full text-left text-primary hover:underline">Share Article</button>
+                        <button class="w-full text-left text-primary hover:underline">Share Experience</button>
+                        <button class="w-full text-left text-primary hover:underline">Ask Question</button>
+                    </div>
+                </div>
+
+                <!-- Build Marketing Section -->
+                <div class="bg-white rounded-lg border border-border p-6">
+                    <h3 class="font-semibold text-textPrimary mb-4">Build your marketing</h3>
+                    <div class="space-y-3">
+                        <button class="w-full text-left flex items-center space-x-3 py-2">
+                            <i class="fas fa-plus-circle text-primary"></i>
+                            <span>Invite a person</span>
+                        </button>
+                        <div class="flex items-center space-x-3 py-2">
+                            <input type="checkbox" class="rounded">
+                            <span class="text-textSecondary">Fill out your profile</span>
+                        </div>
+                        <div class="flex items-center space-x-3 py-2">
+                            <input type="checkbox" class="rounded">
+                            <span class="text-textSecondary">Ask your first question</span>
+                        </div>
+                        <div class="flex items-center space-x-3 py-2">
+                            <input type="checkbox" class="rounded" checked>
+                            <span class="text-green-600">Answer a question</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: Left Sidebar -->
+
+            <!-- @COMPONENT: Main Content Area -->
+            <div class="lg:col-span-6">
+                <!-- Mobile Category Filters -->
+                <div class="lg:hidden mb-6">
+                    <div class="flex space-x-2 overflow-x-auto pb-2">
+                        <button class="flex-shrink-0 px-4 py-2 bg-primary text-white rounded-full text-sm font-medium">
+                            All (20)
+                        </button>
+                        <button class="flex-shrink-0 px-4 py-2 bg-gray-100 text-textSecondary rounded-full text-sm">
+                            My Peers (18)
+                        </button>
+                        <button class="flex-shrink-0 px-4 py-2 bg-gray-100 text-textSecondary rounded-full text-sm">
+                            My Experts
+                        </button>
+                        <button class="flex-shrink-0 px-4 py-2 bg-gray-100 text-textSecondary rounded-full text-sm">
+                            Modern Marketing (5)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question Input -->
+                <div class="bg-white rounded-lg border border-border p-4 mb-6">
+                    <div class="flex items-center space-x-3">
+                        <!-- User profile image for networking -->
+                        <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" 
+                             alt="User avatar" class="w-10 h-10 rounded-full" data-mock="true">
+                        <input type="text" placeholder="Ask a question" 
+                               class="flex-1 py-2 px-4 bg-gray-50 rounded-full focus:outline-none focus:ring-2 focus:ring-primary">
+                    </div>
+                </div>
+
+                <!-- Question Cards -->
+                <!-- @MAP: questions.map(question => ( -->
+                
+                <!-- Question Card 1 -->
+                <article class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <div class="flex items-start space-x-4">
+                        <!-- Professional headshot for business networking -->
+                        <img src="https://pixabay.com/get/g07d1e0cdacd32f77ef6961e14273e1acac410aa87266f60cdde3028d89674e64cd3873f4f322bb16680f2297b6511f6995be0dfd1e4548159de7a04c2faa21ff_1280.jpg" 
+                             alt="Jennifer Smith profile" class="w-12 h-12 rounded-full flex-shrink-0" data-mock="true">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <h3 class="font-semibold text-textPrimary" data-bind="user.name">Jennifer Smith</h3>
+                                <span class="text-textSecondary text-sm" data-bind="user.title">Brand at Modern Media</span>
+                                <span class="text-textSecondary text-sm">• Nov 20</span>
+                            </div>
+                            <p class="text-textSecondary text-sm mb-3" data-bind="question.category">Asked a question • Retouch #Content-marketing #branding</p>
+                            
+                            <h2 class="text-lg font-semibold text-textPrimary mb-4" data-bind="question.title">
+                                Do you have any experience with deploying @Hubspot?
+                            </h2>
+                            
+                            <p class="text-textPrimary mb-4" data-bind="question.description">
+                                We are a series A B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith, Would love your thoughts as well.
+                            </p>
+                            
+                            <!-- Question illustration showing team collaboration -->
+                            <div class="mb-4">
+                                <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=400" 
+                                     alt="Marketing team collaboration" class="w-full h-48 object-cover rounded-lg" data-mock="true">
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex items-center space-x-6 pt-4 border-t border-border">
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary" data-event="click:handleAnswer">
+                                    <i class="fas fa-reply"></i>
+                                    <span>Answer</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-times"></i>
+                                    <span>Pass</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>Thanks</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Insightful</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Answer Card -->
+                <article class="bg-white rounded-lg border border-border p-6 mb-6 ml-8">
+                    <div class="flex items-start space-x-4">
+                        <!-- Professional headshot for business networking -->
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" 
+                             alt="Eckart Walther profile" class="w-12 h-12 rounded-full flex-shrink-0" data-mock="true">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <h3 class="font-semibold text-textPrimary">Eckart Walther</h3>
+                                <span class="text-textSecondary text-sm">CMO at Modern Media • Nov 20</span>
+                            </div>
+                            <p class="text-textSecondary text-sm mb-3">Answering a previous • Retouch #content-marketing #branding</p>
+                            
+                            <h2 class="text-lg font-semibold text-textPrimary mb-4">
+                                Do you have any experience with deploying @Hubspot?
+                            </h2>
+                            
+                            <p class="text-textPrimary mb-4">
+                                We are a series A B2B startup with a custom solution today. We are using @Mixpanel and working with @Division of Labor to rebuild our pages. @Jennifer Smith, Would love your thoughts as well.
+                            </p>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex items-center space-x-6 pt-4 border-t border-border">
+                                <button class="flex items-center space-x-2 text-primary">
+                                    <i class="fas fa-reply"></i>
+                                    <span>Answer</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-times"></i>
+                                    <span>Pass</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>Thanks</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Insightful</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Question Card 2 -->
+                <article class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <div class="flex items-start space-x-4">
+                        <!-- Professional headshot for business networking -->
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" 
+                             alt="Hilary Jones profile" class="w-12 h-12 rounded-full flex-shrink-0" data-mock="true">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <h3 class="font-semibold text-textPrimary">Hilary Jones</h3>
+                                <span class="text-textSecondary text-sm">Performance Marketing • Nov 23</span>
+                            </div>
+                            <p class="text-textSecondary text-sm mb-3">Asked a question</p>
+                            
+                            <p class="text-textPrimary mb-4">
+                                We have used @Hubspot extensively for our business, and are generally very happy with them. We started with a custom solution, and it took us a month to switch, the results have been dramatic, and feel free. <span class="text-primary cursor-pointer">See more</span>
+                            </p>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex items-center space-x-6 pt-4 border-t border-border">
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-reply"></i>
+                                    <span>Answer</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-times"></i>
+                                    <span>Pass</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>Thanks</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Insightful</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Question Card 3 -->
+                <article class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <div class="flex items-start space-x-4">
+                        <!-- Professional headshot for business networking -->
+                        <img src="https://pixabay.com/get/g07d1e0cdacd32f77ef6961e14273e1acac410aa87266f60cdde3028d89674e64cd3873f4f322bb16680f2297b6511f6995be0dfd1e4548159de7a04c2faa21ff_1280.jpg" 
+                             alt="Eckart Walther profile" class="w-12 h-12 rounded-full flex-shrink-0" data-mock="true">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <h3 class="font-semibold text-textPrimary">Eckart Walther</h3>
+                                <span class="text-textSecondary text-sm">CMO at Modern Media • Nov 20</span>
+                            </div>
+                            <p class="text-textSecondary text-sm mb-3">Asked a question • Retouch #content-marketing #branding</p>
+                            
+                            <h2 class="text-lg font-semibold text-textPrimary mb-4">
+                                Do you have any experience with deploying @Hubspot?
+                            </h2>
+                            
+                            <p class="text-textPrimary mb-4">
+                                We are a series A B2B startup with a custom solution today. We are using @Mixpanel and working with... <span class="text-primary cursor-pointer">See more</span>
+                            </p>
+                            
+                            <!-- Action Buttons -->
+                            <div class="flex items-center space-x-6 pt-4 border-t border-border">
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-reply"></i>
+                                    <span>Answer</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-times"></i>
+                                    <span>Pass</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-thumbs-up"></i>
+                                    <span>Thanks</span>
+                                </button>
+                                <button class="flex items-center space-x-2 text-textSecondary hover:text-primary">
+                                    <i class="fas fa-lightbulb"></i>
+                                    <span>Insightful</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                
+                <!-- @END_MAP )) -->
+            </div>
+            <!-- @END_COMPONENT: Main Content Area -->
+
+            <!-- @COMPONENT: Right Sidebar - Desktop Only -->
+            <div class="hidden lg:block lg:col-span-3">
+                <!-- Questions & Answers Stats -->
+                <div class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <p class="text-textSecondary text-sm mb-4">Questions & Answers (12) • Project & Vendors (3) • Articles &</p>
+                </div>
+
+                <!-- User Profile Card -->
+                <div class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <!-- Professional headshot for business networking -->
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&h=100" 
+                             alt="Eckart Walther profile" class="w-12 h-12 rounded-full" data-mock="true">
+                        <div>
+                            <h3 class="font-semibold text-textPrimary">Eckart Walther</h3>
+                            <p class="text-textSecondary text-sm">CMO at Modern Media • Nov 20</p>
+                            <p class="text-textSecondary text-sm">Answering a previous • Retouch #content-marketing #branding</p>
+                        </div>
+                    </div>
+                    
+                    <h4 class="font-semibold text-textPrimary mb-3">Community Contribution</h4>
+                    
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-textSecondary">Posts:</span>
+                            <span class="font-semibold">43</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-textSecondary">Views:</span>
+                            <span class="font-semibold">4.3k</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-textSecondary">Thanks:</span>
+                            <span class="font-semibold">105</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-textSecondary">Insightful:</span>
+                            <span class="font-semibold">342</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Spaces -->
+                <div class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-textPrimary">My Spaces</h3>
+                        <button class="text-primary text-sm hover:underline">Edit</button>
+                    </div>
+                    
+                    <div class="flex flex-wrap gap-2">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                            #advertising <span class="ml-1 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs">22</span>
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                            #performance-m...
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                            #social-media-m...
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                            #public-relations <span class="ml-1 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs">3</span>
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                            #design
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                            #account-based...
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-red-100 text-red-800">
+                            #content-marke... <span class="ml-1 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs">17</span>
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                            #conversion-rat...
+                        </span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-800">
+                            #demand-gener...
+                        </span>
+                    </div>
+                </div>
+
+                <!-- All Members -->
+                <div class="bg-white rounded-lg border border-border p-6 mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-semibold text-textPrimary">All Members</h3>
+                        <button class="text-primary text-sm hover:underline">See all</button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <!-- Professional headshot for business networking -->
+                            <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&h=50" 
+                                 alt="John Smith profile" class="w-8 h-8 rounded-full" data-mock="true">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-textPrimary">John Smith - 1.27</p>
+                                <p class="text-xs text-textSecondary">CMO at Modern Media</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <!-- Professional headshot for business networking -->
+                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&h=50" 
+                                 alt="Ava Nicole profile" class="w-8 h-8 rounded-full" data-mock="true">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-textPrimary">Ava Nicole - 541</p>
+                                <p class="text-xs text-textSecondary">VP Marketing at Puro</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <!-- Professional headshot for business networking -->
+                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&h=50" 
+                                 alt="Hilary Gresta profile" class="w-8 h-8 rounded-full" data-mock="true">
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-textPrimary">Hilary Gresta - 22</p>
+                                <p class="text-xs text-textSecondary">CMO at Sprinklr</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 487 Vendors -->
+                <div class="bg-white rounded-lg border border-border p-6">
+                    <h3 class="font-semibold text-textPrimary mb-4">487 Vendors</h3>
+                    
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span class="text-blue-600 font-semibold text-xs">MP</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-textPrimary">Mixpanel</p>
+                                <p class="text-xs text-textSecondary">San Francisco, CA</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                <span class="text-orange-600 font-semibold text-xs">H</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-textPrimary">Hubspot</p>
+                                <p class="text-xs text-textSecondary">Boston, MA</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                                <span class="text-red-600 font-semibold text-xs">DL</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-sm font-medium text-textPrimary">Division of Labor</p>
+                                <p class="text-xs text-textSecondary">San Francisco, CA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: Right Sidebar -->
+            
+        </div>
+    </div>
+    <!-- @END_COMPONENT: Main Container -->
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-border">
+        <div class="flex items-center justify-around py-2">
+            <a href="#" class="flex flex-col items-center p-2 text-primary">
+                <i class="fas fa-home text-lg"></i>
+                <span class="text-xs mt-1">Home</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-2 text-textSecondary">
+                <i class="fas fa-users text-lg"></i>
+                <span class="text-xs mt-1">Members</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-2 text-textSecondary">
+                <i class="fas fa-book text-lg"></i>
+                <span class="text-xs mt-1">Guides</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-2 text-textSecondary">
+                <i class="fas fa-chart-line text-lg"></i>
+                <span class="text-xs mt-1">Martech</span>
+            </a>
+            <a href="#" class="flex flex-col items-center p-2 text-textSecondary">
+                <i class="fas fa-building text-lg"></i>
+                <span class="text-xs mt-1">Agencies</span>
+            </a>
+        </div>
+    </nav>
+
+    <script>
+        (function() {
+            // TODO: Implement business logic, API calls, or state management
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.querySelector('.md\\:hidden button');
+            const mobileMenu = document.querySelector('.mobile-menu');
+            
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function() {
+                    // TODO: Toggle mobile menu visibility
+                    console.log('Mobile menu clicked');
+                });
+            }
+            
+            // Search functionality
+            const searchInputs = document.querySelectorAll('input[placeholder="Search..."]');
+            searchInputs.forEach(input => {
+                input.addEventListener('input', function(e) {
+                    // TODO: Implement search functionality
+                    console.log('Search query:', e.target.value);
+                });
+            });
+            
+            // Question/Answer interactions
+            const actionButtons = document.querySelectorAll('[data-event^="click:"]');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.getAttribute('data-event').split(':')[1];
+                    // TODO: Implement specific action handlers
+                    console.log('Action triggered:', action);
+                });
+            });
+            
+            // Category filter buttons
+            const filterButtons = document.querySelectorAll('button[class*="rounded"]');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // TODO: Implement category filtering
+                    console.log('Filter clicked:', this.textContent);
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
