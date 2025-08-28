@@ -46,7 +46,7 @@ const JobsPage = () => {
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   const isMobile = useIsMobile();
 
@@ -144,7 +144,7 @@ const JobsPage = () => {
       );
     }
 
-    if (typeFilter) {
+    if (typeFilter && typeFilter !== 'all') {
       filtered = filtered.filter(job => job.type === typeFilter);
     }
 
@@ -306,7 +306,7 @@ const JobsPage = () => {
                           <SelectValue placeholder="Job Type" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All Types</SelectItem>
+                          <SelectItem value="all">All Types</SelectItem>
                           <SelectItem value="full-time">Full Time</SelectItem>
                           <SelectItem value="part-time">Part Time</SelectItem>
                           <SelectItem value="contract">Contract</SelectItem>
