@@ -104,15 +104,15 @@ const JobsPage = () => {
 
     if (searchTerm) {
       filtered = filtered.filter(job => 
-        job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (job.skills && Array.isArray(job.skills) && job.skills.some(skill => skill?.toLowerCase().includes(searchTerm.toLowerCase()))) ||
-        job.company?.toLowerCase().includes(searchTerm.toLowerCase())
+        (job.title && job.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (job.skills && Array.isArray(job.skills) && job.skills.some(skill => skill && skill.toLowerCase().includes(searchTerm.toLowerCase()))) ||
+        (job.company && job.company.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
     if (locationFilter) {
       filtered = filtered.filter(job => 
-        job.location?.toLowerCase().includes(locationFilter.toLowerCase())
+        job.location && job.location.toLowerCase().includes(locationFilter.toLowerCase())
       );
     }
 

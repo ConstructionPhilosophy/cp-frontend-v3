@@ -215,7 +215,7 @@ export function SecurityDashboard() {
               <div className="flex items-center space-x-2 mt-2">
                 <Progress value={assessment?.overallScore} className="flex-1" />
                 <span className={`text-sm font-medium ${getRiskColor(assessment?.riskLevel || '')}`}>
-                  {assessment?.riskLevel?.toUpperCase()}
+                  {assessment?.riskLevel ? assessment.riskLevel.toUpperCase() : 'UNKNOWN'}
                 </span>
               </div>
             </CardContent>
@@ -296,7 +296,7 @@ export function SecurityDashboard() {
                       </div>
                       <div className="flex flex-col space-y-2">
                         <Badge variant={getPriorityColor(rec.priority) as any}>
-                          {rec.priority.toUpperCase()}
+                          {rec.priority ? rec.priority.toUpperCase() : 'MEDIUM'}
                         </Badge>
                         {rec.isImplemented && (
                           <Badge variant="outline" className="text-green-600 border-green-600">
@@ -365,7 +365,7 @@ export function SecurityDashboard() {
                 <Card key={metric.id}>
                   <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                     <CardTitle className="text-sm font-medium capitalize">
-                      {metric.metricType.replace('_', ' ')}
+                      {metric.metricType ? metric.metricType.replace('_', ' ') : 'Unknown Metric'}
                     </CardTitle>
                     {metric.changePercentage && metric.changePercentage > 0 ? (
                       <TrendingUp className="h-4 w-4 text-green-600" />

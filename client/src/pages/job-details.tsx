@@ -300,7 +300,7 @@ const JobDetailsPage = () => {
                 </CardHeader>
                 <CardContent>
                   <Badge className={getApplicationStatusColor(job.applicationStatus)}>
-                    {job.applicationStatus.toUpperCase()}
+                    {job.applicationStatus ? job.applicationStatus.toUpperCase() : 'PENDING'}
                   </Badge>
                   {job.applicationId && (
                     <p className="text-sm text-cmo-text-secondary mt-2">
