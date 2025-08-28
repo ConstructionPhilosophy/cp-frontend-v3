@@ -81,8 +81,28 @@ const JobsPage = () => {
       }
 
       const jobsData = await response.json();
-      setJobs(jobsData);
-      setFilteredJobs(jobsData);
+      
+      // Transform API response to match our interface
+      const transformedJobs = jobsData.map((job: any) => ({
+        jobId: job.JobID,
+        title: job.Title,
+        company: job.Company,
+        location: job.Location,
+        type: job.Type,
+        skills: job.Skills || [],
+        experience: job.Experience,
+        salaryRange: job.SalaryRange,
+        description: job.Description,
+        qualifications: job.Qualifications,
+        postedAt: job.PostedAt,
+        deadline: job.Deadline,
+        numberOfVacancies: job.Vacancies || 1,
+        industry: job.Industry,
+        postedBy: job.PostedBy
+      }));
+      
+      setJobs(transformedJobs);
+      setFilteredJobs(transformedJobs);
     } catch (error) {
       console.error('Error fetching jobs:', error);
       // For now, show empty list if API fails

@@ -71,7 +71,31 @@ const JobDetailsPage = () => {
       }
 
       const jobData = await response.json();
-      setJob(jobData);
+      
+      // Transform API response to match our interface
+      const transformedJob = {
+        jobId: jobData.JobID,
+        title: jobData.Title,
+        company: jobData.Company,
+        location: jobData.Location,
+        type: jobData.Type,
+        skills: jobData.Skills || [],
+        experience: jobData.Experience,
+        salaryRange: jobData.SalaryRange,
+        description: jobData.Description,
+        qualifications: jobData.Qualifications,
+        postedAt: jobData.PostedAt,
+        deadline: jobData.Deadline,
+        numberOfVacancies: jobData.Vacancies || 1,
+        industry: jobData.Industry,
+        postedBy: jobData.PostedBy,
+        alreadyApplied: jobData.AlreadyApplied || false,
+        applicationStatus: jobData.ApplicationStatus,
+        applicationId: jobData.ApplicationId,
+        isOwner: jobData.IsOwner || false
+      };
+      
+      setJob(transformedJob);
     } catch (error) {
       console.error('Error fetching job details:', error);
       toast({
