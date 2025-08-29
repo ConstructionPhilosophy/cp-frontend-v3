@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { mockUsers, mockSpaces, mockVendors } from "../../lib/mock-data";
+import SuggestedUsers from "../ui/suggested-users";
 
 export default function SidebarRight() {
   return (
@@ -90,39 +91,8 @@ export default function SidebarRight() {
         </div>
       </div>
 
-      {/* All Members */}
-      <div className="bg-cmo-card rounded-lg border border-cmo-border p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-sm text-cmo-text-primary">
-            All Members
-          </h3>
-          <Button
-            variant="link"
-            className="text-cmo-primary text-xs hover:underline p-0 h-auto"
-          >
-            See all
-          </Button>
-        </div>
-
-        <div className="space-y-2">
-          {mockUsers.slice(0, 3).map((user) => (
-            <div key={user.id} className="flex items-center space-x-2">
-              <Avatar className="w-6 h-6">
-                <AvatarImage src={user.avatar} />
-                <AvatarFallback className="text-xs">
-                  {user.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="text-xs font-medium text-cmo-text-primary">
-                  {user.name} - 1.27
-                </p>
-                <p className="text-xs text-cmo-text-secondary">{user.title}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      {/* Suggested for You */}
+      <SuggestedUsers />
 
       {/* Vendors */}
       <div className="bg-cmo-card rounded-lg border border-cmo-border p-4">
