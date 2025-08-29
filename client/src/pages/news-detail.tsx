@@ -192,11 +192,8 @@ This innovation represents a significant step forward in sustainable constructio
         </div>
 
         <div className={`grid ${isMobile ? 'grid-cols-1 gap-6' : 'grid-cols-12 gap-6'}`}>
-          {/* Left Sidebar - Hidden on detail page */}
-          {!isMobile && <div className="lg:col-span-3"></div>}
-          
-          {/* Main Content - Same width as news page */}
-          <div className={`${isMobile ? 'col-span-1' : 'col-span-6'}`}>
+          {/* Main Content - Taking up more space for better alignment */}
+          <div className={`${isMobile ? 'col-span-1' : 'col-span-8'}`}>
             <Card>
               <CardContent className="p-4">
                 {/* Author Header */}
@@ -350,7 +347,7 @@ This innovation represents a significant step forward in sustainable constructio
           </div>
 
           {/* Right Side - Comments */}
-          <div className={`${isMobile ? 'col-span-1' : 'col-span-3'}`}>
+          <div className={`${isMobile ? 'col-span-1' : 'col-span-4'}`}>
             <Card className="h-full">
               <CardContent className="p-4 h-full flex flex-col">
                 <h2 className="text-sm font-semibold text-cmo-text-primary mb-4">
