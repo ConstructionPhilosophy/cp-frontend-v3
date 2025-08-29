@@ -30,6 +30,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Header from "../components/layout/header";
+import SidebarLeft from "../components/layout/sidebar-left";
 import SidebarRight from "../components/layout/sidebar-right";
 import MobileNavigation from "../components/mobile-navigation";
 import { useIsMobile } from "../hooks/use-mobile";
@@ -334,294 +335,264 @@ const JobsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-cmo-bg-main">
+    <div className="min-h-screen bg-cmo-background">
       <Header />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="lg:grid lg:grid-cols-12 lg:gap-4">
-          {/* Main Content Area */}
-          <div className="lg:col-span-9">
-            <div className="flex gap-6">
-              {/* Left Sidebar */}
-              <div className="w-64 flex-shrink-0">
-                <div className="bg-white rounded-lg border border-cmo-border p-4 mb-4">
-                  <h2 className="text-lg font-semibold text-cmo-text-primary mb-4">
-                    Job Actions
-                  </h2>
-                  <div className="space-y-3">
-                    <Button
-                      className="w-full justify-start"
-                      variant="default"
-                      onClick={() => setLocation("/post-job")}
-                      data-testid="button-post-job"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Post a Job
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      variant="outline"
-                      data-testid="button-saved-jobs"
-                    >
-                      <Bookmark className="w-4 h-4 mr-2" />
-                      Saved Jobs
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      variant="outline"
-                      data-testid="button-my-applications"
-                    >
-                      <Briefcase className="w-4 h-4 mr-2" />
-                      My Applications
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      variant="outline"
-                      data-testid="button-dashboard"
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Dashboard
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Open to Work Toggle */}
-                <div className="bg-white rounded-lg border border-cmo-border p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-cmo-text-primary">
-                      Open to Work
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setOpenToWork(!openToWork)}
-                      className="p-0 h-6 w-10"
-                      data-testid="toggle-open-to-work"
-                    >
-                      {openToWork ? (
-                        <ToggleRight className="h-6 w-6 text-green-600" />
-                      ) : (
-                        <ToggleLeft className="h-6 w-6 text-gray-400" />
-                      )}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-cmo-text-secondary mt-1">
-                    Let recruiters know you're looking for opportunities
-                  </p>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Sidebar */}
+          <div className="lg:col-span-3">
+            <SidebarLeft />
+            
+            {/* Jobs-specific sidebar content */}
+            <div className="mt-4 space-y-4">
+              <div className="bg-cmo-card border border-cmo-border rounded-lg p-4">
+                <h3 className="font-medium text-sm text-cmo-text-primary mb-3">
+                  Job Actions
+                </h3>
+                <div className="space-y-2">
+                  <Button
+                    className="w-full justify-start text-xs h-8"
+                    variant="default"
+                    onClick={() => setLocation("/post-job")}
+                    data-testid="button-post-job"
+                  >
+                    <Plus className="w-3 h-3 mr-2" />
+                    Post a Job
+                  </Button>
+                  <Button
+                    className="w-full justify-start text-xs h-8"
+                    variant="outline"
+                    data-testid="button-saved-jobs"
+                  >
+                    <Bookmark className="w-3 h-3 mr-2" />
+                    Saved Jobs
+                  </Button>
+                  <Button
+                    className="w-full justify-start text-xs h-8"
+                    variant="outline"
+                    data-testid="button-my-applications"
+                  >
+                    <Briefcase className="w-3 h-3 mr-2" />
+                    My Applications
+                  </Button>
                 </div>
               </div>
 
-              {/* Main Jobs Content */}
-              <div className="flex-1">
-                {/* Search and Filters */}
-                <div className="bg-white rounded-lg border border-cmo-border p-4 mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="md:col-span-2">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cmo-text-secondary w-4 h-4" />
-                        <Input
-                          placeholder="Job title, skills, company..."
-                          value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
-                          className="pl-10"
-                          data-testid="input-job-search"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cmo-text-secondary w-4 h-4" />
-                        <Input
-                          placeholder="Location (e.g. Chennai)"
-                          value={locationFilter}
-                          onChange={(e) => setLocationFilter(e.target.value)}
-                          className="pl-10"
-                          data-testid="input-location-filter"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <Select value={typeFilter} onValueChange={setTypeFilter}>
-                        <SelectTrigger data-testid="select-job-type">
-                          <SelectValue placeholder="Job Type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All Types</SelectItem>
-                          <SelectItem value="full-time">Full Time</SelectItem>
-                          <SelectItem value="part-time">Part Time</SelectItem>
-                          <SelectItem value="contract">Contract</SelectItem>
-                          <SelectItem value="freelance">Freelance</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+              {/* Open to Work Toggle */}
+              <div className="bg-cmo-card border border-cmo-border rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-cmo-text-primary">
+                    Open to Work
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setOpenToWork(!openToWork)}
+                    className="p-0 h-5 w-8"
+                    data-testid="toggle-open-to-work"
+                  >
+                    {openToWork ? (
+                      <ToggleRight className="h-5 w-5 text-green-600" />
+                    ) : (
+                      <ToggleLeft className="h-5 w-5 text-gray-400" />
+                    )}
+                  </Button>
                 </div>
-
-                {/* Job Results Header */}
-                <div className="mb-4">
-                  <h1 className="text-xl font-semibold text-cmo-text-primary">
-                    {filteredJobs?.length || 0} Job
-                    {(filteredJobs?.length || 0) !== 1 ? "s" : ""} Found
-                  </h1>
-                  <p className="text-sm text-cmo-text-secondary">
-                    Showing results for construction industry professionals
-                  </p>
-                </div>
-
-                {/* Jobs List */}
-                <div className="space-y-4">
-                  {filteredJobs && filteredJobs.length > 0 ? (
-                    filteredJobs.map((job) => (
-                      <div
-                        key={job.jobId}
-                        className="bg-white rounded-lg border border-cmo-border p-4 hover:border-cmo-primary transition-colors cursor-pointer"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleJobClick(job.jobId);
-                        }}
-                        data-testid={`card-job-${job.jobId}`}
-                      >
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-cmo-text-primary mb-1">
-                              {job.title}
-                            </h3>
-                            <p className="text-cmo-text-secondary font-medium">
-                              {job.company}
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSaveJob(job.jobId);
-                              }}
-                              data-testid={`button-save-${job.jobId}`}
-                            >
-                              <Bookmark className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap items-center gap-4 mb-3 text-sm text-cmo-text-secondary">
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            {job.location || "Location not specified"}
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-1" />
-                            {job.experience || "Not specified"}
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {job.postedAt
-                              ? formatDate(job.postedAt)
-                              : "Recently posted"}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between mb-3">
-                          <Badge
-                            variant="outline"
-                            className={getJobTypeColor(job.type)}
-                          >
-                            {(job.type || "full-time")
-                              .replace("-", " ")
-                              .toUpperCase()}
-                          </Badge>
-                          <span className="text-lg font-semibold text-cmo-primary">
-                            {job.salaryRange || "Salary not disclosed"}
-                          </span>
-                        </div>
-
-                        <p className="text-cmo-text-secondary text-sm mb-3 line-clamp-2">
-                          {job.description || "No description available"}
-                        </p>
-
-                        <div className="flex flex-wrap gap-1 mb-3">
-                          {job.skills &&
-                            Array.isArray(job.skills) &&
-                            job.skills.slice(0, 4).map((skill) => (
-                              <Badge
-                                key={skill}
-                                variant="secondary"
-                                className="text-xs"
-                              >
-                                {skill}
-                              </Badge>
-                            ))}
-                          {job.skills && job.skills.length > 4 && (
-                            <Badge variant="secondary" className="text-xs">
-                              +{job.skills.length - 4} more
-                            </Badge>
-                          )}
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4 text-xs text-cmo-text-secondary">
-                            <div className="flex items-center">
-                              <Eye className="w-3 h-3 mr-1" />
-                              {job.totalViews || 0} views
-                            </div>
-                            <div className="flex items-center">
-                              <Users className="w-3 h-3 mr-1" />
-                              {job.totalApplications || 0} applications
-                            </div>
-                          </div>
-                          {job.alreadyApplied ? (
-                            <Badge
-                              variant="outline"
-                              className="text-green-700 border-green-200"
-                            >
-                              Applied
-                            </Badge>
-                          ) : (
-                            <Button
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleApplyJob(job.jobId);
-                              }}
-                              data-testid={`button-apply-${job.jobId}`}
-                            >
-                              Apply Now
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-12">
-                      <Briefcase className="w-16 h-16 text-cmo-text-secondary mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold text-cmo-text-primary mb-2">
-                        No Jobs Found
-                      </h3>
-                      <p className="text-cmo-text-secondary">
-                        Try adjusting your search criteria or filters
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {loading && (
-                  <div className="text-center py-12">
-                    <div className="animate-spin w-8 h-8 border-4 border-cmo-primary border-t-transparent rounded-full mx-auto mb-4"></div>
-                    <p className="text-cmo-text-secondary">Loading jobs...</p>
-                  </div>
-                )}
+                <p className="text-xs text-cmo-text-secondary mt-1">
+                  Let recruiters know you're looking
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Right Sidebar - Desktop Only */}
-          {!isMobile && (
-            <div className="hidden lg:block lg:col-span-3">
-              <SidebarRight />
+          {/* Main Content */}
+          <div className="lg:col-span-6">
+            {/* Search and Filters */}
+            <div className="bg-cmo-card border border-cmo-border rounded-lg p-4 mb-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="md:col-span-2">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cmo-text-secondary w-3 h-3" />
+                    <Input
+                      placeholder="Job title, skills, company..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-8 h-8 text-xs"
+                      data-testid="input-job-search"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger className="h-8 text-xs" data-testid="select-job-type">
+                      <SelectValue placeholder="Job Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Types</SelectItem>
+                      <SelectItem value="full-time">Full Time</SelectItem>
+                      <SelectItem value="part-time">Part Time</SelectItem>
+                      <SelectItem value="contract">Contract</SelectItem>
+                      <SelectItem value="freelance">Freelance</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
-          )}
+
+            {/* Job Results Header */}
+            <div className="mb-4">
+              <h1 className="text-sm font-semibold text-cmo-text-primary">
+                {filteredJobs?.length || 0} Job
+                {(filteredJobs?.length || 0) !== 1 ? "s" : ""} Found
+              </h1>
+            </div>
+
+            {/* Jobs List */}
+            <div className="space-y-3">
+              {filteredJobs && filteredJobs.length > 0 ? (
+                filteredJobs.map((job) => (
+                  <div
+                    key={job.jobId}
+                    className="bg-cmo-card border border-cmo-border rounded-lg p-4 hover:border-cmo-primary transition-colors cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleJobClick(job.jobId);
+                    }}
+                    data-testid={`card-job-${job.jobId}`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div className="flex-1">
+                        <h3 className="text-sm font-semibold text-cmo-text-primary mb-1">
+                          {job.title}
+                        </h3>
+                        <p className="text-xs text-cmo-text-secondary font-medium">
+                          {job.company}
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleSaveJob(job.jobId);
+                        }}
+                        className="h-6 w-6 p-0"
+                        data-testid={`button-save-${job.jobId}`}
+                      >
+                        <Bookmark className="w-3 h-3" />
+                      </Button>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 mb-2 text-xs text-cmo-text-secondary">
+                      <div className="flex items-center">
+                        <MapPin className="w-3 h-3 mr-1" />
+                        {job.location || "Remote"}
+                      </div>
+                      <div className="flex items-center">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {job.experience || "Any"}
+                      </div>
+                      <div className="flex items-center">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {job.postedAt ? formatDate(job.postedAt) : "New"}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge
+                        variant="outline"
+                        className={`text-xs ${getJobTypeColor(job.type)}`}
+                      >
+                        {(job.type || "full-time").replace("-", " ").toUpperCase()}
+                      </Badge>
+                      <span className="text-xs font-semibold text-cmo-primary">
+                        {job.salaryRange || "Not disclosed"}
+                      </span>
+                    </div>
+
+                    <p className="text-cmo-text-secondary text-xs mb-2 line-clamp-2">
+                      {job.description || "No description available"}
+                    </p>
+
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {job.skills &&
+                        Array.isArray(job.skills) &&
+                        job.skills.slice(0, 3).map((skill) => (
+                          <Badge
+                            key={skill}
+                            variant="secondary"
+                            className="text-xs h-5"
+                          >
+                            {skill}
+                          </Badge>
+                        ))}
+                      {job.skills && job.skills.length > 3 && (
+                        <Badge variant="secondary" className="text-xs h-5">
+                          +{job.skills.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3 text-xs text-cmo-text-secondary">
+                        <div className="flex items-center">
+                          <Eye className="w-3 h-3 mr-1" />
+                          {job.totalViews || 0}
+                        </div>
+                        <div className="flex items-center">
+                          <Users className="w-3 h-3 mr-1" />
+                          {job.totalApplications || 0}
+                        </div>
+                      </div>
+                      {job.alreadyApplied ? (
+                        <Badge
+                          variant="outline"
+                          className="text-green-700 border-green-200 text-xs"
+                        >
+                          Applied
+                        </Badge>
+                      ) : (
+                        <Button
+                          size="sm"
+                          className="h-6 text-xs px-3"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleApplyJob(job.jobId);
+                          }}
+                          data-testid={`button-apply-${job.jobId}`}
+                        >
+                          Apply
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 bg-cmo-card border border-cmo-border rounded-lg">
+                  <Briefcase className="w-8 h-8 text-cmo-text-secondary mx-auto mb-2" />
+                  <h3 className="text-sm font-semibold text-cmo-text-primary mb-1">
+                    No Jobs Found
+                  </h3>
+                  <p className="text-xs text-cmo-text-secondary">
+                    Try adjusting your search criteria
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {loading && (
+              <div className="text-center py-8">
+                <div className="animate-spin w-6 h-6 border-4 border-cmo-primary border-t-transparent rounded-full mx-auto mb-2"></div>
+                <p className="text-xs text-cmo-text-secondary">Loading jobs...</p>
+              </div>
+            )}
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="lg:col-span-3">
+            <SidebarRight />
+          </div>
         </div>
       </div>
 
