@@ -22,14 +22,22 @@ export default function SidebarRight() {
             <AvatarFallback>{mockUsers[1].name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-medium text-sm text-cmo-text-primary">{mockUsers[1].name}</h3>
-            <p className="text-cmo-text-secondary text-xs">{mockUsers[1].title} • Nov 20</p>
-            <p className="text-cmo-text-secondary text-xs">Answering a previous • Retouch #content-marketing #branding</p>
+            <h3 className="font-medium text-sm text-cmo-text-primary">
+              {mockUsers[1].name}
+            </h3>
+            <p className="text-cmo-text-secondary text-xs">
+              Architect at L&T • Nov 20
+            </p>
+            <p className="text-xs text-cmo-text-secondary">
+              Kochi, Kerala, India
+            </p>
           </div>
         </div>
-        
-        <h4 className="font-medium text-sm text-cmo-text-primary mb-2">Community Contribution</h4>
-        
+
+        <h4 className="font-medium text-sm text-cmo-text-primary mb-2">
+          Community Contribution
+        </h4>
+
         <div className="space-y-1 text-xs">
           <div className="flex justify-between">
             <span className="text-cmo-text-secondary">Posts:</span>
@@ -53,16 +61,21 @@ export default function SidebarRight() {
       {/* My Spaces */}
       <div className="bg-cmo-card rounded-lg border border-cmo-border p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-sm text-cmo-text-primary">My Spaces</h3>
-          <Button variant="link" className="text-cmo-primary text-xs hover:underline p-0 h-auto">
+          <h3 className="font-medium text-sm text-cmo-text-primary">
+            My Spaces
+          </h3>
+          <Button
+            variant="link"
+            className="text-cmo-primary text-xs hover:underline p-0 h-auto"
+          >
             Edit
           </Button>
         </div>
-        
+
         <div className="flex flex-wrap gap-1">
           {mockSpaces.map((space) => (
-            <Badge 
-              key={space.id} 
+            <Badge
+              key={space.id}
               variant={space.isActive ? "destructive" : "secondary"}
               className="text-xs h-6"
             >
@@ -80,21 +93,30 @@ export default function SidebarRight() {
       {/* All Members */}
       <div className="bg-cmo-card rounded-lg border border-cmo-border p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-medium text-sm text-cmo-text-primary">All Members</h3>
-          <Button variant="link" className="text-cmo-primary text-xs hover:underline p-0 h-auto">
+          <h3 className="font-medium text-sm text-cmo-text-primary">
+            All Members
+          </h3>
+          <Button
+            variant="link"
+            className="text-cmo-primary text-xs hover:underline p-0 h-auto"
+          >
             See all
           </Button>
         </div>
-        
+
         <div className="space-y-2">
           {mockUsers.slice(0, 3).map((user) => (
             <div key={user.id} className="flex items-center space-x-2">
               <Avatar className="w-6 h-6">
                 <AvatarImage src={user.avatar} />
-                <AvatarFallback className="text-xs">{user.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback className="text-xs">
+                  {user.name.charAt(0)}
+                </AvatarFallback>
               </Avatar>
               <div className="flex-1">
-                <p className="text-xs font-medium text-cmo-text-primary">{user.name} - 1.27</p>
+                <p className="text-xs font-medium text-cmo-text-primary">
+                  {user.name} - 1.27
+                </p>
                 <p className="text-xs text-cmo-text-secondary">{user.title}</p>
               </div>
             </div>
@@ -104,19 +126,25 @@ export default function SidebarRight() {
 
       {/* Vendors */}
       <div className="bg-cmo-card rounded-lg border border-cmo-border p-4">
-        <h3 className="font-medium text-sm text-cmo-text-primary mb-3">487 Vendors</h3>
-        
+        <h3 className="font-medium text-sm text-cmo-text-primary mb-3">
+          487 Vendors
+        </h3>
+
         <div className="space-y-2">
           {mockVendors.map((vendor) => (
             <div key={vendor.id} className="flex items-center space-x-2">
-              <div 
+              <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center ${vendor.color}`}
               >
                 <span className="font-medium text-xs">{vendor.initials}</span>
               </div>
               <div className="flex-1">
-                <p className="text-xs font-medium text-cmo-text-primary">{vendor.name}</p>
-                <p className="text-xs text-cmo-text-secondary">{vendor.location}</p>
+                <p className="text-xs font-medium text-cmo-text-primary">
+                  {vendor.name}
+                </p>
+                <p className="text-xs text-cmo-text-secondary">
+                  {vendor.location}
+                </p>
               </div>
             </div>
           ))}

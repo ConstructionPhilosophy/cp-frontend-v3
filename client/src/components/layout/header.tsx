@@ -1,18 +1,34 @@
 import React from "react";
-import { Search, MoreHorizontal, Home, User, Edit, Flag, Share, Settings, FileText, Briefcase, Users, MessageSquare, RefreshCw, LogOut, TrendingUp } from "lucide-react";
+import {
+  Search,
+  MoreHorizontal,
+  Home,
+  User,
+  Edit,
+  Flag,
+  Share,
+  Settings,
+  FileText,
+  Briefcase,
+  Users,
+  MessageSquare,
+  RefreshCw,
+  LogOut,
+  TrendingUp,
+} from "lucide-react";
 import { Link, useLocation } from "wouter";
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Button } from '../ui/button';
-import { 
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Button } from "../ui/button";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
-import { useAuth } from '../../contexts/AuthContext';
-import { auth } from '../../lib/firebase';
-import { useToast } from '../../hooks/use-toast';
+} from "../ui/dropdown-menu";
+import { useAuth } from "../../contexts/AuthContext";
+import { auth } from "../../lib/firebase";
+import { useToast } from "../../hooks/use-toast";
 
 export default function Header() {
   const { userProfile } = useAuth();
@@ -22,14 +38,14 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await auth.signOut();
-      localStorage.removeItem('rememberMe');
+      localStorage.removeItem("rememberMe");
       toast({
         title: "Signed out successfully",
         description: "You have been logged out of your account.",
       });
-      setLocation('/login');
+      setLocation("/login");
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error("Error signing out:", error);
       toast({
         title: "Logout failed",
         description: "Something went wrong. Please try again.",
@@ -39,7 +55,7 @@ export default function Header() {
   };
 
   const handleProfileClick = () => {
-    setLocation('/profile');
+    setLocation("/profile");
   };
   return (
     <header className="bg-white border-b border-cmo-border sticky top-0 z-50">
@@ -56,7 +72,9 @@ export default function Header() {
                   <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
                 </div>
               </div>
-              <span className="text-lg font-bold text-cmo-text-primary">CP</span>
+              <span className="text-lg font-bold text-cmo-text-primary">
+                CP
+              </span>
             </div>
           </div>
 
@@ -98,12 +116,6 @@ export default function Header() {
                 <span className="text-xs mt-1">Jobs</span>
               </a>
             </Link>
-            <Link href="/employer-dashboard">
-              <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
-                <TrendingUp className="w-5 h-5" />
-                <span className="text-xs mt-1">Dashboard</span>
-              </a>
-            </Link>
             <Link href="/forum">
               <a className="flex flex-col items-center text-cmo-text-secondary hover:text-cmo-primary transition-colors">
                 <Users className="w-5 h-5" />
@@ -122,21 +134,21 @@ export default function Header() {
                 <span className="text-xs mt-1">Updates</span>
               </a>
             </Link>
-
           </nav>
 
           {/* Right Section */}
           <div className="flex items-center space-x-4">
             {/* My Profile Button - Direct redirect */}
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               className="flex items-center gap-2 text-cmo-text-secondary hover:text-cmo-primary"
               onClick={handleProfileClick}
             >
               <Avatar className="w-8 h-8">
                 <AvatarImage src={userProfile?.profilePic || ""} />
                 <AvatarFallback>
-                  {userProfile?.firstName?.charAt(0) || 'U'}{userProfile?.lastName?.charAt(0) || ''}
+                  {userProfile?.firstName?.charAt(0) || "U"}
+                  {userProfile?.lastName?.charAt(0) || ""}
                 </AvatarFallback>
               </Avatar>
               <span>My Profile</span>
@@ -145,7 +157,11 @@ export default function Header() {
             {/* Three Dots Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-cmo-text-secondary hover:text-cmo-primary">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-cmo-text-secondary hover:text-cmo-primary"
+                >
                   <MoreHorizontal className="w-5 h-5" />
                 </Button>
               </DropdownMenuTrigger>
@@ -167,7 +183,10 @@ export default function Header() {
                   <span>Terms & Conditions</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                <DropdownMenuItem
+                  onClick={handleLogout}
+                  className="text-red-600"
+                >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Logout</span>
                 </DropdownMenuItem>
