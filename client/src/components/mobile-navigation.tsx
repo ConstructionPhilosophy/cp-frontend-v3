@@ -1,5 +1,5 @@
 import React from "react";
-import { Home, Users, Book, TrendingUp, Building, User } from "lucide-react";
+import { Home, Users, Book, TrendingUp, Building, User, MessageSquare } from "lucide-react";
 import { Link } from "wouter";
 
 export default function MobileNavigation() {
@@ -18,10 +18,10 @@ export default function MobileNavigation() {
             <span className="text-xs mt-1">Members</span>
           </a>
         </Link>
-        <Link href="/guides">
+        <Link href="/forum">
           <a className="flex flex-col items-center p-2 text-cmo-text-secondary">
-            <Book className="h-5 w-5" />
-            <span className="text-xs mt-1">Guides</span>
+            <MessageSquare className="h-5 w-5" />
+            <span className="text-xs mt-1">Forum</span>
           </a>
         </Link>
         <Link href="/profile">

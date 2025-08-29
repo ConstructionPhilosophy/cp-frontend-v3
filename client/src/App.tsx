@@ -23,6 +23,8 @@ import JobsPage from "./pages/jobs";
 import PostJobPage from "./pages/post-job";
 import JobDetailsPage from "./pages/job-details";
 import EmployerDashboard from "./pages/employer-dashboard";
+import Forum from "./pages/forum";
+import ForumDetail from "./pages/forum-detail";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { PublicRoute } from "./components/PublicRoute";
@@ -198,6 +200,22 @@ function App() {
             component={() => (
               <ProtectedRoute>
                 <EmployerDashboard />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/forum"
+            component={() => (
+              <ProtectedRoute>
+                <Forum />
+              </ProtectedRoute>
+            )}
+          />
+          <Route
+            path="/forum/:id"
+            component={() => (
+              <ProtectedRoute>
+                <ForumDetail />
               </ProtectedRoute>
             )}
           />
