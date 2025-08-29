@@ -64,6 +64,20 @@ The application now uses direct external API calls for optimal performance:
 
 # Recent Changes
 
+## Detail Pages Container Width & Naming Fix (2025-08-29)
+**Updated detail pages for consistent layout and proper naming**
+- **FIXED**: News detail page container width to match home/articles pages (`max-w-7xl mx-auto`)
+- **UPDATED**: Generic naming for shared detail component (NewsDetail used for posts, articles, news)
+- **IMPROVED**: Smart back navigation based on content type (posts → home, articles → articles, news → news)
+- **STANDARDIZED**: All detail pages now use consistent container width and layout structure
+- **MAINTAINED**: Three-column layout consistency across all pages
+
+**Technical Details:**
+- **Container Width**: All pages now use `max-w-7xl mx-auto px-4 py-6` for consistent width
+- **Shared Component**: NewsDetail component serves /posts/:id, /articles/:id, and /news/:id routes
+- **Navigation Logic**: Dynamic back button routing based on URL path
+- **Responsive Design**: Consistent grid layout (lg:grid-cols-12) across all content types
+
 ## Firebase Hosting Configuration (2025-08-29)
 **Successfully configured project for Firebase hosting deployment**
 - **ADDED**: Firebase configuration files (`firebase.json`, `.firebaserc`)

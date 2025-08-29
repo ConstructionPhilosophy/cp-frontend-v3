@@ -130,18 +130,26 @@ This innovation represents a significant step forward in sustainable constructio
   };
 
   const handleBack = () => {
-    setLocation("/news");
+    // Determine which page to go back to based on current path
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/posts/')) {
+      setLocation("/home");
+    } else if (currentPath.includes('/articles/')) {
+      setLocation("/articles");
+    } else {
+      setLocation("/news");
+    }
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <main className="container mx-auto px-4 py-6">
+        <main className="max-w-7xl mx-auto px-4 py-6">
           <div className="flex items-center justify-center h-64">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cmo-primary mx-auto mb-4"></div>
-              <p className="text-cmo-text-secondary">Loading news article...</p>
+              <p className="text-cmo-text-secondary">Loading article...</p>
             </div>
           </div>
         </main>
@@ -153,12 +161,12 @@ This innovation represents a significant step forward in sustainable constructio
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <main className="container mx-auto px-4 py-6">
+        <main className="max-w-7xl mx-auto px-4 py-6">
           <div className="text-center">
-            <h1 className="text-xl font-bold text-cmo-text-primary mb-4">Article Not Found</h1>
+            <h1 className="text-xl font-bold text-cmo-text-primary mb-4">Content Not Found</h1>
             <Button onClick={handleBack} className="mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to News
+              Back
             </Button>
           </div>
         </main>
@@ -170,16 +178,16 @@ This innovation represents a significant step forward in sustainable constructio
     <div className="min-h-screen bg-gray-50">
       <Header />
       
-      <main className="container mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="mb-6">
           <Button
             variant="ghost"
             onClick={handleBack}
             className="mb-4"
-            data-testid="button-back-to-news"
+            data-testid="button-back"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to News
+            Back
           </Button>
         </div>
 
@@ -200,7 +208,7 @@ This innovation represents a significant step forward in sustainable constructio
                     </Avatar>
                     <div>
                       <h3 className="font-medium text-sm text-cmo-text-primary">
-                        {newsPost.authorName || "News Reporter"}
+                        {newsPost.authorName || "Author"}
                       </h3>
                       {newsPost.authorTitle && (
                         <p className="text-xs text-cmo-text-secondary">
