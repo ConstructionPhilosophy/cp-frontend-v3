@@ -239,18 +239,15 @@ const NewsPage = () => {
   return (
     <div className="min-h-screen bg-cmo-background">
       <Header />
-
-      <div className="container mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Sidebar - Desktop Only */}
-          {!isMobile && (
-            <div className="hidden lg:block lg:col-span-3">
-              <SidebarLeft />
-            </div>
-          )}
+          {/* Left Sidebar */}
+          <div className="lg:col-span-3">
+            <SidebarLeft />
+          </div>
 
           {/* Main Content */}
-          <div className={`${isMobile ? "col-span-1" : "lg:col-span-6"}`}>
+          <div className="lg:col-span-6">
             {/* Simple Post Trigger - LinkedIn Style */}
             <Card className="mb-4">
               <CardContent className="p-4">
@@ -529,12 +526,10 @@ const NewsPage = () => {
             </div>
           </div>
 
-          {/* Right Sidebar - Desktop Only */}
-          {!isMobile && (
-            <div className="hidden lg:block lg:col-span-3">
-              <SidebarRight />
-            </div>
-          )}
+          {/* Right Sidebar */}
+          <div className="lg:col-span-3">
+            <SidebarRight />
+          </div>
         </div>
       </div>
 
