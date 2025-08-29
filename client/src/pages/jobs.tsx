@@ -11,6 +11,7 @@ import {
   Eye,
   Users,
   Calendar,
+  TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,7 +35,7 @@ import SidebarRight from "../components/layout/sidebar-right";
 import MobileNavigation from "../components/mobile-navigation";
 import { useIsMobile } from "../hooks/use-mobile";
 import { useAuth } from "../hooks/useAuth";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import JobApplicationModal from "../components/JobApplicationModal";
 
 interface Job {
@@ -392,6 +393,33 @@ const JobsPage = () => {
                 >
                   <Briefcase className="w-3 h-3 mr-2" />
                   My Applications
+                </Button>
+              </div>
+            </div>
+
+            {/* For Employers - Dashboard Section */}
+            <div className="bg-cmo-card border border-cmo-border rounded-lg p-4">
+              <h3 className="font-medium text-sm text-cmo-text-primary mb-3">
+                For Employers
+              </h3>
+              <div className="space-y-2">
+                <Button
+                  className="w-full justify-start text-xs h-8"
+                  variant="ghost"
+                  onClick={() => setLocation("/employer-dashboard")}
+                  data-testid="button-employer-dashboard"
+                >
+                  <TrendingUp className="w-3 h-3 mr-2 text-cmo-primary" />
+                  Employer Dashboard
+                </Button>
+                <Button
+                  className="w-full justify-start text-xs h-8"
+                  variant="ghost"
+                  onClick={() => setLocation("/post-job")}
+                  data-testid="button-post-job-employers"
+                >
+                  <Plus className="w-3 h-3 mr-2 text-cmo-primary" />
+                  Post a Job
                 </Button>
               </div>
             </div>
