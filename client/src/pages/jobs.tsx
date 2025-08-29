@@ -30,7 +30,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Header from "../components/layout/header";
-import SidebarLeft from "../components/layout/sidebar-left";
 import SidebarRight from "../components/layout/sidebar-right";
 import MobileNavigation from "../components/mobile-navigation";
 import { useIsMobile } from "../hooks/use-mobile";
@@ -339,68 +338,120 @@ const JobsPage = () => {
       <Header />
       <div className="max-w-7xl mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Sidebar */}
-          <div className="lg:col-span-3">
-            <SidebarLeft />
-            
-            {/* Jobs-specific sidebar content */}
-            <div className="mt-4 space-y-4">
-              <div className="bg-cmo-card border border-cmo-border rounded-lg p-4">
-                <h3 className="font-medium text-sm text-cmo-text-primary mb-3">
-                  Job Actions
+          {/* Left Sidebar - Compact LinkedIn Style */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* User Profile Card - Compact */}
+            <div className="bg-cmo-card border border-cmo-border rounded-lg overflow-hidden">
+              <div className="h-12 bg-gradient-to-r from-blue-500 to-blue-600"></div>
+              <div className="p-4 -mt-6">
+                <div className="w-8 h-8 bg-cmo-primary rounded-full flex items-center justify-center text-white text-xs font-semibold mb-2">
+                  {user?.displayName?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                </div>
+                <h3 className="text-sm font-semibold text-cmo-text-primary truncate">
+                  {user?.displayName || 'User'}
                 </h3>
-                <div className="space-y-2">
-                  <Button
-                    className="w-full justify-start text-xs h-8"
-                    variant="default"
-                    onClick={() => setLocation("/post-job")}
-                    data-testid="button-post-job"
-                  >
-                    <Plus className="w-3 h-3 mr-2" />
-                    Post a Job
-                  </Button>
-                  <Button
-                    className="w-full justify-start text-xs h-8"
-                    variant="outline"
-                    data-testid="button-saved-jobs"
-                  >
-                    <Bookmark className="w-3 h-3 mr-2" />
-                    Saved Jobs
-                  </Button>
-                  <Button
-                    className="w-full justify-start text-xs h-8"
-                    variant="outline"
-                    data-testid="button-my-applications"
-                  >
-                    <Briefcase className="w-3 h-3 mr-2" />
-                    My Applications
-                  </Button>
+                <p className="text-xs text-cmo-text-secondary truncate">
+                  Construction Professional
+                </p>
+                <div className="mt-3 pt-3 border-t border-cmo-border">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-cmo-text-secondary">Profile views</span>
+                    <span className="text-cmo-primary font-medium">47</span>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* Open to Work Toggle */}
-              <div className="bg-cmo-card border border-cmo-border rounded-lg p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-cmo-text-primary">
-                    Open to Work
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setOpenToWork(!openToWork)}
-                    className="p-0 h-5 w-8"
-                    data-testid="toggle-open-to-work"
-                  >
-                    {openToWork ? (
-                      <ToggleRight className="h-5 w-5 text-green-600" />
-                    ) : (
-                      <ToggleLeft className="h-5 w-5 text-gray-400" />
-                    )}
-                  </Button>
+            {/* Job Actions - Compact */}
+            <div className="bg-cmo-card border border-cmo-border rounded-lg p-4">
+              <h3 className="font-medium text-sm text-cmo-text-primary mb-3">
+                Job Actions
+              </h3>
+              <div className="space-y-2">
+                <Button
+                  className="w-full justify-start text-xs h-8"
+                  variant="default"
+                  onClick={() => setLocation("/post-job")}
+                  data-testid="button-post-job"
+                >
+                  <Plus className="w-3 h-3 mr-2" />
+                  Post a Job
+                </Button>
+                <Button
+                  className="w-full justify-start text-xs h-8"
+                  variant="outline"
+                  data-testid="button-saved-jobs"
+                >
+                  <Bookmark className="w-3 h-3 mr-2" />
+                  Saved Jobs
+                </Button>
+                <Button
+                  className="w-full justify-start text-xs h-8"
+                  variant="outline"
+                  data-testid="button-my-applications"
+                >
+                  <Briefcase className="w-3 h-3 mr-2" />
+                  My Applications
+                </Button>
+              </div>
+            </div>
+
+            {/* Open to Work Toggle - Compact */}
+            <div className="bg-cmo-card border border-cmo-border rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-cmo-text-primary">
+                  Open to Work
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setOpenToWork(!openToWork)}
+                  className="p-0 h-5 w-8"
+                  data-testid="toggle-open-to-work"
+                >
+                  {openToWork ? (
+                    <ToggleRight className="h-5 w-5 text-green-600" />
+                  ) : (
+                    <ToggleLeft className="h-5 w-5 text-gray-400" />
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-cmo-text-secondary">
+                Let recruiters know you're looking
+              </p>
+              {openToWork && (
+                <div className="mt-2 pt-2 border-t border-cmo-border">
+                  <p className="text-xs text-green-600 font-medium">
+                    ✓ Open to work badge active
+                  </p>
                 </div>
-                <p className="text-xs text-cmo-text-secondary mt-1">
-                  Let recruiters know you're looking
-                </p>
+              )}
+            </div>
+
+            {/* Recent Activity - Compact */}
+            <div className="bg-cmo-card border border-cmo-border rounded-lg p-4">
+              <h3 className="font-medium text-sm text-cmo-text-primary mb-3">
+                Recent Activity
+              </h3>
+              <div className="space-y-2">
+                <div className="flex items-center text-xs">
+                  <div className="w-1 h-1 bg-blue-500 rounded-full mr-2"></div>
+                  <span className="text-cmo-text-secondary">
+                    Viewed 3 jobs today
+                  </span>
+                </div>
+                <div className="flex items-center text-xs">
+                  <div className="w-1 h-1 bg-green-500 rounded-full mr-2"></div>
+                  <span className="text-cmo-text-secondary">
+                    Applied to 1 position
+                  </span>
+                </div>
+                <div className="flex items-center text-xs">
+                  <div className="w-1 h-1 bg-purple-500 rounded-full mr-2"></div>
+                  <span className="text-cmo-text-secondary">
+                    Profile viewed 5 times
+                  </span>
+                </div>
               </div>
             </div>
           </div>
